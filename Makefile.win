@@ -1,0 +1,253 @@
+### User Configuration ###
+
+# Name of application to build
+TARGET := powerstruggle
+
+DEBUG ?= 0
+
+# Do not change below this line!
+
+# Set powershell as the shell on Windows
+# ifeq ($(OS),Windows_NT)
+#   SHELL := powershell.exe
+#   .SHELLFLAGS := -NoProfile -Command
+# endif
+
+PLATFORM := pc
+
+### Text variables ###
+
+# These use the fact that += always adds a space to create a variable that is just a space
+# Space has a single space, indent has 2
+space :=
+space +=
+
+indent =
+indent += 
+indent += 
+
+### Tools ###
+
+# System tools
+CD := cd
+CP := cp
+RM := rm
+
+
+ifeq ($(OS),Windows_NT)
+  # MKDIR := New-Item -Path 
+  # MKDIR_OPTS := -Force -Type Directory | Out-Null
+  
+  # RMDIR := (Remove-Item
+  # RMDIR_OPTS := -ErrorAction SilentlyContinue -Recurse -Force) -or $$true | Out-Null # The -or $true is needed to prevent make from saying error
+  
+  # RUN := cmd /c
+  
+  # PRINT := Write-Host -NoNewline 
+  #  ENDCOLOR := $(PRINT) "$$([char]27)[0m"; 
+  #  WHITE     := 
+  #  ENDWHITE  := $(space) -ForegroundColor White; $(ENDCOLOR) $(PRINT) 
+  #  GREEN     := 
+  #  ENDGREEN  := $(space) -ForegroundColor Green; $(ENDCOLOR) $(PRINT) 
+  #  BLUE      := 
+  #  ENDBLUE   := $(space) -ForegroundColor Blue; $(ENDCOLOR) $(PRINT) 
+  #  YELLOW    := 
+  #  ENDYELLOW := $(space) -ForegroundColor Yellow; $(ENDCOLOR) $(PRINT) 
+  # ENDLINE := ; Write-Host 
+
+  # PREFIX  := 
+  MKDIR := mkdir
+  MKDIR_OPTS := 
+
+  RMDIR := rm
+  RMDIR_OPTS := -rf
+
+  PRINT := printf '
+   ENDCOLOR := \033[0m
+   WHITE     := \033[0m
+   ENDWHITE  := $(ENDCOLOR)
+   GREEN     := \033[0;32m
+   ENDGREEN  := $(ENDCOLOR)
+   BLUE      := \033[0;34m
+   ENDBLUE   := $(ENDCOLOR)
+   YELLOW    := \033[0;33m
+   ENDYELLOW := $(ENDCOLOR)
+  ENDLINE := \n'
+
+  RUN := 
+  
+  PREFIX  := x86_64-w64-mingw32-
+else
+  MKDIR := mkdir
+  MKDIR_OPTS := -p
+
+  RMDIR := rm
+  RMDIR_OPTS := -rf
+
+  PRINT := printf '
+   ENDCOLOR := \033[0m
+   WHITE     := \033[0m
+   ENDWHITE  := $(ENDCOLOR)
+   GREEN     := \033[0;32m
+   ENDGREEN  := $(ENDCOLOR)
+   BLUE      := \033[0;34m
+   ENDBLUE   := $(ENDCOLOR)
+   YELLOW    := \033[0;33m
+   ENDYELLOW := $(ENDCOLOR)
+  ENDLINE := \n'
+
+  RUN := 
+  
+  PREFIX  := x86_64-w64-mingw32-
+endif
+
+# Build tools
+CC      := $(PREFIX)gcc
+AS      := $(PREFIX)as
+CPP     := $(PREFIX)cpp
+CXX     := $(PREFIX)g++
+LD      := $(PREFIX)g++
+OBJCOPY := $(PREFIX)objcopy
+
+### Files and Directories ###
+
+# Source files
+PLATFORM_DIR := platforms/$(PLATFORM)
+SRC_ROOT  := src
+SRC_DIRS  := $(wildcard $(SRC_ROOT)/*) $(wildcard $(PLATFORM_DIR)/$(SRC_ROOT)/*)
+C_SRCS    := $(foreach src_dir,$(SRC_DIRS),$(wildcard $(src_dir)/*.c))
+CXX_SRCS  := $(foreach src_dir,$(SRC_DIRS),$(wildcard $(src_dir)/*.cpp))
+ASM_SRCS  := $(foreach src_dir,$(SRC_DIRS),$(wildcard $(src_dir)/*.s))
+BIN_FILES := $(foreach src_dir,$(SRC_DIRS),$(wildcard $(src_dir)/*.bin))
+SEG_C_SRCS   := $(wildcard segments/*.c)
+SEG_CPP_SRCS := $(wildcard segments/*.cpp)
+
+# Build folders
+ifeq ($(DEBUG),0)
+BUILD_ROOT     := build/$(PLATFORM)/release
+else
+BUILD_ROOT     := build/$(PLATFORM)/debug
+endif
+SEG_BUILD_DIR  := $(BUILD_ROOT)/segments
+BUILD_DIRS     := $(addprefix $(BUILD_ROOT)/,$(SRC_DIRS)) $(SEG_BUILD_DIR)
+
+# External library folders
+DILIGENT := /mnt/c/GameDev/DiligentEngine
+SDL2_DIR := /mnt/c/SDL2-2.0.14/x86_64-w64-mingw32
+
+LIBS :=
+LIBS += SDL2main SDL2
+LIBS += user32 winmm imm32 ole32 oleaut32 setupapi version
+LIBS += DiligentTools LibJpeg LibPng LibTiff ZLib DiligentCore SPIRV-Tools-opt SPIRV-Tools glew-static dxgi d3d11 d3d12 d3dcompiler opengl32 shlwapi
+
+DIGILENT_LIBS := glslang HLSL OGLCompiler OSDependent spirv-cross-core SPIRV GenericCodeGen MachineIndependent
+
+ifeq ($(DEBUG),0)
+LIBS += $(DIGILENT_LIBS)
+DILIGENT_TOOLS := $(DILIGENT)/build/mingw64-release/DiligentTools
+# MSVC libs (doesn't work)
+# LIB_DIRS += $(DILIGENT)/install/lib/DiligentCore/Release $(DILIGENT)/install/lib/DiligentTools/Release
+# mingw libs
+DILIGENT_LD_DIRS := $(DILIGENT)/build/mingw64-release/install/lib/DiligentCore/Release $(DILIGENT)/build/mingw64-release/install/lib/DiligentTools/Release
+DILIGENT_DLL_DIR := $(DILIGENT)/install/bin/DiligentCore/release
+else
+LIBS += $(addsuffix d, $(DIGILENT_LIBS))
+# MSVC libs (doesn't work)
+# LIB_DIRS += $(DILIGENT)/install/lib/DiligentCore/Debug $(DILIGENT)/install/lib/DiligentTools/Debug
+# mingw libs
+DILIGENT_LD_DIRS := $(DILIGENT)/build/mingw64/install/lib/DiligentCore/Debug $(DILIGENT)/build/mingw64/install/lib/DiligentTools/Debug
+DILIGENT_DLL_DIR := $(DILIGENT)/install/bin/DiligentCore/release
+endif
+
+LIBS += mingw32
+LIBS_INC_DIRS  := $(DILIGENT)/install/include $(SDL2_DIR)/include
+LIBS_INC_FLAGS := $(addprefix -I,$(LIBS_INC_DIRS))
+LIBS_LD_DIRS   := $(DILIGENT_LD_DIRS) $(SDL2_DIR)/lib
+LIBS_LD_FLAGS  := $(addprefix -L,$(LIBS_LD_DIRS)) $(addprefix -l,$(LIBS))
+
+
+
+# Build files
+C_OBJS   := $(addprefix $(BUILD_ROOT)/,$(C_SRCS:.c=.o))
+CXX_OBJS := $(addprefix $(BUILD_ROOT)/,$(CXX_SRCS:.cpp=.o))
+ASM_OBJS := $(addprefix $(BUILD_ROOT)/,$(ASM_SRCS:.s=.o))
+BIN_OBJS := $(addprefix $(BUILD_ROOT)/,$(BIN_FILES:.bin=.o))
+OBJS     := $(C_OBJS) $(CXX_OBJS) $(ASM_OBJS) $(BIN_OBJS)
+SEG_OBJS := $(addprefix $(BUILD_ROOT)/,$(SEG_C_SRCS:.c=.o)) $(addprefix $(BUILD_ROOT)/,$(SEG_CPP_SRCS:.cpp=.o))
+D_FILES  := $(C_OBJS:.o=.d) $(CXX_OBJS:.o=.d) $(LD_CPP).d $(SEG_OBJS:.o=.d)
+
+APP      := $(addprefix $(BUILD_ROOT)/,$(TARGET).exe)
+
+### Flags ###
+
+# Build tool flags
+
+CFLAGS     := -fdata-sections -ffunction-sections -flto
+CXXFLAGS   := -std=c++20 -fno-rtti -fdata-sections -ffunction-sections -flto
+CPPFLAGS   := -I include -I $(PLATFORM_DIR)/include -I . -I src/ -Ilib/glm -D__EXTENSIONS__ $(LIBS_INC_FLAGS) -DAPP_NAME=\"$(TARGET)\"
+WARNFLAGS  := -Wall -Wextra -Wpedantic -Wdouble-promotion -Wfloat-conversion
+ASFLAGS    := 
+LDFLAGS    := -static -mconsole -mwindows "-Wl,--entry=main" "-Wl,-gc-sections"
+LDFLAGS    += $(LIBS_LD_FLAGS)
+
+ifneq ($(DEBUG),0)
+CPPFLAGS   += -DDEBUG_MODE
+OPT_FLAGS  := -Og -ggdb
+else
+CPPFLAGS   += -DNDEBUG
+OPT_FLAGS  := -O3
+LDFLAGS    += -s
+endif
+
+$(SEG_OBJS): WARNFLAGS += -Wno-overflow -Wno-float-conversion -Wno-narrowing -Wno-missing-field-initializers
+
+### Rules ###
+
+# Default target, all
+all: $(APP)
+
+# Make directories
+$(BUILD_ROOT) $(BUILD_DIRS) :
+	@$(PRINT)$(GREEN)Creating directory: $(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
+	@$(MKDIR) $@ $(MKDIR_OPTS)
+
+# .cpp -> .o
+$(BUILD_ROOT)/%.o : %.cpp | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Compiling C++ source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(CXX) $< -o $@ -c -MMD -MF $(@:.o=.d) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FLAGS) $(WARNFLAGS)
+
+# .c -> .o
+$(BUILD_ROOT)/%.o : %.c | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Compiling C source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(CC) $< -o $@ -c -MMD -MF $(@:.o=.d) $(CFLAGS) $(CPPFLAGS) $(OPT_FLAGS) $(WARNFLAGS)
+
+# .bin -> .o
+$(BUILD_ROOT)/%.o : %.bin | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Objcopying binary file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(OBJCOPY) -I binary -O elf32-big $< $@
+
+# .s -> .o
+$(BUILD_ROOT)/%.o : %.s | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Compiling ASM source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(AS) $< -o $@ $(ASFLAGS)
+
+# .o -> application
+$(APP) : $(OBJS) $(SEG_OBJS)
+	@$(PRINT)$(GREEN)Linking application: $(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
+	@$(LD) -o $@ $^ $(LDFLAGS)
+	@$(CP) $(DILIGENT_DLL_DIR)/* $(BUILD_ROOT)
+	@$(PRINT)$(WHITE)Application Built!$(ENDWHITE)$(ENDLINE)
+
+clean:
+	@$(PRINT)$(YELLOW)Cleaning build$(ENDYELLOW)$(ENDLINE)
+	@$(RMDIR) $(BUILD_ROOT) $(RMDIR_OPTS)
+
+run: $(APP)
+	@$(PRINT)$(GREEN)Running $(APP)$(ENDGREEN)$(ENDLINE)
+	@$(RUN) $(APP) -d
+
+.PHONY: all clean load
+
+-include $(D_FILES)
+
+print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
