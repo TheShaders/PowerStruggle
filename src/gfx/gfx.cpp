@@ -3,7 +3,6 @@
 #include <mathutils.h>
 #include <gfx.h>
 #include <mem.h>
-#include <model.h>
 #include <collision.h>
 #include <camera.h>
 #include <audio.h>

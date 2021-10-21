@@ -1,6 +1,7 @@
 #include <glm/glm.hpp>
 #include <types.h>
 #include <gfx.h>
+#include <platform_gfx.h>
 #include <mem.h>
 #include <ecs.h>
 #include <model.h>
@@ -217,7 +218,7 @@ void drawAllEntities()
     scrollTextures();
 }
 
-Gfx *gfxCbBeforeBillboard(UNUSED Bone* bone, UNUSED BoneLayer *layer)
+Gfx *gfxCbBeforeBillboard(UNUSED Joint* bone, UNUSED JointMeshLayer *layer)
 {
     MtxF billboardMtx;
     Vec3 offset = {0.0f, 0.0f, 0.0f};
@@ -228,7 +229,7 @@ Gfx *gfxCbBeforeBillboard(UNUSED Bone* bone, UNUSED BoneLayer *layer)
     return nullptr;
 }
 
-Gfx *gfxCbAfterBillboard(UNUSED Bone* bone, UNUSED BoneLayer *layer)
+Gfx *gfxCbAfterBillboard(UNUSED Joint* bone, UNUSED JointMeshLayer *layer)
 {
     gfx::pop_mat();
     

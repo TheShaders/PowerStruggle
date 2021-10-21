@@ -5,6 +5,11 @@
 #include <glm/glm.hpp>
 #include <types.h>
 
+// TODO
+struct Model {
+    void *reserved;
+};
+
 constexpr glm::vec3 constexpr_normalize(const glm::vec3& in)
 {
     glm::vec3 squared = in * in;

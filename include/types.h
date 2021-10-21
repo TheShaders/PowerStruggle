@@ -15,15 +15,13 @@
 #endif
 
 // Prototypes for model structs
-typedef struct BoneLayer_t BoneLayer;
-typedef struct Bone_t Bone;
-typedef struct Model_t Model;
+struct Model;
 
 // Prototypes for animation structs
-typedef struct Animation_t Animation;
-typedef struct BoneTable_t BoneTable;
-typedef struct AnimTrigger_t AnimTrigger;
-typedef struct AnimState_t AnimState;
+struct Animation;
+struct JointTable;
+struct AnimTrigger;
+struct AnimState;
 
 // Prototypes for collision structs
 typedef struct AABB_t AABB;

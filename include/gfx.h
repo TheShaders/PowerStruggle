@@ -1,6 +1,8 @@
 #ifndef __GFX_H__
 #define __GFX_H__
 
+#include <type_traits>
+
 #include <config.h>
 #include <types.h>
 #include <mathutils.h>

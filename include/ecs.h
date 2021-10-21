@@ -2,6 +2,7 @@
 #define __ECS_H__
 
 #include <types.h>
+#include <platform_gfx.h>
 
 #define MAX_ARCHETYPES 256
 

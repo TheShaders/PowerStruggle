@@ -16,6 +16,7 @@ extern "C" {
 #include <camera.h>
 #include <audio.h>
 #include <platform.h>
+#include <platform_gfx.h>
 
 #include <memory>
 
@@ -72,20 +73,22 @@ void createPlayer(PlayerState *state)
     createEntitiesCallback(ARCHETYPE_PLAYER, state, 1, createPlayerCallback);
 }
 
+extern Model *get_cube_model();
+
 void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
     Vec3 *pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_PLAYER);
     UNUSED Vec3s *rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_PLAYER);
-    UNUSED ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(componentArrays, ARCHETYPE_PLAYER);
-    UNUSED BehaviorParams *bhvParams = get_component<Bit_Behavior, BehaviorParams>(componentArrays, ARCHETYPE_PLAYER);
-    UNUSED Model **model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_PLAYER);
-    UNUSED GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(componentArrays, ARCHETYPE_PLAYER);
+    ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(componentArrays, ARCHETYPE_PLAYER);
+    BehaviorParams *bhvParams = get_component<Bit_Behavior, BehaviorParams>(componentArrays, ARCHETYPE_PLAYER);
+    Model **model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_PLAYER);
+    GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(componentArrays, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)arg;
     // *model = &character_model;
     
     // Set up gravity
-    gravity->accel = -PLAYER_GRAVITY;
+    gravity->accel = 0; //-PLAYER_GRAVITY;
     gravity->terminalVelocity = -PLAYER_TERMINAL_VELOCITY;
 
     // Set up behavior code
@@ -103,6 +106,8 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->ySpacing = PLAYER_WALL_RAYCAST_SPACING;
     collider->frictionDamping = 1.0f;
     collider->floor = nullptr;
+
+    *model = get_cube_model();
 }
 
 void playerCallback(UNUSED void **components, void *data)

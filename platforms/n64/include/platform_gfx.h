@@ -2,5 +2,6 @@
 #define __PLATFORM_GFX_H__
 
 #include <ultra64.h>
+#include <n64_model.h>
 
 #endif

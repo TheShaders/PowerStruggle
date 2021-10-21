@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <ultra64.h>
 #include <PR/sched.h>
 #include <PR/gs2dex.h>
@@ -288,35 +290,32 @@ void startFrame(void)
 // Draws a model (TODO add posing)
 void drawModel(Model *toDraw, Animation *anim, u32 frame)
 {
-    int boneIndex, layerIndex;
-    Bone *bones, *curBone;
-    BoneLayer *curBoneLayer;
-    BoneTable *curBoneTable = nullptr;
-    Gfx *callbackReturn;
-    MtxF *boneMatrices;
+    int jointIndex;
+    Joint *joints, *curJoint;
+    JointTable *curJointTable = nullptr;
+    // Gfx *callbackReturn;
+    std::unique_ptr<MtxF[]> jointMatrices;
     u32 numFrames = 0;
 
     if (toDraw == nullptr) return;
 
-    // Get the virtual address of the model
-    toDraw = segmentedToVirtual(toDraw);
-    // Allocate space for this model's bone matrices
-    boneMatrices = static_cast<MtxF*>(allocRegion(toDraw->numBones * sizeof(MtxF), ALLOC_GFX));
+    // Allocate space for this model's joint matrices
+    // Use new instead of make_unique to avoid unnecessary initialization
+    jointMatrices = std::unique_ptr<MtxF[]>(new MtxF[toDraw->num_joints]);
 
-    // Draw the model's bones
-    curBone = bones = segmentedToVirtual(&toDraw->bones[0]);
+    // Draw the model's joints
+    curJoint = joints = toDraw->joints;
     if (anim != nullptr)
     {
-        anim = segmentedToVirtual(anim);
         numFrames = anim->frameCount;
-        curBoneTable = segmentedToVirtual(anim->boneTables);
+        curJointTable = anim->jointTables;
     }
-    for (boneIndex = 0; boneIndex < toDraw->numBones; boneIndex++)
+    for (jointIndex = 0; jointIndex < toDraw->num_joints; jointIndex++)
     {
-        // If the bone has a parent, load the parent's matrix before transforming
-        if (curBone->parent != 0xFF)
+        // If the joint has a parent, load the parent's matrix before transforming
+        if (curJoint->parent != 0xFF)
         {
-            gfx::push_load_mat(bones[curBone->parent].matrix);
+            gfx::push_load_mat(&jointMatrices[curJoint->parent]);
         }
         // Otherwise, use the current matrix on the stack
         else
@@ -324,7 +323,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             gfx::push_mat();
         }
 
-        gfx::apply_translation(curBone->posX, curBone->posY, curBone->posZ);
+        gfx::apply_translation(curJoint->posX, curJoint->posY, curJoint->posZ);
 
         if (anim != nullptr)
         {
@@ -332,26 +331,30 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             float y = 0.0f;
             float z = 0.0f;
             u32 hasCurrentTransformComponent = 0;
-            s16 *curBoneChannel = segmentedToVirtual(curBoneTable->channels);
+            s16 *curJointChannel = curJointTable->channels;
             s16 rx = 0; s16 ry = 0; s16 rz = 0;
-            curBoneChannel += frame;
+            curJointChannel += frame;
 
-            if (curBoneTable->flags & CHANNEL_POS_X)
+            // TODO fix this, horrible for cache performance.
+            // Data should not be split up into channels, but instead be one contiguous stream of data.
+            // Each frame's data should be one span in the total data.
+            // That would be much better for locality.
+            if (curJointTable->flags & CHANNEL_POS_X)
             {
-                x = *curBoneChannel;
-                curBoneChannel += numFrames;
+                x = *curJointChannel;
+                curJointChannel += numFrames; 
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_POS_Y)
+            if (curJointTable->flags & CHANNEL_POS_Y)
             {
-                y = *curBoneChannel;
-                curBoneChannel += numFrames;
+                y = *curJointChannel;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_POS_Z)
+            if (curJointTable->flags & CHANNEL_POS_Z)
             {
-                z = *curBoneChannel;
-                curBoneChannel += numFrames;
+                z = *curJointChannel;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
             if (hasCurrentTransformComponent)
@@ -361,22 +364,22 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             
             hasCurrentTransformComponent = 0;
 
-            if (curBoneTable->flags & CHANNEL_ROT_X)
+            if (curJointTable->flags & CHANNEL_ROT_X)
             {
-                rx = *curBoneChannel;
-                curBoneChannel += numFrames;
+                rx = *curJointChannel;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_ROT_Y)
+            if (curJointTable->flags & CHANNEL_ROT_Y)
             {
-                ry = *curBoneChannel;
-                curBoneChannel += numFrames;
+                ry = *curJointChannel;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_ROT_Z)
+            if (curJointTable->flags & CHANNEL_ROT_Z)
             {
-                rz = *curBoneChannel;
-                curBoneChannel += numFrames;
+                rz = *curJointChannel;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
 
@@ -389,22 +392,22 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
 
             x = y = z = 1.0f;
 
-            if (curBoneTable->flags & CHANNEL_SCALE_X)
+            if (curJointTable->flags & CHANNEL_SCALE_X)
             {
-                x = *(u16*)curBoneChannel / 256.0f;
-                curBoneChannel += numFrames;
+                x = *(u16*)curJointChannel / 256.0f;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_SCALE_Y)
+            if (curJointTable->flags & CHANNEL_SCALE_Y)
             {
-                y = *(u16*)curBoneChannel / 256.0f;
-                curBoneChannel += numFrames;
+                y = *(u16*)curJointChannel / 256.0f;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
-            if (curBoneTable->flags & CHANNEL_SCALE_Z)
+            if (curJointTable->flags & CHANNEL_SCALE_Z)
             {
-                z = *(u16*)curBoneChannel / 256.0f;
-                curBoneChannel += numFrames;
+                z = *(u16*)curJointChannel / 256.0f;
+                curJointChannel += numFrames;
                 hasCurrentTransformComponent = 1;
             }
             if (hasCurrentTransformComponent)
@@ -414,65 +417,63 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             
         }
 
-        // Draw the bone's layers
-        curBoneLayer = segmentedToVirtual(&curBone->layers[0]);
-        for (layerIndex = 0; layerIndex < curBone->numLayers; layerIndex++)
+        // Draw the joint's layers
+        for (size_t cur_layer = 0; cur_layer < gfx::draw_layers; cur_layer++)
         {
-            // Check if this bone has a before drawn callback, and if so call it
-            if (curBone->beforeCb)
-            {
-                callbackReturn = curBone->beforeCb(curBone, curBoneLayer);
-                // If the callback returned a displaylist, draw it
-                if (callbackReturn)
-                {
-                    gSPDisplayList(g_dlistHead++, callbackReturn);
-                }
-            }
+            JointMeshLayer *curJointLayer = &curJoint->layers[cur_layer];
+            // Check if this layer has any draws and skip it if it doesn't
+            if (curJointLayer->num_draws == 0) continue;
+            
+            // Check if this joint has a before drawn callback, and if so call it
+            // if (curJoint->beforeCb)
+            // {
+            //     callbackReturn = curJoint->beforeCb(curJoint, curJointLayer);
+            //     // If the callback returned a displaylist, draw it
+            //     if (callbackReturn)
+            //     {
+            //         gSPDisplayList(g_dlistHead++, callbackReturn);
+            //     }
+            // }
             
             // Draw the layer
-            drawGfx(curBoneLayer->layer, curBoneLayer->displaylist);
+            drawGfx(static_cast<DrawLayer>(cur_layer), curJointLayer->gfx);
 
-            // Check if this bone has an after drawn callback, and if so call it
-            if (curBone->afterCb)
-            {
-                callbackReturn = curBone->afterCb(curBone, curBoneLayer);
-                // If the callback returned a displaylist, draw it
-                if (callbackReturn)
-                {
-                    gSPDisplayList(g_dlistHead++, callbackReturn);
-                }
-            }
-            curBoneLayer++;
+            // Check if this joint has an after drawn callback, and if so call it
+            // if (curJoint->afterCb)
+            // {
+            //     callbackReturn = curJoint->afterCb(curJoint, curJointLayer);
+            //     // If the callback returned a displaylist, draw it
+            //     if (callbackReturn)
+            //     {
+            //         gSPDisplayList(g_dlistHead++, callbackReturn);
+            //     }
+            // }
         }
 
-        curBone->matrix = &boneMatrices[boneIndex];
-        // Save this bone's matrix in case other bones are children of this one
-        gfx::save_mat(&boneMatrices[boneIndex]);
+        // Save this joint's matrix in case other joints are children of this one
+        gfx::save_mat(&jointMatrices[jointIndex]);
 
-        // Pop this bone's matrix off the stack
+        // Pop this joint's matrix off the stack
         gfx::pop_mat();
 
-        curBone++;
+        curJoint++;
         if (anim)
-            curBoneTable++;
+            curJointTable++;
     }
-
-    // Free the memory used for the bone matrices
-    freeAlloc(boneMatrices);
 }
 
-Gfx* gfxSetEnvColor(Bone* bone, UNUSED BoneLayer *layer)
-{
-    if (bone->index == 0)
-    {
-        gDPSetEnvColor(g_dlistHead++, 255, 0, 0, 0);
-    }
-    else if (bone->index == 1)
-    {
-        gDPSetEnvColor(g_dlistHead++, 0, 255, 0, 0);
-    }
-    return nullptr;
-}
+// Gfx* gfxSetEnvColor(Joint* joint, UNUSED JointMeshLayer *layer)
+// {
+//     if (joint->index == 0)
+//     {
+//         gDPSetEnvColor(g_dlistHead++, 255, 0, 0, 0);
+//     }
+//     else if (joint->index == 1)
+//     {
+//         gDPSetEnvColor(g_dlistHead++, 0, 255, 0, 0);
+//     }
+//     return nullptr;
+// }
 
 void drawGfx(DrawLayer layer, Gfx* toDraw)
 {
