@@ -39,11 +39,11 @@ void setupCameraMatrices(Camera *camera)
         camera->target[0], camera->target[1] + camera->yOffset, camera->target[2], // Look pos
         0.0f, 1.0f, 0.0f); // Up vector
     
-    gfx::mul_lookat(
-        camera->target[0], camera->target[1] + camera->yOffset, camera->target[2], // Eye pos
-        camera->target[0] - eyeOffset[0], camera->target[1] + camera->yOffset - eyeOffset[1], camera->target[2] - eyeOffset[2], // Look pos
-        0.0f, 1.0f, 0.0f); // Up vector
+    // gfx::mul_lookat(
+    //     camera->target[0], camera->target[1] + camera->yOffset, camera->target[2], // Eye pos
+    //     camera->target[0] - eyeOffset[0], camera->target[1] + camera->yOffset - eyeOffset[1], camera->target[2] - eyeOffset[2], // Look pos
+    //     0.0f, 1.0f, 0.0f); // Up vector
 
     // Perpsective
-    gfx::load_perspective(camera->fov, get_aspect_ratio(), 10.0f, 20000.0f, 1.0f);
+    gfx::load_perspective(camera->fov, get_aspect_ratio(), 100.0f, 20000.0f, 1.0f);
 }

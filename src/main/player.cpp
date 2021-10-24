@@ -75,6 +75,14 @@ void createPlayer(PlayerState *state)
 
 extern Model *get_cube_model();
 
+// extern u8 _testmodelSegmentRomStart[];
+// extern u8 _testmodelSegmentSize[];
+
+// Model *testmodel;
+// extern Animation character_anim;
+
+#include <n64_mem.h>
+
 void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
@@ -84,6 +92,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     BehaviorParams *bhvParams = get_component<Bit_Behavior, BehaviorParams>(componentArrays, ARCHETYPE_PLAYER);
     Model **model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_PLAYER);
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(componentArrays, ARCHETYPE_PLAYER);
+    AnimState *animState = get_component<Bit_AnimState, AnimState>(componentArrays, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)arg;
     // *model = &character_model;
     
@@ -106,8 +115,32 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->ySpacing = PLAYER_WALL_RAYCAST_SPACING;
     collider->frictionDamping = 1.0f;
     collider->floor = nullptr;
-
+    
+    setAnim(animState, nullptr);
     *model = get_cube_model();
+
+    // // Set up animation
+    // setAnim(animState, &character_anim);
+
+    // // *model = get_cube_model();
+    // testmodel = (Model*)allocRegion((u32)_testmodelSegmentSize, ALLOC_GFX);
+    // {
+    //     OSMesgQueue queue;
+    //     OSMesg msg;
+    //     OSIoMesg io_msg;
+    //     // Set up the intro segment DMA
+    //     io_msg.hdr.pri = OS_MESG_PRI_NORMAL;
+    //     io_msg.hdr.retQueue = &queue;
+    //     io_msg.dramAddr = testmodel;
+    //     io_msg.devAddr = (u32)_testmodelSegmentRomStart;
+    //     io_msg.size = (u32)_testmodelSegmentSize;
+    //     osCreateMesgQueue(&queue, &msg, 1);
+    //     osEPiStartDma(g_romHandle, &io_msg, OS_READ);
+    //     osRecvMesg(&queue, nullptr, OS_MESG_BLOCK);
+    // }
+    // testmodel->adjust_offsets();
+    // testmodel->setup_gfx();
+    // *model = testmodel;
 }
 
 void playerCallback(UNUSED void **components, void *data)
@@ -125,6 +158,8 @@ void playerCallback(UNUSED void **components, void *data)
     stateUpdateCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
     // Process the current state
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
+
+    (*rot)[1] = 218 * g_gameTimer;
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
 }

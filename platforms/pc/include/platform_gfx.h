@@ -10,6 +10,10 @@ struct Model {
     void *reserved;
 };
 
+struct Animation {
+    void *reserved;
+};
+
 constexpr glm::vec3 constexpr_normalize(const glm::vec3& in)
 {
     glm::vec3 squared = in * in;

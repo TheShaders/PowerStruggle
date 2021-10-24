@@ -1,4 +1,5 @@
 #include <n64_model.h>
+#include <model.h>
 
 void TriangleGroup::adjust_offsets(void *base_addr)
 {
@@ -16,7 +17,12 @@ void MaterialDraw::adjust_offsets(void *base_addr)
 
 size_t MaterialDraw::gfx_length() const
 {
-    size_t num_commands = 1; // material load DL call
+    // Skip empty material draws (could exist for the purpose of just switching material)
+    if (num_groups == 0)
+    {
+        return 0;
+    }
+    size_t num_commands = 1; // end DL
     for (size_t group_idx = 0; group_idx < num_groups; group_idx++)
     {
         num_commands += 
@@ -37,9 +43,7 @@ void JointMeshLayer::adjust_offsets(void *base_addr)
 
 size_t JointMeshLayer::gfx_length() const
 {
-    // Skip 0 draw layers
-    if (num_draws == 0) return 0;
-    size_t num_commands = 1; // end DL command
+    size_t num_commands = 0;
     for (size_t draw_idx = 0; draw_idx < num_draws; draw_idx++)
     {
         num_commands += draws[draw_idx].gfx_length();
@@ -65,8 +69,9 @@ size_t Joint::gfx_length() const
     return num_commands;
 }
 
-void Model::adjust_offsets(void *base_addr)
+void Model::adjust_offsets()
 {
+    void *base_addr = this;
     joints    = ::add_offset(joints, base_addr);
     materials = ::add_offset(materials, base_addr);
     verts     = ::add_offset(verts, base_addr);
@@ -89,7 +94,6 @@ size_t Model::gfx_length() const
     }
     for (size_t mat_idx = 0; mat_idx < num_materials; mat_idx++)
     {
-        materials[mat_idx]->gfx_length = 3; // TODO temporary
         num_commands += materials[mat_idx]->gfx_length;
     }
     return num_commands;
@@ -97,46 +101,54 @@ size_t Model::gfx_length() const
 
 Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos)
 {
-    gDPSetEnvColor(gfx_pos++, 0xFF, 0x00, 0x00, 0xFF);
-    gDPSetCombineLERP(gfx_pos++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1);
+    int rand_val = guRandom() % 3;
+    gDPPipeSync(gfx_pos++);
+    switch (rand_val)
+    {
+        case 0:
+            gDPSetEnvColor(gfx_pos++, 0xFF, 0xFF, 0xFF, 0xFF);
+            break;
+        case 1:
+            gDPSetEnvColor(gfx_pos++, 0xFF, 0xFF, 0xFF, 0xFF);
+            break;
+        case 2:
+            gDPSetEnvColor(gfx_pos++, 0xFF, 0x00, 0x00, 0xFF);
+            break;
+    }
+    gDPSetCombineLERP(gfx_pos++, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1);
     gSPEndDisplayList(gfx_pos++);
     return gfx_pos;
 }
 
-Gfx *JointMeshLayer::setup_gfx(Gfx* gfx_pos, Vtx* verts, MaterialHeader **materials) const
+Gfx *MaterialDraw::setup_gfx(Gfx* gfx_pos, Vtx* verts) const
 {
-    // No need to waste space in the DL for an empty layer
-    if (num_draws == 0)
-        return gfx_pos;
-    // Iterate over every material draw
-    for (size_t draw_idx = 0; draw_idx < num_draws; draw_idx++)
+    // Skip empty material draws (could exist for the purpose of just switching material)
+    if (num_groups == 0)
     {
-        const auto& cur_draw = draws[draw_idx];
-        // Add the call to the material's DL
-        gSPDisplayList(gfx_pos++, materials[cur_draw.material_index]->gfx);
-        // Iterate over every triangle group in this draw
-        for (size_t group_idx = 0; group_idx < cur_draw.num_groups; group_idx++)
+        return gfx_pos;
+    }
+    // Iterate over every triangle group in this draw
+    for (size_t group_idx = 0; group_idx < num_groups; group_idx++)
+    {
+        const auto& cur_group = groups[group_idx];
+        // Add the triangle group's vertex load
+        gSPVertex(gfx_pos++, &verts[cur_group.load.start], cur_group.load.count, cur_group.load.buffer_offset);
+        // Add the triangle group's triangle commands
+        for (size_t tri2_index = 0; tri2_index < cur_group.num_tris / 2; tri2_index++)
         {
-            const auto& cur_group = cur_draw.groups[group_idx];
-            // Add the triangle group's vertex load
-            gSPVertex(gfx_pos++, &verts[cur_group.load.start], cur_group.load.count, cur_group.load.buffer_offset);
-            // Add the triangle group's triangle commands
-            for (size_t tri2_index = 0; tri2_index < cur_group.num_tris / 2; tri2_index++)
-            {
-                const auto& tri1 = cur_group.triangles[tri2_index * 2 + 0];
-                const auto& tri2 = cur_group.triangles[tri2_index * 2 + 1];
-                gSP2Triangles(gfx_pos++,
-                    tri1[0], tri1[1], tri1[2], 0x00,
-                    tri2[0], tri2[1], tri2[2], 0x00);
-            }
-            if (cur_group.num_tris & 1) // If odd number of tris, add the last 1tri command
-            {
-                const auto& tri = cur_group.triangles[cur_group.num_tris - 1];
-                gSP1Triangle(gfx_pos++, tri[0], tri[1], tri[2], 0x00);
-            }
+            const auto& tri1 = cur_group.triangles[tri2_index * 2 + 0];
+            const auto& tri2 = cur_group.triangles[tri2_index * 2 + 1];
+            gSP2Triangles(gfx_pos++,
+                tri1[0], tri1[1], tri1[2], 0x00,
+                tri2[0], tri2[1], tri2[2], 0x00);
+        }
+        if (cur_group.num_tris & 1) // If odd number of tris, add the last 1tri command
+        {
+            const auto& tri = cur_group.triangles[cur_group.num_tris - 1];
+            gSP1Triangle(gfx_pos++, tri[0], tri[1], tri[2], 0x00);
         }
     }
-    // Terminate the joint layer's DL
+    // Terminate the draw's DL
     gSPEndDisplayList(gfx_pos++);
     return gfx_pos;
 }
@@ -159,8 +171,12 @@ void Model::setup_gfx()
     {
         for (size_t layer = 0; layer < gfx::draw_layers; layer++)
         {
-            joints[joint_idx].layers[layer].gfx = cur_gfx;
-            cur_gfx = joints[joint_idx].layers[layer].setup_gfx(cur_gfx, verts, materials);
+            auto& cur_layer = joints[joint_idx].layers[layer];
+            for (size_t draw_idx = 0; draw_idx < cur_layer.num_draws; draw_idx++)
+            {
+                cur_layer.draws[draw_idx].gfx = cur_gfx;
+                cur_gfx = cur_layer.draws[draw_idx].setup_gfx(cur_gfx, verts);
+            }
         }
     }
     // infinite loop to check if my math was wrong
@@ -191,22 +207,63 @@ constexpr Vtx make_vert_normal(int16_t x, int16_t y, int16_t z, int16_t s, int16
 }
 
 Vtx cube_verts[] {
-    make_vert_normal( 50, 50,  50,  0, 0,  0x00, 0x7F, 0x00),
-    make_vert_normal( 50, 50, -50,  0, 0,  0x00, 0x7F, 0x00),
-    make_vert_normal(-50, 50,  50,  0, 0,  0x00, 0x7F, 0x00),
-    make_vert_normal(-50, 50, -50,  0, 0,  0x00, 0x7F, 0x00),
+    // -y
+    make_vert_normal( 50, -50,  50,  0, 0,  0x00, -0x7F,  0x00),
+    make_vert_normal(-50, -50,  50,  0, 0,  0x00, -0x7F,  0x00),
+    make_vert_normal( 50, -50, -50,  0, 0,  0x00, -0x7F,  0x00),
+    make_vert_normal(-50, -50, -50,  0, 0,  0x00, -0x7F,  0x00),
+
+    // +y
+    make_vert_normal( 50,  50,  50,  0, 0,  0x00,  0x7F,  0x00),
+    make_vert_normal( 50,  50, -50,  0, 0,  0x00,  0x7F,  0x00),
+    make_vert_normal(-50,  50,  50,  0, 0,  0x00,  0x7F,  0x00),
+    make_vert_normal(-50,  50, -50,  0, 0,  0x00,  0x7F,  0x00),
+    
+    // +x
+    make_vert_normal( 50,  50,  50,  0, 0,  0x7F,  0x00,  0x00),
+    make_vert_normal( 50, -50,  50,  0, 0,  0x7F,  0x00,  0x00),
+    make_vert_normal( 50,  50, -50,  0, 0,  0x7F,  0x00,  0x00),
+    make_vert_normal( 50, -50, -50,  0, 0,  0x7F,  0x00,  0x00),
+    
+    // -x
+    make_vert_normal(-50,  50,  50,  0, 0, -0x7F,  0x00, 0x00),
+    make_vert_normal(-50,  50, -50,  0, 0, -0x7F,  0x00, 0x00),
+    make_vert_normal(-50, -50,  50,  0, 0, -0x7F,  0x00, 0x00),
+    make_vert_normal(-50, -50, -50,  0, 0, -0x7F,  0x00, 0x00),
+    
+    // +z
+    make_vert_normal( 50,  50,  50,  0, 0,  0x00,  0x00,  0x7F),
+    make_vert_normal(-50,  50,  50,  0, 0,  0x00,  0x00,  0x7F),
+    make_vert_normal( 50, -50,  50,  0, 0,  0x00,  0x00,  0x7F),
+    make_vert_normal(-50, -50,  50,  0, 0,  0x00,  0x00,  0x7F),
+    
+    // -z
+    make_vert_normal( 50,  50, -50,  0, 0,  0x00,  0x00, -0x7F),
+    make_vert_normal( 50, -50, -50,  0, 0,  0x00,  0x00, -0x7F),
+    make_vert_normal(-50,  50, -50,  0, 0,  0x00,  0x00, -0x7F),
+    make_vert_normal(-50, -50, -50,  0, 0,  0x00,  0x00, -0x7F),
 };
 
 TriangleIndices cube_joint0_layer0_draw0_group0[] {
-    { 0, 1, 2 },
-    { 3, 2, 1 },
+    // +y
+    {  0,  1,  2 }, {  3,  2,  1 },
+    // -y
+    {  4,  5,  6 }, {  7,  6,  5 },
+    // +x
+    {  8,  9, 10 }, { 11, 10,  9 },
+    // -x
+    { 12, 13, 14 }, { 15, 14, 13 },
+    // +z
+    { 16, 17, 18 }, { 19, 18, 17 },
+    // -z
+    { 20, 21, 22 }, { 23, 22, 21 },
 };
 
 TriangleGroup cube_joint0_layer0_draw0_groups[] {
     {
         { // load
             0, // start
-            4, // count
+            array_size(cube_verts), // count
             0, // buffer_offset
         },
         array_size(cube_joint0_layer0_draw0_group0), // num_tris
@@ -219,6 +276,7 @@ MaterialDraw cube_joint0_layer0_draws[] {
         array_size(cube_joint0_layer0_draw0_groups), // num_groups
         0,
         cube_joint0_layer0_draw0_groups,
+        nullptr // gfx
     }
 };
 
@@ -235,7 +293,6 @@ Joint cube_joints[] {
             {
                 array_size(cube_joint0_layer0_draws), // num_draws
                 cube_joint0_layer0_draws, // draws
-                nullptr // gfx
             },
             {},
             {},
@@ -247,7 +304,7 @@ Joint cube_joints[] {
 
 MaterialHeader cube_mat0 {
     MaterialFlags::none,
-    2,
+    4,
     nullptr
 };
 
@@ -269,3 +326,38 @@ Model *get_cube_model()
     cube_model.setup_gfx();
     return &cube_model;
 }
+
+// template <size_t N>
+// constexpr std::array<int16_t, N> generate_sine_table()
+// {
+//     std::array<int16_t, N> ret;
+
+//     for (size_t i = 0; i < N; i++)
+//     {
+//         ret[i] = static_cast<int16_t>(std::lround(std::sin(2 * 3.1415926535f * i / N) * 2 * 0x8000));
+//     }
+
+//     return ret;
+// }
+
+// std::array<int16_t, 256> character_anim_joint_table0_data = generate_sine_table<256>();
+
+// JointTable character_anim_joint_tables[16] {
+//     {}, // root
+//     {}, // waist
+//     {}, // torso
+//     {}, // neck
+//     {}, // upperarm.L
+//     { // forearm.L
+//         CHANNEL_ROT_Y, // flags
+//         character_anim_joint_table0_data.data(),
+//     },
+// };
+
+// Animation character_anim {
+//     256, // frameCount
+//     16, // jointCount
+//     ANIM_LOOP, // flags (e.g. ANIM_LOOP)
+//     character_anim_joint_tables, // jointTables
+//     nullptr, // triggers
+// };

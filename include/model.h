@@ -25,24 +25,6 @@
 #define CHANNEL_SCALE_Y (1 << 7)
 #define CHANNEL_SCALE_Z (1 << 8)
 
-struct Animation {
-    uint16_t frameCount; // The number of frames of data this animation has
-    uint8_t jointCount; // Number of joints this animation has data for
-    uint8_t flags; // Flags for this animation
-    JointTable *jointTables; // Segmented pointer to the array of joint animation tables
-    AnimTrigger *triggers; // Segmented pointer to the array of triggers for this animation
-};
-
-struct JointTable {
-    uint32_t flags; // Flags to specify which channels are encoded in this joint's animation data
-    int16_t *channels; // Segmented pointer to the array of all channel data
-};
-
-struct AnimTrigger {
-    uint32_t frame; // The frame at which this trigger should run
-    void (*triggerCb)(Model* model, uint32_t frame); // The callback to run at the specified frame
-};
-
 #define ANIM_COUNTER_FACTOR 16.0f
 #define ANIM_COUNTER_SHIFT 4
 #define ANIM_COUNTER_TO_FRAME(x) ((x) >> (ANIM_COUNTER_SHIFT))

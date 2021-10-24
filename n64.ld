@@ -79,6 +79,12 @@ SECTIONS
 
     memPoolStart = .;
 
+    /* START_SEGMENT(testmodel, 0x0)
+    {
+        Armature.o(.*data*);
+    }
+    END_SEGMENT(testmodel); */
+
     /DISCARD/ :
     {
         *(*);

@@ -296,6 +296,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
     // Gfx *callbackReturn;
     std::unique_ptr<MtxF[]> jointMatrices;
     u32 numFrames = 0;
+    int cur_material = -1;
 
     if (toDraw == nullptr) return;
 
@@ -416,13 +417,22 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             }
             
         }
+        
+        Mtx* curMtx = (Mtx*)allocGfx(sizeof(Mtx));
+        guMtxF2L(*g_curMatFPtr, curMtx);
 
         // Draw the joint's layers
         for (size_t cur_layer = 0; cur_layer < gfx::draw_layers; cur_layer++)
         {
             JointMeshLayer *curJointLayer = &curJoint->layers[cur_layer];
-            // Check if this layer has any draws and skip it if it doesn't
-            if (curJointLayer->num_draws == 0) continue;
+
+            // Don't bother adding a matrix load if there's nothing to draw on this layer for this joint
+            if (curJointLayer->num_draws == 0)
+            {
+                continue;
+            }
+
+            addMtxToDrawLayer(static_cast<DrawLayer>(cur_layer), curMtx);
             
             // Check if this joint has a before drawn callback, and if so call it
             // if (curJoint->beforeCb)
@@ -436,7 +446,21 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             // }
             
             // Draw the layer
-            drawGfx(static_cast<DrawLayer>(cur_layer), curJointLayer->gfx);
+            for (size_t draw_idx = 0; draw_idx < curJointLayer->num_draws; draw_idx++)
+            {
+                auto& cur_draw = curJointLayer->draws[draw_idx];
+                // Check if we've changed materials; if so load the new material
+                if (cur_draw.material_index != cur_material)
+                {
+                    cur_material = cur_draw.material_index;
+                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), toDraw->materials[cur_material]->gfx);
+                }
+                // Check if this draw has any groups and skip it if it doesn't
+                if (cur_draw.num_groups != 0)
+                {
+                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_draw.gfx);
+                }
+            }
 
             // Check if this joint has an after drawn callback, and if so call it
             // if (curJoint->afterCb)

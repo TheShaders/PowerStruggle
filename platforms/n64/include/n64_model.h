@@ -51,9 +51,11 @@ struct MaterialDraw {
     uint16_t num_groups;
     uint16_t material_index;
     TriangleGroup *groups;
+    Gfx* gfx;
 
     void adjust_offsets(void *base_addr);
     size_t gfx_length() const;
+    Gfx *setup_gfx(Gfx* gfx_pos, Vtx *verts) const;
 };
 
 // A submesh of a joint for a single draw layer
@@ -61,11 +63,9 @@ struct MaterialDraw {
 struct JointMeshLayer {
     uint32_t num_draws;
     MaterialDraw *draws;
-    Gfx* gfx;
 
     void adjust_offsets(void *base_addr);
     size_t gfx_length() const;
-    Gfx *setup_gfx(Gfx* gfx_pos, Vtx *verts, MaterialHeader **materials) const;
 };
 
 // One joint (aka bone) of a mesh
@@ -73,7 +73,7 @@ struct JointMeshLayer {
 struct Joint {
     float posX; // Base positional offset x component (float to save conversion time later on)
     float posY; // Base positional offset y component
-    float posZ; // Base positional offset y component
+    float posZ; // Base positional offset z component
     uint8_t parent;
     uint8_t reserved; // Would be automatically added for alignment
     uint16_t reserved2; // Ditto
@@ -91,9 +91,31 @@ struct Model {
     Vtx *verts; // pointer to all vertices
     std::unique_ptr<Gfx[]> gfx;
 
-    void adjust_offsets(void *base_addr);
+    void adjust_offsets();
     size_t gfx_length() const;
     void setup_gfx();
+};
+
+struct JointTable {
+    uint32_t flags; // Flags to specify which channels are encoded in this joint's animation data
+    int16_t *channels; // Segmented pointer to the array of all channel data
+
+    void adjust_offsets(void *base_addr);
+};
+
+struct AnimTrigger {
+    uint32_t frame; // The frame at which this trigger should run
+    void (*triggerCb)(Model* model, uint32_t frame); // The callback to run at the specified frame
+};
+
+struct Animation {
+    uint16_t frameCount; // The number of frames of data this animation has
+    uint8_t jointCount; // Number of joints this animation has data for
+    uint8_t flags; // Flags for this animation
+    JointTable *jointTables; // Pointer to the array of joint animation tables
+    AnimTrigger *triggers; // Pointer to the array of triggers for this animation
+
+    void adjust_offsets();
 };
 
 #endif

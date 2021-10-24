@@ -19,8 +19,6 @@ struct Model;
 
 // Prototypes for animation structs
 struct Animation;
-struct JointTable;
-struct AnimTrigger;
 struct AnimState;
 
 // Prototypes for collision structs
