@@ -64,9 +64,11 @@ indent +=
 ### Tools ###
 
 # System tools
-CD := cd
-CP := cp
-RM := rm
+CD    := cd
+CP    := cp
+RM    := rm
+CAT   := cat
+GPERF := gperf
 
 
 ifeq ($(OS),Windows_NT)
@@ -146,31 +148,45 @@ LD_SCRIPT := n64.ld
 BOOT      := $(PLATFORM_DIR)/boot/boot.6102
 ENTRY_AS  := $(PLATFORM_DIR)/boot/entry.s
 
-# Asset files
-ASSET_DIR := assets/
-
-MODEL_DIR := $(ASSET_DIR)/models
-MODELS    := $(wildcard $(MODEL_DIR)/*.gltf)
-
-LEVEL_DIR := $(ASSET_DIR)/levels
-LEVELS    := $(wildcard $(MODEL_DIR)/*.json)
-
-# Build folders
+# Build root
 ifeq ($(DEBUG),0)
 BUILD_ROOT     := build/$(PLATFORM)/release
 else
 BUILD_ROOT     := build/$(PLATFORM)/debug
 endif
+
+# Asset files
+ASSET_ROOT := assets
+
+MODEL_DIR  := $(ASSET_ROOT)/models
+MODELS     := $(wildcard $(MODEL_DIR)/*.gltf)
+MODELS_OUT := $(addprefix $(BUILD_ROOT)/, $(MODELS:.gltf=))
+
+ASSETS_OUT  := $(MODELS_OUT)
+
+LEVEL_DIR := $(ASSET_ROOT)/levels
+LEVELS    := $(wildcard $(MODEL_DIR)/*.json)
+
+ASSETS_DIRS  := $(LEVEL_DIR) $(MODEL_DIR)
+ASSETS_BIN   := $(BUILD_ROOT)/assets.bin
+ASSETS_OBJ   := $(ASSETS_BIN:.bin=.o)
+# gperf input file
+ASSETS_TXT   := $(ASSETS_BIN:.bin=.txt)
+ASSETS_GPERF := $(ASSETS_BIN:.bin=_gperf.txt)
+ASSETS_CPP   := $(ASSETS_BIN:.bin=_code.cpp)
+ASSETS_CPP_O := $(ASSETS_CPP:.cpp=.o)
+
+# Build folders
 SEG_BUILD_DIR  := $(BUILD_ROOT)/segments
 BOOT_BUILD_DIR := $(BUILD_ROOT)/$(PLATFORM_DIR)/boot
-BUILD_DIRS     := $(addprefix $(BUILD_ROOT)/,$(SRC_DIRS)) $(SEG_BUILD_DIR) $(BOOT_BUILD_DIR)
+BUILD_DIRS     := $(addprefix $(BUILD_ROOT)/,$(SRC_DIRS) $(ASSETS_DIRS)) $(SEG_BUILD_DIR) $(BOOT_BUILD_DIR)
 
 # Build files
 C_OBJS   := $(addprefix $(BUILD_ROOT)/,$(C_SRCS:.c=.o))
 CXX_OBJS := $(addprefix $(BUILD_ROOT)/,$(CXX_SRCS:.cpp=.o))
 ASM_OBJS := $(addprefix $(BUILD_ROOT)/,$(ASM_SRCS:.s=.o))
 BIN_OBJS := $(addprefix $(BUILD_ROOT)/,$(BIN_FILES:.bin=.o))
-OBJS     := $(C_OBJS) $(CXX_OBJS) $(ASM_OBJS) $(BIN_OBJS)
+OBJS     := $(C_OBJS) $(CXX_OBJS) $(ASM_OBJS) $(BIN_OBJS) $(ASSETS_CPP_O)
 SEG_OBJS := $(addprefix $(BUILD_ROOT)/,$(SEG_C_SRCS:.c=.o)) $(addprefix $(BUILD_ROOT)/,$(SEG_CPP_SRCS:.cpp=.o))
 LD_CPP   := $(BUILD_ROOT)/$(LD_SCRIPT)
 BOOT_OBJ := $(BUILD_ROOT)/$(BOOT).o
@@ -226,6 +242,7 @@ endif
 $(BUILD_ROOT)/platforms/n64/src/usb/usb.o: OPT_FLAGS := -O0
 $(BUILD_ROOT)/platforms/n64/src/usb/usb.o: WARNFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
 $(BUILD_ROOT)/platforms/n64/src/usb/debug.o: WARNFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
+$(ASSETS_CPP_O): WARNFLAGS += -Wno-missing-field-initializers
 $(SEG_OBJS): WARNFLAGS += -Wno-overflow -Wno-float-conversion -Wno-narrowing -Wno-missing-field-initializers
 
 ### Rules ###
@@ -243,6 +260,11 @@ $(BUILD_ROOT)/%.o : %.cpp | $(BUILD_DIRS)
 	@$(PRINT)$(GREEN)Compiling C++ source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
 	@$(CXX) $< -o $@ -c -MMD -MF $(@:.o=.d) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FLAGS) $(WARNFLAGS)
 
+# .cpp -> .o (build folder)
+$(BUILD_ROOT)/%.o : $(BUILD_ROOT)/%.cpp | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Compiling C++ source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(CXX) $< -o $@ -c -MMD -MF $(@:.o=.d) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FLAGS) $(WARNFLAGS)
+
 # .c -> .o
 $(BUILD_ROOT)/%.o : %.c | $(BUILD_DIRS)
 	@$(PRINT)$(GREEN)Compiling C source file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
@@ -251,7 +273,12 @@ $(BUILD_ROOT)/%.o : %.c | $(BUILD_DIRS)
 # .bin -> .o
 $(BUILD_ROOT)/%.o : %.bin | $(BUILD_DIRS)
 	@$(PRINT)$(GREEN)Objcopying binary file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
-	@$(OBJCOPY) -I binary -O elf32-big $< $@
+	@$(OBJCOPY) -I binary -O elf32-bigmips -B mips:3000 $< $@
+
+# .bin -> .o (build folder)
+$(BUILD_ROOT)/%.o : $(BUILD_ROOT)/%.bin | $(BUILD_DIRS)
+	@$(PRINT)$(GREEN)Objcopying built binary file: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(OBJCOPY) -I binary -O elf32-bigmips -B mips:3000 $< $@
 
 # .s -> .o
 $(BUILD_ROOT)/%.o : %.s | $(BUILD_DIRS)
@@ -269,7 +296,7 @@ $(CODESEG) : $(OBJS) | $(TOOLS)
 	@$(LD) -o $@ -r $^ $(SEG_LDFLAGS)
 
 # .o -> .elf
-$(ELF) : $(CODESEG) $(SEG_OBJS) $(LD_CPP) $(BOOT_OBJ) $(ENTRY_OBJ)
+$(ELF) : $(CODESEG) $(SEG_OBJS) $(LD_CPP) $(BOOT_OBJ) $(ENTRY_OBJ) $(ASSETS_OBJ)
 	@$(PRINT)$(GREEN)Linking elf file:$(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
 	@$(LD) $(LDFLAGS) -o $@
 
@@ -294,12 +321,32 @@ $(LD_CPP) : $(LD_SCRIPT) | $(BUILD_ROOT)
 # Compile assetpack
 $(ASSETPACK) :
 	@$(PRINT)$(GREEN)Compiling assetpack$(ENDGREEN)$(ENDLINE)
-	@$(MAKE) -C tools/assetpack -j4
+	@$(MAKE) -C tools/assetpack
+
+# Pack assets
+$(ASSETS_BIN) : $(ASSETS_OUT)
+	@$(PRINT)$(GREEN)Packing assets$(ENDGREEN)$(ENDLINE)
+	@$(ASSETPACK) $(BUILD_ROOT)/$(ASSET_ROOT) $@ $(ASSETS_TXT)
+
+# Create gperf words file
+$(ASSETS_GPERF) : $(ASSETS_BIN)
+	@$(PRINT)$(GREEN)Creating assets gperf input file$(ENDGREEN)$(ENDLINE)
+	@$(CAT) $(PLATFORM_DIR)/asset_gperf_header.txt $(ASSETS_TXT) > $@
+
+# Run gperf
+$(ASSETS_CPP) : $(ASSETS_GPERF)
+	@$(PRINT)$(GREEN)Running gperf for asset table$(ENDGREEN)$(ENDLINE)
+	@$(GPERF) -L C++ -Z FileRecords -N get_offset -C -c -m 1000 -t $< > $@
 
 # Compile gltf64
 $(GLTF64) :
 	@$(PRINT)$(GREEN)Compiling glTF64$(ENDGREEN)$(ENDLINE)
-	@$(MAKE) -C tools/gltf64 -j4
+	@$(MAKE) -C tools/gltf64
+
+# Convert models
+$(MODELS_OUT) : $(BUILD_ROOT)/% : %.gltf | $(BUILD_DIRS) $(GLTF64)
+	@$(PRINT)$(GREEN)Converting model:$(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
+	@$(GLTF64) $< $@
 
 clean:
 	@$(PRINT)$(YELLOW)Cleaning build$(ENDYELLOW)$(ENDLINE)

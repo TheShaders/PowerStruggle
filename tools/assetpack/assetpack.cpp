@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <vector>
 #include <fstream>
+#include <tuple>
 
 #include <fmt/core.h>
 #include <fmt/os.h>
@@ -9,6 +10,12 @@
 #include "dynamic_array.h"
 
 namespace fs = std::filesystem;
+
+struct size_offset_t
+{
+    size_t size;
+    size_t offset;
+};
 
 // Alignment in bytes of file offsets
 constexpr size_t file_alignment_bytes = 4;
@@ -42,9 +49,9 @@ size_t gather_files(const fs::path& dir, std::vector<fs::path>& files)
     return ret;
 }
 
-dynamic_array<size_t> write_files(std::ofstream& output_file, std::vector<fs::path>& all_files, size_t total_size)
+dynamic_array<size_offset_t> write_files(std::ofstream& output_file, std::vector<fs::path>& all_files, size_t total_size)
 {
-    dynamic_array<size_t> file_offsets(all_files.size());
+    dynamic_array<size_offset_t> file_offsets(all_files.size());
 
     dynamic_array<char> output_buf(total_size);
     size_t cur_offset = 0;
@@ -54,8 +61,10 @@ dynamic_array<size_t> write_files(std::ofstream& output_file, std::vector<fs::pa
         // Get the current file's path and size
         const std::string& cur_file_path = all_files[file_idx];
         size_t cur_file_size = fs::file_size(cur_file_path);
+        // Record the file's size, rounded up to alignment
+        file_offsets[file_idx].size = round_up<file_alignment_bytes>(cur_file_size);
         // Record the current output buffer position as the offset for the current file
-        file_offsets[file_idx] = cur_offset;
+        file_offsets[file_idx].offset = cur_offset;
         // Open the current file and read its contents into the buffer
         std::ifstream cur_file(all_files[file_idx], std::ios_base::binary);
         cur_file.read(output_buf.data() + cur_offset, cur_file_size);
@@ -89,13 +98,16 @@ int main(int argc, char *argv[])
     size_t total_size = gather_files(asset_folder, all_files);
 
     std::ofstream packed_file(packed_file_path, std::ios_base::binary);
-    dynamic_array<size_t> file_offsets = write_files(packed_file, all_files, total_size);
+    dynamic_array<size_offset_t> file_offsets = write_files(packed_file, all_files, total_size);
     packed_file.close();
 
     auto asset_table = fmt::output_file(asset_table_path);
     for (size_t file_idx = 0; file_idx < file_offsets.size(); file_idx++)
     {
-        asset_table.print("{}, {}\n", fs::relative(all_files[file_idx], asset_folder).c_str(), file_offsets[file_idx]);
+        asset_table.print("{}, {}, {}\n",
+            fs::relative(all_files[file_idx], asset_folder).c_str(),
+            file_offsets[file_idx].offset,
+            file_offsets[file_idx].size);
     }
     asset_table.close();
 

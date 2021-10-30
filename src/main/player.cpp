@@ -17,6 +17,7 @@ extern "C" {
 #include <audio.h>
 #include <platform.h>
 #include <platform_gfx.h>
+#include <files.h>
 
 #include <memory>
 
@@ -117,7 +118,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->floor = nullptr;
     
     setAnim(animState, nullptr);
-    *model = get_cube_model();
+    *model = load_model("models/Floor");
 
     // // Set up animation
     // setAnim(animState, &character_anim);

@@ -16,6 +16,7 @@ typedef uint8_t owner_t;
 #define ALLOC_GFX        1
 #define ALLOC_AUDIO      2
 #define ALLOC_ECS        3
+#define ALLOC_FILE       4
 
 #define ALLOC_MALLOC     252 // Memory allocated by malloc
 #define ALLOC_NEW        253 // Memory allocated by new

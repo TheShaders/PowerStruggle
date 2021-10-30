@@ -79,11 +79,11 @@ SECTIONS
 
     memPoolStart = .;
 
-    /* START_SEGMENT(testmodel, 0x0)
+    START_SEGMENT(assets, romPos)
     {
-        Armature.o(.*data*);
+        BUILD_ROOT/assets.o(.*data*);
     }
-    END_SEGMENT(testmodel); */
+    END_SEGMENT(assets);
 
     /DISCARD/ :
     {
