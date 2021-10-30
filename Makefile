@@ -126,6 +126,9 @@ OBJCOPY := $(N64CHAIN)$(PREFIX)objcopy
 CKSUM   := $(PYTHON) tools/n64cksum.py
 
 ASSETPACK := tools/assetpack/assetpack
+GLTF64    := tools/gltf64/gltf64
+
+TOOLS := $(ASSETPACK) $(GLTF64)
 
 ### Files and Directories ###
 
@@ -142,6 +145,15 @@ SEG_CPP_SRCS := $(wildcard segments/*.cpp)
 LD_SCRIPT := n64.ld
 BOOT      := $(PLATFORM_DIR)/boot/boot.6102
 ENTRY_AS  := $(PLATFORM_DIR)/boot/entry.s
+
+# Asset files
+ASSET_DIR := assets/
+
+MODEL_DIR := $(ASSET_DIR)/models
+MODELS    := $(wildcard $(MODEL_DIR)/*.gltf)
+
+LEVEL_DIR := $(ASSET_DIR)/levels
+LEVELS    := $(wildcard $(MODEL_DIR)/*.json)
 
 # Build folders
 ifeq ($(DEBUG),0)
@@ -252,7 +264,7 @@ $(BOOT_OBJ) : $(BOOT) | $(BOOT_BUILD_DIR)
 	@$(OBJCOPY) -I binary -O elf32-big $< $@
 
 # All .o -> codesegment.o
-$(CODESEG) : $(OBJS) | $(ASSETPACK)
+$(CODESEG) : $(OBJS) | $(TOOLS)
 	@$(PRINT)$(GREEN)Combining code objects into code segment$(ENDGREEN)$(ENDLINE)
 	@$(LD) -o $@ -r $^ $(SEG_LDFLAGS)
 
@@ -283,6 +295,11 @@ $(LD_CPP) : $(LD_SCRIPT) | $(BUILD_ROOT)
 $(ASSETPACK) :
 	@$(PRINT)$(GREEN)Compiling assetpack$(ENDGREEN)$(ENDLINE)
 	@$(MAKE) -C tools/assetpack -j4
+
+# Compile gltf64
+$(GLTF64) :
+	@$(PRINT)$(GREEN)Compiling glTF64$(ENDGREEN)$(ENDLINE)
+	@$(MAKE) -C tools/gltf64 -j4
 
 clean:
 	@$(PRINT)$(YELLOW)Cleaning build$(ENDYELLOW)$(ENDLINE)

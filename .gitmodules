@@ -4,3 +4,6 @@
 [submodule "lib/fmt"]
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "tools/gltf64"]
+	path = tools/gltf64
+	url = https://github.com/Mr-Wiseguy/gltf64.git
