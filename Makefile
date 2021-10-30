@@ -125,6 +125,8 @@ OBJCOPY := $(N64CHAIN)$(PREFIX)objcopy
 
 CKSUM   := $(PYTHON) tools/n64cksum.py
 
+ASSETPACK := tools/assetpack/assetpack
+
 ### Files and Directories ###
 
 # Source files
@@ -250,7 +252,7 @@ $(BOOT_OBJ) : $(BOOT) | $(BOOT_BUILD_DIR)
 	@$(OBJCOPY) -I binary -O elf32-big $< $@
 
 # All .o -> codesegment.o
-$(CODESEG) : $(OBJS)
+$(CODESEG) : $(OBJS) | $(ASSETPACK)
 	@$(PRINT)$(GREEN)Combining code objects into code segment$(ENDGREEN)$(ENDLINE)
 	@$(LD) -o $@ -r $^ $(SEG_LDFLAGS)
 
@@ -276,6 +278,11 @@ $(V64) : $(Z64)
 $(LD_CPP) : $(LD_SCRIPT) | $(BUILD_ROOT)
 	@$(PRINT)$(GREEN)Preprocessing linker script$(ENDGREEN)$(ENDLINE)
 	@$(CPP) $(LDCPPFLAGS) -MMD -MP -MT $@ -MF $@.d -o $@ $<
+
+# Compile assetpack
+$(ASSETPACK) :
+	@$(PRINT)$(GREEN)Compiling assetpack$(ENDGREEN)$(ENDLINE)
+	@$(MAKE) -C tools/assetpack -j4
 
 clean:
 	@$(PRINT)$(YELLOW)Cleaning build$(ENDYELLOW)$(ENDLINE)
