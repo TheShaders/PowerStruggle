@@ -230,6 +230,13 @@ LDFLAGS    := -T $(LD_CPP) -Wl,--accept-unknown-input-arch -Wl,--no-check-sectio
 SEG_LDFLAGS:= $(ULTRA_LINKER) -L lib -lstdc++ -lc -l$(LIBULTRA) -e init
 LDCPPFLAGS := -P -Wno-trigraphs -DBUILD_ROOT=$(BUILD_ROOT) -Umips
 OCOPYFLAGS := --pad-to=0x400000 --gap-fill=0xFF
+
+# TODO test various values of the following:
+#  --param max-completely-peeled-insns=X
+#  --param max-unrolled-insns=X
+#  -finline-limit=X (which controls the following)
+#    --param max-inline-insns-single=X/2
+#    --param max-inline-insns-auto=X/2
 OPT_FLAGS  := -Os # Somehow Os is the fastest option according to testing
 
 ifneq ($(DEBUG),0)
@@ -345,7 +352,7 @@ $(GLTF64) :
 
 # Convert models
 $(MODELS_OUT) : $(BUILD_ROOT)/% : %.gltf | $(BUILD_DIRS) $(GLTF64)
-	@$(PRINT)$(GREEN)Converting model:$(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
+	@$(PRINT)$(GREEN)Converting model: $(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
 	@$(GLTF64) $< $@
 
 clean:

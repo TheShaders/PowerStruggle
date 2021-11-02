@@ -7,3 +7,6 @@
 [submodule "tools/gltf64"]
 	path = tools/gltf64
 	url = https://github.com/Mr-Wiseguy/gltf64.git
+[submodule "lib/json"]
+	path = lib/json
+	url = https://github.com/nlohmann/json
