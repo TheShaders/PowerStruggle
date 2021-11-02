@@ -96,6 +96,11 @@ namespace gfx
         g_curMatFPtr++;
     }
 
+    inline void load_mat(const MtxF *src)
+    {
+        gfx::copy_mat(g_curMatFPtr, src);
+    }
+
     inline void push_load_mat(const MtxF *src)
     {
         g_curMatFPtr++;

@@ -88,7 +88,7 @@ public:
     size_t index_from_block(MemoryBlock *t);
     MemoryBlock *block_from_index(size_t index);
     void *alloc(int num_blocks, owner_t owner);
-    void free(void *mem);
+    void free(void *mem) noexcept;
 };
 
 MemoryPool::MemoryPool(void *start, void *end)
@@ -202,7 +202,7 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
 }
 
 // Frees a previously allocated block(s)
-void MemoryPool::free(void *mem)
+void MemoryPool::free(void *mem) noexcept
 {
     // Cast the input memory address to a MemoryBlock
     MemoryBlock *toFree = static_cast<MemoryBlock*>(mem);
@@ -250,7 +250,7 @@ void *allocRegion(int length, owner_t owner)
     return g_memoryPool.alloc((length + (mem_block_size - 1)) / mem_block_size, owner);
 }
 
-void freeAlloc(void *start)
+void freeAlloc(void *start) noexcept
 {
     g_memoryPool.free(start);
 }

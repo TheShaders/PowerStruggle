@@ -529,3 +529,31 @@ void deleteAllEntities(void)
     numGaps = 0;
     firstGap = 0;
 }
+
+void processBehaviorEntities(size_t count, UNUSED void *arg, int numComponents, archetype_t archetype, void **componentArrays, size_t *componentSizes)
+{
+    int i = 0;
+    // Get the index of the BehaviorParams component in the component array and iterate over it
+    BehaviorParams *curBhvParams = static_cast<BehaviorParams*>(componentArrays[COMPONENT_INDEX(Behavior, archetype)]);
+    // Iterate over every entity in the given array
+    while (count)
+    {
+        // Call the entity's callback with the component pointers and it's data pointer
+        curBhvParams->callback(componentArrays, curBhvParams->data);
+
+        // Increment the component pointers so they are valid for the next entity
+        for (i = 0; i < numComponents; i++)
+        {
+            componentArrays[i] = static_cast<uint8_t*>(componentArrays[i]) + componentSizes[i];
+        }
+        // Increment to the next entity's behavior params
+        curBhvParams++;
+        // Decrement the remaining entity count
+        count--;
+    }
+}
+
+void iterateBehaviorEntities()
+{
+    iterateOverEntitiesAllComponents(processBehaviorEntities, nullptr, Bit_Behavior, 0);
+}

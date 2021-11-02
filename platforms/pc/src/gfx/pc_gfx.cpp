@@ -122,12 +122,9 @@ void create_indices()
     m_pDevice->CreateBuffer(IndBuffDesc, &IBData, &m_CubeIndexBuffer);
 }
 
-uint32_t fillColor = GPACK_RGBA5551(0, 61, 8, 1) << 16 | GPACK_RGBA5551(0, 61, 8, 1);
-
 
 static int cur_context = 0;
 static std::array<std::array<MtxF, matf_stack_len>, 2> matrix_stacks;
-int32_t firstFrame;
 
 MtxF *g_curMatFPtr;
 

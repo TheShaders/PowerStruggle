@@ -46,6 +46,13 @@ void *allocChunks(int numChunks, owner_t owner);
 // Allocates a contiguous region of memory at least as large as the given length
 void *allocRegion(int length, owner_t owner);
 // Free a region of allocated memory
-void freeAlloc(void *start);
+void freeAlloc(void *start) noexcept;
+
+// Deleter class for use with unique_ptr when holding memory allocated with allocRegion/allocChunks
+class alloc_deleter
+{
+public:
+    void operator()(void* ptr) { freeAlloc(ptr); }
+};
 
 #endif

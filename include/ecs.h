@@ -104,6 +104,8 @@ Entity *findEntity(archetype_t archetype, size_t archetypeArrayIndex);
 Entity *findEntityFromComponent(archetype_t archetype, int componentArchetypeIndex, void* componentPointer);
 // Deletes all entities (duh)
 void deleteAllEntities(void);
+// Iterates over every behavior entity and processes their behavior
+void iterateBehaviorEntities(void);
 
 extern const size_t g_componentSizes[];
 

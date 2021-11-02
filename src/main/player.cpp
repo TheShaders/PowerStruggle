@@ -118,7 +118,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->floor = nullptr;
     
     setAnim(animState, nullptr);
-    *model = load_model("models/Floor");
+    *model = load_model("models/FloorBlue");
 
     // // Set up animation
     // setAnim(animState, &character_anim);

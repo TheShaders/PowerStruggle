@@ -4,7 +4,7 @@
 #include <ultra64.h>
 #include <config.h>
 
-#define NUM_THREADS 4
+#define NUM_THREADS 5
 
 #define IDLE_THREAD 1
 #define IDLE_THREAD_INDEX (IDLE_THREAD - 1)
@@ -19,6 +19,11 @@
 #define MAIN_THREAD_INDEX (MAIN_THREAD - 1)
 #define MAIN_THREAD_STACKSIZE 0x4000
 #define MAIN_THREAD_PRI 10
+
+#define LOAD_THREAD 4
+#define LOAD_THREAD_INDEX (LOAD_THREAD - 1)
+#define LOAD_THREAD_STACKSIZE 0x1000
+#define LOAD_THREAD_PRI 11
 
 #define SCHEDULER_PRI 13
 

@@ -4,13 +4,13 @@
 #include <types.h>
 #include <stdint.h>
 
-typedef struct PlayerState_t
+struct PlayerState
 {
     Entity *playerEntity;
     uint8_t state;
     uint8_t subState;
     uint16_t stateArg;
-} PlayerState;
+};
 
 #define MAX_PLAYER_SPEED 8.0f
 #define MAX_PLAYER_SPEED_SQ POW2(MAX_PLAYER_SPEED)

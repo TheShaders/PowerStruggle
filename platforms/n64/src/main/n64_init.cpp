@@ -15,6 +15,8 @@ extern "C" {
 #include <n64_mem.h>
 #include <n64_audio.h>
 
+void loadThreadFunc(void *);
+
 #include <array>
 
 void platformInit()
@@ -24,6 +26,7 @@ void platformInit()
 u8 idleThreadStack[IDLE_THREAD_STACKSIZE] __attribute__((aligned (16)));
 u8 mainThreadStack[MAIN_THREAD_STACKSIZE] __attribute__((aligned (16)));
 u8 audioThreadStack[AUDIO_THREAD_STACKSIZE] __attribute__((aligned (16)));
+u8 loadThreadStack[LOAD_THREAD_STACKSIZE] __attribute__((aligned (16)));
 
 static OSMesgQueue piMesgQueue;
 static std::array<OSMesg, NUM_PI_MESSAGES> piMessages;
@@ -86,6 +89,11 @@ void idle(__attribute__ ((unused)) void *arg)
     osCreateThread(&g_threads[AUDIO_THREAD_INDEX], AUDIO_THREAD, audioThreadFunc, nullptr, audioThreadStack + AUDIO_THREAD_STACKSIZE, AUDIO_THREAD_PRI);
     // Start the audio thread
     osStartThread(&g_threads[AUDIO_THREAD_INDEX]);
+
+    // Create the load thread
+    osCreateThread(&g_threads[LOAD_THREAD_INDEX], LOAD_THREAD, loadThreadFunc, nullptr, loadThreadStack + LOAD_THREAD_STACKSIZE, LOAD_THREAD_PRI);
+    // Start the load thread
+    osStartThread(&g_threads[LOAD_THREAD_INDEX]);
 
     // Create the main thread
     osCreateThread(&g_threads[MAIN_THREAD_INDEX], MAIN_THREAD, mainThreadFunc, nullptr, mainThreadStack + MAIN_THREAD_STACKSIZE, MAIN_THREAD_PRI);

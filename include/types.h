@@ -8,10 +8,12 @@
 #define UNUSED __attribute__((unused))
 #define KEEP __attribute__((section (".text.keep"), used))
 #define NOINLINE __attribute__((noinline))
+#define FORCEINLINE inline __attribute__((always_inline))
 #elif _MSC_VER
 #define UNUSED
 #define KEEP
 #define NOINLINE __declspec(noinline)
+#define FORCEINLINE inline __forceinline
 #endif
 
 // Prototypes for model structs
@@ -53,7 +55,7 @@ typedef struct LevelHeader_t LevelHeader;
 typedef struct GravityParams_t GravityParams;
 
 // Prototypes for player structs
-typedef struct PlayerState_t PlayerState;
+struct PlayerState;
 
 // Components
 // #define COMPONENT(Name, Type) typedef Type Name;
