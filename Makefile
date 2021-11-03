@@ -129,8 +129,9 @@ CKSUM   := $(PYTHON) tools/n64cksum.py
 
 ASSETPACK := tools/assetpack/assetpack
 GLTF64    := tools/gltf64/gltf64
+LEVELCONV := tools/levelconv/levelconv
 
-TOOLS := $(ASSETPACK) $(GLTF64)
+TOOLS := $(ASSETPACK) $(GLTF64) $(LEVELCONV)
 
 ### Files and Directories ###
 
@@ -162,7 +163,11 @@ MODEL_DIR  := $(ASSET_ROOT)/models
 MODELS     := $(wildcard $(MODEL_DIR)/*.gltf)
 MODELS_OUT := $(addprefix $(BUILD_ROOT)/, $(MODELS:.gltf=))
 
-ASSETS_OUT  := $(MODELS_OUT)
+LEVELS_DIR := $(ASSET_ROOT)/levels
+LEVELS     := $(wildcard $(LEVELS_DIR)/*.level)
+LEVELS_OUT := $(addprefix $(BUILD_ROOT)/, $(LEVELS:.level=))
+
+ASSETS_OUT  := $(MODELS_OUT) $(LEVELS_OUT)
 
 LEVEL_DIR := $(ASSET_ROOT)/levels
 LEVELS    := $(wildcard $(MODEL_DIR)/*.json)
@@ -352,8 +357,18 @@ $(GLTF64) :
 
 # Convert models
 $(MODELS_OUT) : $(BUILD_ROOT)/% : %.gltf | $(BUILD_DIRS) $(GLTF64)
-	@$(PRINT)$(GREEN)Converting model: $(ENDGREEN)$(BLUE)$@$(ENDBLUE)$(ENDLINE)
+	@$(PRINT)$(GREEN)Converting model: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
 	@$(GLTF64) $< $@
+
+# Compile levelconv
+$(LEVELCONV) :
+	@$(PRINT)$(GREEN)Compiling levelconv$(ENDGREEN)$(ENDLINE)
+	@$(MAKE) -C tools/levelconv
+
+# Convert levels
+$(LEVELS_OUT) : $(BUILD_ROOT)/% : %.level | $(BUILD_DIRS) $(LEVELCONV)
+	@$(PRINT)$(GREEN)Converting level: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
+	@$(LEVELCONV) $< $@ $(ASSET_ROOT)
 
 clean:
 	@$(PRINT)$(YELLOW)Cleaning build$(ENDYELLOW)$(ENDLINE)

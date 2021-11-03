@@ -184,10 +184,10 @@ int main(int argc, char *argv[])
         fs::path assets_absolute = fs::canonical(asset_folder);
         fs::path input_dir = fs::path(input_path).parent_path() / fs::path{"./"};
         int min_x = input_json["MinX"];
-        int min_y = input_json["MinY"];
+        // int min_y = input_json["MinY"];
         int min_z = input_json["MinZ"];
         int max_x = input_json["MaxX"];
-        int max_y = input_json["MaxY"];
+        // int max_y = input_json["MaxY"];
         int max_z = input_json["MaxZ"];
         std::vector<std::string> tile_paths;
 
@@ -219,12 +219,12 @@ int main(int argc, char *argv[])
             }
             column_vec->second.push_back(Cell{/*x,*/ y, /*z,*/ tile_index, rotation});
         }
-        int sum = std::accumulate(columns.begin(), columns.end(), 0, 
-            [](auto a, decltype(columns)::value_type& b)
-            {
-                return a + b.second.size();
-            }
-        );
+        // int sum = std::accumulate(columns.begin(), columns.end(), 0, 
+        //     [](auto a, decltype(columns)::value_type& b)
+        //     {
+        //         return a + b.second.size();
+        //     }
+        // );
         size_t num_cells_x = max_x - min_x;
         size_t num_cells__z = max_z - min_z;
         size_t num_chunks_x = round_up_divide(num_cells_x, chunk_size);
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
             {
                 Chunk& cur_chunk = chunks[{chunk_x,chunk_z}];
 
-                fmt::print("chunk: {:<2} {:<2}\n", chunk_x, chunk_z);
+                // fmt::print("chunk: {:<2} {:<2}\n", chunk_x, chunk_z);
                 size_t start_x = chunk_x * chunk_size;
                 size_t start_z = chunk_z * chunk_size;
                 for (size_t subchunk_x = 0; subchunk_x < chunk_size; subchunk_x++)
@@ -292,10 +292,10 @@ int main(int argc, char *argv[])
         std::ofstream output_file(output_path, std::ios_base::binary);
         write_grid(output_file, chunks);
 
-        fmt::print("Column count: {}\n", columns.size());
-        fmt::print("Tile count: {}\n", sum);
-        fmt::print("Min: {} {} {} Max: {} {} {}\n", min_x, min_y, min_z, max_x, max_y, max_z);
-        fmt::print("Chunks: {} by {}\n", num_chunks_x, num_chunks_z);
+        // fmt::print("Column count: {}\n", columns.size());
+        // fmt::print("Tile count: {}\n", sum);
+        // fmt::print("Min: {} {} {} Max: {} {} {}\n", min_x, min_y, min_z, max_x, max_y, max_z);
+        // fmt::print("Chunks: {} by {}\n", num_chunks_x, num_chunks_z);
     }
     catch (js::json::exception& err)
     {

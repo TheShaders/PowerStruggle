@@ -60,7 +60,7 @@ bool GameplayScene::load()
 
     debug_printf("Getting grid definition\n");
 
-    GridDefinition def = get_grid_definition("levels/test.bin");
+    GridDefinition def = get_grid_definition("levels/test_");
     grid_ = Grid{def, std::move(tiles)};
 
     debug_printf("Starting chunk loads\n");
