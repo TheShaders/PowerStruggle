@@ -248,9 +248,12 @@ public:
     constexpr void erase(value_type* element) noexcept
     {
         size_t index = (element - data_.data());
-        skipped_[index] = 0xFF;
-        element->~T();
-        num_items_--;
+        if (skipped_[index] == 0)
+        {
+            skipped_[index] = 0xFF;
+            element->~T();
+            num_items_--;
+        }
     }
     
     constexpr iterator insert(const value_type& value) noexcept
@@ -288,7 +291,7 @@ public:
     std::array<uint8_t, Length + 1> skipped_;
     size_type num_items_;
 
-    constexpr size_type first_idx() const
+    constexpr __attribute__((noinline)) size_type first_idx() const
     {
         size_type i;
         for (i = 0; skipped_[i] && i < Length; i++);

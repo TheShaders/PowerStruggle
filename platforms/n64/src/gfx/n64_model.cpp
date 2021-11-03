@@ -1,6 +1,10 @@
 #include <n64_model.h>
 #include <model.h>
 
+extern "C" {
+#include <debug.h>
+}
+
 void TriangleGroup::adjust_offsets(void *base_addr)
 {
     triangles = ::add_offset(triangles, base_addr);
@@ -72,6 +76,8 @@ size_t Joint::gfx_length() const
 void Model::adjust_offsets()
 {
     void *base_addr = this;
+    debug_printf("Adjusting offsets of model at 0x%08X\n", base_addr);
+    debug_printf("  Joints: %d Materials: %d\n", num_joints, num_materials);
     joints    = ::add_offset(joints, base_addr);
     materials = ::add_offset(materials, base_addr);
     verts     = ::add_offset(verts, base_addr);

@@ -19,6 +19,8 @@ void loadThreadFunc(void *);
 
 #include <array>
 
+#define static
+
 void platformInit()
 {
 }
@@ -43,6 +45,9 @@ extern "C" void init(void)
     
     bzero(_mainSegmentBssStart, (u32)_mainSegmentBssEnd - (u32)_mainSegmentBssStart);
 
+    // TODO figure out what's uninitialized that requires this to work
+    // bzero(_mainSegmentBssEnd, 0x80400000 -  (u32)_mainSegmentBssEnd);
+
     initMemAllocator(memPoolStart, (void*) MEM_END);
     g_romHandle = osCartRomInit();
 
@@ -52,6 +57,8 @@ extern "C" void init(void)
 
 int main(int, char **);
 extern "C" u32 __osSetFpcCsr(u32);
+
+// void crash_screen_init();
 
 void mainThreadFunc(void *)
 {
@@ -99,6 +106,8 @@ void idle(__attribute__ ((unused)) void *arg)
     osCreateThread(&g_threads[MAIN_THREAD_INDEX], MAIN_THREAD, mainThreadFunc, nullptr, mainThreadStack + MAIN_THREAD_STACKSIZE, MAIN_THREAD_PRI);
     // Start the main thread
     osStartThread(&g_threads[MAIN_THREAD_INDEX]);
+
+    // crash_screen_init();
 
     // Set this thread's priority to 0, making it the idle thread
     osSetThreadPri(nullptr, 0);

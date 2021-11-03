@@ -9,48 +9,61 @@
 #include <main.h>
 #include <files.h>
 
+extern "C" {
+#include <debug.h>
+}
+
 extern GridDefinition get_grid_definition(const char *file);
 
 GameplayScene::GameplayScene() : grid_{}
 {
 }
 
-// load_handle handle;
+// LoadHandle handle;
 
 bool GameplayScene::load()
 {
     // Create the player entity
     // createPlayer(&playerState_);
 
-    dynamic_array<TileType> tiles{
-        TileType{load_model("models/Floor")},
-        TileType{load_model("models/FloorBlue")},
-        TileType{load_model("models/FloorBrown")},
-        TileType{load_model("models/FloorGray")},
-        TileType{load_model("models/FloorGreen")},
-        TileType{load_model("models/FloorRed")},
-        TileType{load_model("models/FloorWhite")},
-        TileType{load_model("models/FloorYellow")},
-        TileType{load_model("models/Slope")},
-        TileType{load_model("models/SlopeBlue")},
-        TileType{load_model("models/SlopeBrown")},
-        TileType{load_model("models/SlopeGray")},
-        TileType{load_model("models/SlopeGreen")},
-        TileType{load_model("models/SlopeRed")},
-        TileType{load_model("models/SlopeWhite")},
-        TileType{load_model("models/SlopeYellow")},
-        TileType{load_model("models/Wall")},
-        TileType{load_model("models/WallBlue")},
-        TileType{load_model("models/WallBrown")},
-        TileType{load_model("models/WallGray")},
-        TileType{load_model("models/WallGreen")},
-        TileType{load_model("models/WallRed")},
-        TileType{load_model("models/WallWhite")},
-        TileType{load_model("models/WallYellow")},
-    };
+    debug_printf("Loading tiles\n");
+
+    dynamic_array<TileType> tiles(24);
+
+    int i = 0;
+    
+    tiles[i++] = TileType{load_model("models/Floor")};
+    tiles[i++] = TileType{load_model("models/FloorBlue")};
+    tiles[i++] = TileType{load_model("models/FloorBrown")};
+    tiles[i++] = TileType{load_model("models/FloorGray")};
+    tiles[i++] = TileType{load_model("models/FloorGreen")};
+    tiles[i++] = TileType{load_model("models/FloorRed")};
+    tiles[i++] = TileType{load_model("models/FloorWhite")};
+    tiles[i++] = TileType{load_model("models/FloorYellow")};
+    tiles[i++] = TileType{load_model("models/Slope")};
+    tiles[i++] = TileType{load_model("models/SlopeBlue")};
+    tiles[i++] = TileType{load_model("models/SlopeBrown")};
+    tiles[i++] = TileType{load_model("models/SlopeGray")};
+    tiles[i++] = TileType{load_model("models/SlopeGreen")};
+    tiles[i++] = TileType{load_model("models/SlopeRed")};
+    tiles[i++] = TileType{load_model("models/SlopeWhite")};
+    tiles[i++] = TileType{load_model("models/SlopeYellow")};
+    tiles[i++] = TileType{load_model("models/Wall")};
+    tiles[i++] = TileType{load_model("models/WallBlue")};
+    tiles[i++] = TileType{load_model("models/WallBrown")};
+    tiles[i++] = TileType{load_model("models/WallGray")};
+    tiles[i++] = TileType{load_model("models/WallGreen")};
+    tiles[i++] = TileType{load_model("models/WallRed")};
+    tiles[i++] = TileType{load_model("models/WallWhite")};
+    tiles[i++] = TileType{load_model("models/WallYellow")};
+
+
+    debug_printf("Getting grid definition\n");
 
     GridDefinition def = get_grid_definition("levels/test.bin");
     grid_ = Grid{def, std::move(tiles)};
+
+    debug_printf("Starting chunk loads\n");
     grid_.load_chunk({0, 0});
     grid_.load_chunk({0, 1});
     grid_.load_chunk({0, 2});
@@ -64,7 +77,9 @@ bool GameplayScene::load()
     grid_.load_chunk({2, 2});
     grid_.load_chunk({2, 3});
 
-    // load_handle
+    debug_printf("Finished GameplayScene::load\n");
+
+    // LoadHandle
     // handle = start_file_load("models/Wall");
     // handle.join();
     // auto m = load_model("models/Wall");
@@ -103,6 +118,7 @@ bool GameplayScene::load()
 
 void GameplayScene::update()
 {
+    grid_.process_loading_chunks();
     // Increment the physics state
     // debug_printf("before physics tick\n");
     physicsTick();

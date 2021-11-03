@@ -14,22 +14,22 @@ public:
     void operator()(void* ptr);
 };
 
-class load_handle
+class LoadHandle
 {
 public:
     // Default constructor
-    load_handle() = default;
+    LoadHandle() = default;
     // Default destructor thanks to unique_ptr
-    ~load_handle() = default;
+    ~LoadHandle() = default;
     // Not copyable or copy assignable
-    load_handle(const load_handle&) = delete;
-    load_handle& operator=(const load_handle&) = delete;
+    LoadHandle(const LoadHandle&) = delete;
+    LoadHandle& operator=(const LoadHandle&) = delete;
     // Move constructor
-    load_handle(load_handle&& rhs) :
+    LoadHandle(LoadHandle&& rhs) :
         handle_slot_(std::exchange(rhs.handle_slot_, nullptr))
     {}
     // Move assignment operator
-    load_handle& operator=(load_handle&& rhs)
+    LoadHandle& operator=(LoadHandle&& rhs)
     {
         handle_slot_ = std::exchange(rhs.handle_slot_, nullptr);
         return *this;
@@ -41,11 +41,11 @@ public:
     void* join();
 private:
     std::unique_ptr<LoadRxSlot, LoadRxSlotDeleter> handle_slot_;
-    load_handle(LoadRxSlot *handle_slot) :
+    LoadHandle(LoadRxSlot *handle_slot) :
         handle_slot_(handle_slot)
     {}
 
-    friend load_handle start_data_load(void*, uint32_t, uint32_t);
+    friend LoadHandle start_data_load(void*, uint32_t, uint32_t);
 };
 
 #endif

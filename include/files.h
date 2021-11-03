@@ -8,11 +8,11 @@
 #include <platform_files.h>
 
 // Implementation-defined in platform_files.h
-class load_handle;
+class LoadHandle;
 
 
-[[nodiscard]] load_handle start_file_load(const char *path);
-load_handle start_data_load(void* ret, uint32_t rom_pos, uint32_t size); // TODO refactor for PC support
+[[nodiscard]] LoadHandle start_file_load(const char *path);
+LoadHandle start_data_load(void* ret, uint32_t rom_pos, uint32_t size); // TODO refactor for PC support
 [[nodiscard]] void *load_file(const char *path);
 [[nodiscard]] void *load_data(uint32_t rom_pos, uint32_t size); // Same as above
 void *load_data(void* ret, uint32_t rom_pos, uint32_t size); // Same as above

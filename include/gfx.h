@@ -160,6 +160,11 @@ namespace gfx
         mtxfMul(*g_curMatFPtr, *g_curMatFPtr, tmp);
     }
 
+    inline void apply_matrix(MtxF *mat)
+    {
+        mtxfMul(*g_curMatFPtr, *g_curMatFPtr, *mat);
+    }
+
     inline void apply_translation(float x, float y, float z)
     {
         MtxF tmp;

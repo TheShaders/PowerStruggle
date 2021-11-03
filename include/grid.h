@@ -9,6 +9,7 @@
 #include <skipfield.h>
 #include <model.h>
 #include <mem.h>
+#include <files.h>
 
 template <typename T>
 constexpr T round_up_divide(T x, T y)
@@ -18,6 +19,7 @@ constexpr T round_up_divide(T x, T y)
 
 constexpr size_t chunk_size = 16;
 constexpr size_t max_loaded_chunks = 64;
+constexpr size_t max_loading_chunks = 16;
 
 using tile_id = uint8_t;
 using grid_pos = std::pair<unsigned int, unsigned int>;
@@ -119,6 +121,7 @@ public:
     // }
     // void set_tile(unsigned int row, unsigned int col, Tile type) { tiles_[row * width_ + col] = type; }
     void load_chunk(chunk_pos pos);
+    void process_loading_chunks();
 
     void draw();
 
@@ -134,6 +137,7 @@ private:
     GridDefinition definition_;
     dynamic_array<TileType> tile_types_;
     skipfield<ChunkEntry, max_loaded_chunks> loaded_chunks_;
+    skipfield<std::pair<chunk_pos, LoadHandle>, max_loading_chunks> loading_chunks_;
 };
 
 // Tile& GridPosProxy::operator[](unsigned int col) { return grid.get_tile(row, col); }

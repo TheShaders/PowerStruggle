@@ -81,7 +81,7 @@ SECTIONS
 
     START_SEGMENT(assets, romPos)
     {
-        BUILD_ROOT/assets.o(.*data*);
+        KEEP(BUILD_ROOT/assets.o(.*data*));
     }
     END_SEGMENT(assets);
 

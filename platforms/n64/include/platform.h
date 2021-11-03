@@ -59,7 +59,7 @@ static inline void disableInterrupts() {
 static inline void enableInterrupts() {
     uint32_t statusReg;
     __asm__ __volatile__("mfc0 %0, $%1" : "=r"(statusReg) : "I"(C0_SR));
-    statusReg |= ~SR_IE;
+    statusReg |= SR_IE;
     __asm__ __volatile__("mtc0 %0, $%1" : : "r"(statusReg), "I"(C0_SR));
 }
 
