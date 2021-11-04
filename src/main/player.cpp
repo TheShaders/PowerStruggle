@@ -38,10 +38,12 @@ void updateGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED 
     (void)input;
 }
 
-void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
+void processGround(UNUSED PlayerState *state, InputData *input, Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
 {
-    (void)state;
-    (void)input;
+    float targetSpeed = MAX_PLAYER_SPEED * input->magnitude;
+    vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
+    vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
+    VEC3_ADD(pos, pos, vel);
 }
 
 void updateAir(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
@@ -105,8 +107,8 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     bhvParams->callback = playerCallback;
     bhvParams->data = arg;
     state->playerEntity = findEntityFromComponent(ARCHETYPE_PLAYER, Component_Position, pos);
-    state->state = PSTATE_AIR;
-    state->subState = PASUBSTATE_FALLING;
+    state->state = PSTATE_GROUND;
+    state->subState = PGSUBSTATE_WALKING;
     state->stateArg = 0;
 
     // Set up collider
@@ -118,7 +120,11 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->floor = nullptr;
     
     setAnim(animState, nullptr);
-    *model = load_model("models/FloorBlue");
+    *model = load_model("models/Box");
+
+    (*pos)[0] = 0.0f;
+    (*pos)[1] = 0.0f;
+    (*pos)[2] = 0.0f;
 
     // // Set up animation
     // setAnim(animState, &character_anim);
@@ -160,7 +166,17 @@ void playerCallback(UNUSED void **components, void *data)
     // Process the current state
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
 
-    (*rot)[1] = 218 * g_gameTimer;
+    VEC3_COPY(g_Camera.target, *pos);
+
+    if (g_PlayerInput.buttonsHeld & U_CBUTTONS)
+    {
+        g_Camera.distance -= 50.0f;
+    }
+
+    if (g_PlayerInput.buttonsHeld & D_CBUTTONS)
+    {
+        g_Camera.distance += 50.0f;
+    }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
 }

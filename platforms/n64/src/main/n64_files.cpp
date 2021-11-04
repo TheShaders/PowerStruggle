@@ -95,14 +95,14 @@ LoadHandle start_data_load(void *ret, uint32_t rom_pos, uint32_t size)
         ret = allocRegion(size, ALLOC_FILE);
     }
     // Get an rx slot and set its parameters
-    auto rx_iter = load_rx_slots.emplace({rom_pos, size, ret, new_id});
+    auto rx_iter = load_rx_slots.emplace(rom_pos, size, ret, new_id);
     LoadRxSlot* rx_slot = &(*rx_iter);
     
     // debug_printf("Getting a free tx slot\n");
     // Wait for a free tx slot
     while (load_tx_slots.full()) { osYieldThread(); }
     // Get a tx slot and point it at the current rx slot
-    auto tx_iter = load_tx_slots.emplace({rx_slot, new_id});
+    auto tx_iter = load_tx_slots.emplace(rx_slot, new_id);
     LoadTxSlot* tx_slot = &(*tx_iter);
 
     // debug_printf("Starting data load of 0x%08X bytes at 0x%08X\n", size, rom_pos);
@@ -193,7 +193,7 @@ void loadThreadFunc(UNUSED void *arg)
     // Set up the message queues in the rx slots
     for (size_t i = 0; i < num_load_slots; i++)
     {
-        auto &rx_slot = *load_rx_slots.emplace({});
+        auto &rx_slot = *load_rx_slots.emplace();
         osCreateMesgQueue(&rx_slot.queue, &rx_slot.mesg_buf, 1);
     }
     load_rx_slots.clear();

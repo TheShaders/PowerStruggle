@@ -21,7 +21,7 @@ void drawAnimatedModels(size_t count, UNUSED void *arg, void **componentArrays)
         Animation *anim = segmentedToVirtual(curAnimState->anim);
 
         gfx::push_mat();
-         gfx::apply_translation((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
          gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
           drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
         gfx::pop_mat();
@@ -63,7 +63,7 @@ void drawModels(size_t count, UNUSED void *arg, void **componentArrays)
     while (count)
     {
         gfx::push_mat();
-         gfx::apply_translation((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
          gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
           drawModel(*curModel, nullptr, 0);
         gfx::pop_mat();
@@ -88,9 +88,9 @@ void drawResizableAnimatedModels(size_t count, UNUSED void *arg, void **componen
         Animation *anim = segmentedToVirtual(curAnimState->anim);
 
         gfx::push_mat();
-         gfx::apply_translation((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
          gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-         gfx::apply_scale(*curScale, *curScale, *curScale);
+         gfx::apply_scale_affine(*curScale, *curScale, *curScale);
           drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
         gfx::pop_mat();
 
@@ -133,9 +133,9 @@ void drawResizableModels(size_t count, UNUSED void *arg, void **componentArrays)
     while (count)
     {
         gfx::push_mat();
-         gfx::apply_translation((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
          gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-         gfx::apply_scale(*curScale, *curScale, *curScale);
+         gfx::apply_scale_affine(*curScale, *curScale, *curScale);
           drawModel(*curModel, nullptr, 0);
         gfx::pop_mat();
         count--;

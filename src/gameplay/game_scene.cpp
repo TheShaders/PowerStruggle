@@ -24,7 +24,7 @@ GameplayScene::GameplayScene() : grid_{}
 bool GameplayScene::load()
 {
     // Create the player entity
-    // createPlayer(&playerState_);
+    createPlayer(&playerState_);
 
     debug_printf("Loading tiles\n");
 
@@ -62,20 +62,6 @@ bool GameplayScene::load()
 
     GridDefinition def = get_grid_definition("levels/test_");
     grid_ = Grid{def, std::move(tiles)};
-
-    debug_printf("Starting chunk loads\n");
-    grid_.load_chunk({0, 0});
-    grid_.load_chunk({0, 1});
-    grid_.load_chunk({0, 2});
-    grid_.load_chunk({0, 3});
-    grid_.load_chunk({1, 0});
-    grid_.load_chunk({1, 1});
-    grid_.load_chunk({1, 2});
-    grid_.load_chunk({1, 3});
-    grid_.load_chunk({2, 0});
-    grid_.load_chunk({2, 1});
-    grid_.load_chunk({2, 2});
-    grid_.load_chunk({2, 3});
 
     debug_printf("Finished GameplayScene::load\n");
 
@@ -118,6 +104,8 @@ bool GameplayScene::load()
 
 void GameplayScene::update()
 {
+    grid_.unload_nonvisible_chunks(g_Camera);
+    grid_.load_visible_chunks(g_Camera);
     grid_.process_loading_chunks();
     // Increment the physics state
     // debug_printf("before physics tick\n");

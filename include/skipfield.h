@@ -264,12 +264,13 @@ public:
         }
         int idx = first_free();
         skipped_[idx] = 0;
-        data_[idx] = value;
+        new (&data_[idx]) T(value);
         num_items_++;
         return iterator{&data_[idx], &skipped_[idx]};
     }
     
-    constexpr iterator emplace(value_type&& value) noexcept
+    template <typename... Args>
+    constexpr iterator emplace(Args&&... args) noexcept
     {
         if (num_items_ == Length)
         {
@@ -277,7 +278,7 @@ public:
         }
         int idx = first_free();
         skipped_[idx] = 0;
-        data_[idx] = std::move(value);
+        new (&data_[idx]) T(std::forward<Args>(args)...);
         num_items_++;
         return iterator{&data_[idx], &skipped_[idx]};
     }

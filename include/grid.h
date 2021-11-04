@@ -76,15 +76,21 @@ struct GridDefinition {
     void get_chunk_offset_size(unsigned int x, unsigned int z, uint32_t *offset, uint32_t *size);
 };
 
-template <typename T>
-constexpr T round_down_divide(T x, T y)
+// Division in C rounds towards 0, rather than towards negative infinity
+// Rounding towards negative infinity is quicker for powers of two (just a right arithmetic shift)
+// This also ensure correctness for negative chunk positions (which don't exist currently, but might in the future)
+template <size_t D, typename T>
+constexpr T round_down_divide(T x)
 {
-    return static_cast<T>((((std::make_unsigned_t<T>)x / y) * y) / y);
+    static_assert(D && !(D & (D - 1)), "Can only round down divide by a power of 2!");
+    // This log is evaluated at compile time
+    size_t log = static_cast<size_t>(std::log2(D));
+    return x >> log;
 }
 
 constexpr chunk_pos chunk_from_pos(grid_pos pos)
 {
-    return chunk_pos{round_down_divide(pos.first, chunk_size), round_down_divide(pos.second, chunk_size)};
+    return chunk_pos{round_down_divide<chunk_size>(pos.first), round_down_divide<chunk_size>(pos.second)};
 }
 
 class Grid;
@@ -120,6 +126,10 @@ public:
     //     return tiles_[row * width_ + col];
     // }
     // void set_tile(unsigned int row, unsigned int col, Tile type) { tiles_[row * width_ + col] = type; }
+    void get_loaded_chunks_in_area(int min_chunk_x, int min_chunk_z, int max_chunk_x, int max_chunk_z, bool* found);
+    bool is_loaded_or_loading(chunk_pos pos);
+    void load_visible_chunks(Camera& camera);
+    void unload_nonvisible_chunks(Camera& camera);
     void load_chunk(chunk_pos pos);
     void process_loading_chunks();
 
@@ -138,6 +148,13 @@ private:
     dynamic_array<TileType> tile_types_;
     skipfield<ChunkEntry, max_loaded_chunks> loaded_chunks_;
     skipfield<std::pair<chunk_pos, LoadHandle>, max_loading_chunks> loading_chunks_;
+
+    using loaded_chunk_iterator = decltype(loaded_chunks_)::iterator;
+    loaded_chunk_iterator unload_chunk(loaded_chunk_iterator it)
+    {
+        // unique_ptr will handle freeing the chunk data
+        return loaded_chunks_.erase(it);
+    }
 };
 
 // Tile& GridPosProxy::operator[](unsigned int col) { return grid.get_tile(row, col); }

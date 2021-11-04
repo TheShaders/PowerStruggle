@@ -1,7 +1,7 @@
 #include <camera.h>
 
 Camera g_Camera = {
-    {1800.0f, 0.0f, 4000.0f},
+    {0.0f, 0.0f, 0.0f},
     200.0f,
     60.0f,
     4000.0f,

@@ -324,7 +324,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             gfx::push_mat();
         }
 
-        gfx::apply_translation(curJoint->posX, curJoint->posY, curJoint->posZ);
+        gfx::apply_translation_affine(curJoint->posX, curJoint->posY, curJoint->posZ);
 
         if (anim != nullptr)
         {
@@ -360,7 +360,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             }
             if (hasCurrentTransformComponent)
             {
-                gfx::apply_translation(x, y, z);
+                gfx::apply_translation_affine(x, y, z);
             }
             
             hasCurrentTransformComponent = 0;
@@ -413,7 +413,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             }
             if (hasCurrentTransformComponent)
             {
-                gfx::apply_scale(x, y, z);
+                gfx::apply_scale_affine(x, y, z);
             }
             
         }

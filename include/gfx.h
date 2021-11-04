@@ -6,6 +6,7 @@
 #include <config.h>
 #include <types.h>
 #include <mathutils.h>
+#include <cstring>
 
 // Draw layers
 enum class DrawLayer : unsigned int {
@@ -138,6 +139,7 @@ namespace gfx
 
     inline void mul_lookat(float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ)
     {
+        // TODO affine matrix optimization
         MtxF tmp;
         guLookAtF(tmp,
             eyeX, eyeY, eyeZ,
@@ -148,6 +150,7 @@ namespace gfx
 
     inline void rotate_axis_angle(float angle, float axisX, float axisY, float axisZ)
     {
+        // TODO affine matrix optimization
         MtxF tmp;
         guRotateF(tmp, angle, axisX, axisY, axisZ);
         mtxfMul(*g_curMatFPtr, *g_curMatFPtr, tmp);
@@ -165,18 +168,24 @@ namespace gfx
         mtxfMul(*g_curMatFPtr, *g_curMatFPtr, *mat);
     }
 
-    inline void apply_translation(float x, float y, float z)
+    inline void apply_translation_affine(float x, float y, float z)
     {
-        MtxF tmp;
-        guTranslateF(tmp, x, y, z);
-        mtxfMul(*g_curMatFPtr, *g_curMatFPtr, tmp);
+        MtxF& mat = *g_curMatFPtr;
+        for (int i = 0; i < 3; i++)
+        {
+            mat[3][i] += mat[0][i] * x + mat[1][i] * y + mat[2][i] * z;
+        }
     }
 
-    inline void apply_scale(float sx, float sy, float sz)
+    inline void apply_scale_affine(float sx, float sy, float sz)
     {
-        MtxF tmp;
-        guScaleF(tmp, sx, sy, sz);
-        mtxfMul(*g_curMatFPtr, *g_curMatFPtr, tmp);
+        MtxF& mat = *g_curMatFPtr;
+        for (int i = 0; i < 3; i++)
+        {
+            mat[0][i] *= sx;
+            mat[1][i] *= sy;
+            mat[2][i] *= sz;
+        }
     }
 
     inline void apply_position(float pitch, float rx, float ry, float rz, float x, float y, float z)
