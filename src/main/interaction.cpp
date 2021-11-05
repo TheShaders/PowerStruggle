@@ -12,7 +12,7 @@ typedef struct FindClosestData_t
     float maxDistSq;
     float closestDistSq;
     Vec3 *closestPos;
-    archetype_t closestArchetype;
+    Entity *entity;
 
 } FindClosestData;
 
@@ -24,11 +24,12 @@ void findClosestCallback(size_t count, void *arg, UNUSED int numComponents, arch
     
     float maxDistSq = findData->maxDistSq;
     float closestDistSq = findData->closestDistSq;
-    archetype_t closestArchetype = findData->closestArchetype;
+    Entity *closestEntity = findData->entity;
     Vec3 *closestPos = findData->closestPos;
 
     Vec3 nearPos = { findData->nearPos[0], findData->nearPos[1], findData->nearPos[2] };
     Vec3 *curPos = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Position, archetype)]);
+    Entity **curEntity = static_cast<Entity**>(componentArrays[0]);
     while (count)
     {
         Vec3 posDiff;
@@ -40,16 +41,17 @@ void findClosestCallback(size_t count, void *arg, UNUSED int numComponents, arch
         {
             closestDistSq = curDistSq;
             closestPos = curPos;
-            closestArchetype = archetype;
+            closestEntity = *curEntity;
         }
 
         count--;
         curPos++;
+        curEntity++;
     }
 
     findData->closestDistSq = closestDistSq;
     findData->closestPos = closestPos;
-    findData->closestArchetype = closestArchetype;
+    findData->entity = closestEntity;
 }
 
 Entity *findClosestEntity(Vec3 pos, archetype_t archetype, float maxDist, float *foundDist, Vec3 foundPos)
@@ -60,18 +62,17 @@ Entity *findClosestEntity(Vec3 pos, archetype_t archetype, float maxDist, float 
         .maxDistSq = std::pow<float, float>(maxDist, 2),
         .closestDistSq = std::numeric_limits<float>::max(),
         .closestPos = nullptr,
-        .closestArchetype = 0,
+        .entity = nullptr,
     };
     // Entities need a position component to be "close" to something, so only look for ones that have it
     archetype |= Bit_Position;
     iterateOverEntitiesAllComponents(findClosestCallback, &findData, archetype, 0);
 
-    if (findData.closestArchetype != 0)
+    if (findData.entity != nullptr)
     {
-        Entity *foundEntity = findEntityFromComponent(findData.closestArchetype, COMPONENT_INDEX(Position, findData.closestArchetype), findData.closestPos);
         *foundDist = std::sqrt(findData.closestDistSq);
         VEC3_COPY(foundPos, *findData.closestPos);
-        return foundEntity;
+        return findData.entity;
     }
 
     return nullptr;

@@ -6,6 +6,13 @@
 #include <array>
 #include <span>
 
+extern "C" {
+#include <debug.h>
+}
+
+#include <platform.h>
+#include <mutex>
+
 /**
  * One block of memory in the memory pool, contains links to the previous and next free blocks
  */
@@ -134,6 +141,8 @@ MemoryBlock *MemoryPool::block_from_index(size_t index)
     return (MemoryBlock *)blockAddr;
 }
 
+std::mutex mem_mutex{};
+
 // Allocates a contiguous number of blocks with the given owner
 void *MemoryPool::alloc(int num_blocks, owner_t owner)
 {
@@ -148,6 +157,7 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
         _firstFree = _firstFree->unlink();
         _blockTable[retBlock->index()] = owner;
         
+        // debug_printf("Allocated %08X\n", retBlock);
         return retBlock;
     }
     else
@@ -194,6 +204,7 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
                         _firstFree = newLink;
                 }
 
+                // debug_printf("Allocated %08X\n", freeBlock);
                 return &freeBlock;
             }
         }
@@ -204,6 +215,7 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
 // Frees a previously allocated block(s)
 void MemoryPool::free(void *mem) noexcept
 {
+    // debug_printf("Freeing alloc %08X\n", mem);
     // Cast the input memory address to a MemoryBlock
     MemoryBlock *toFree = static_cast<MemoryBlock*>(mem);
     // Get the index of the block being freed

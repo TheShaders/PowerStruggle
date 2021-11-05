@@ -88,6 +88,8 @@ extern Model *get_cube_model();
 
 void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays)
 {
+    // debug_printf("Creating player entity\n");
+
     // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
     Vec3 *pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_PLAYER);
     UNUSED Vec3s *rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_PLAYER);
@@ -98,6 +100,12 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     AnimState *animState = get_component<Bit_AnimState, AnimState>(componentArrays, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)arg;
     // *model = &character_model;
+    // debug_printf("Player components\n");
+    // debug_printf(" pos %08X\n", pos);
+    // debug_printf(" rot %08X\n", rot);
+    // debug_printf(" collider %08X\n", collider);
+    // debug_printf(" bhvParams %08X\n", bhvParams);
+    // debug_printf(" model %08X\n", model);
     
     // Set up gravity
     gravity->accel = 0; //-PLAYER_GRAVITY;
@@ -106,7 +114,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     // Set up behavior code
     bhvParams->callback = playerCallback;
     bhvParams->data = arg;
-    state->playerEntity = findEntityFromComponent(ARCHETYPE_PLAYER, Component_Position, pos);
+    state->playerEntity = get_entity(componentArrays);
     state->state = PSTATE_GROUND;
     state->subState = PGSUBSTATE_WALKING;
     state->stateArg = 0;
@@ -122,9 +130,11 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     setAnim(animState, nullptr);
     *model = load_model("models/Box");
 
-    (*pos)[0] = 0.0f;
+    (*pos)[0] = 512.0f;
     (*pos)[1] = 0.0f;
-    (*pos)[2] = 0.0f;
+    (*pos)[2] = 512.0f;
+
+    // debug_printf("Set up player entity: 0x%08X\n", state->playerEntity);
 
     // // Set up animation
     // setAnim(animState, &character_anim);

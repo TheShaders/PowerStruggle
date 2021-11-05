@@ -380,7 +380,7 @@ void startFrame(void)
 void endFrame(void)
 {
     Entity player;
-    void *components[NUM_COMPONENTS(ARCHETYPE_PLAYER)];
+    void *components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
 
     player.archetype = ARCHETYPE_PLAYER;
     player.archetypeArrayIndex = 0;

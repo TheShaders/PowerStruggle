@@ -524,16 +524,16 @@ size_t	 strlen (const char *);
                     debug_printf("badvaddr\t0x%08x\n\n", context->badvaddr);
                     
                     // Print the registers
-                    debug_printf("at 0x%016llx v0 0x%016llx v1 0x%016llx\n", context->at, context->v0, context->v1);
-                    debug_printf("a0 0x%016llx a1 0x%016llx a2 0x%016llx\n", context->a0, context->a1, context->a2);
-                    debug_printf("a3 0x%016llx t0 0x%016llx t1 0x%016llx\n", context->a3, context->t0, context->t1);
-                    debug_printf("t2 0x%016llx t3 0x%016llx t4 0x%016llx\n", context->t2, context->t3, context->t4);
-                    debug_printf("t5 0x%016llx t6 0x%016llx t7 0x%016llx\n", context->t5, context->t6, context->t7);
-                    debug_printf("s0 0x%016llx s1 0x%016llx s2 0x%016llx\n", context->s0, context->s1, context->s2);
-                    debug_printf("s3 0x%016llx s4 0x%016llx s5 0x%016llx\n", context->s3, context->s4, context->s5);
-                    debug_printf("s6 0x%016llx s7 0x%016llx t8 0x%016llx\n", context->s6, context->s7, context->t8);
-                    debug_printf("t9 0x%016llx gp 0x%016llx sp 0x%016llx\n", context->t9, context->gp, context->sp);
-                    debug_printf("s8 0x%016llx ra 0x%016llx\n\n",            context->s8, context->ra);
+                    debug_printf("at 0x%08X v0 0x%08X v1 0x%08X\n", (u32)context->at, (u32)context->v0, (u32)context->v1);
+                    debug_printf("a0 0x%08X a1 0x%08X a2 0x%08X\n", (u32)context->a0, (u32)context->a1, (u32)context->a2);
+                    debug_printf("a3 0x%08X t0 0x%08X t1 0x%08X\n", (u32)context->a3, (u32)context->t0, (u32)context->t1);
+                    debug_printf("t2 0x%08X t3 0x%08X t4 0x%08X\n", (u32)context->t2, (u32)context->t3, (u32)context->t4);
+                    debug_printf("t5 0x%08X t6 0x%08X t7 0x%08X\n", (u32)context->t5, (u32)context->t6, (u32)context->t7);
+                    debug_printf("s0 0x%08X s1 0x%08X s2 0x%08X\n", (u32)context->s0, (u32)context->s1, (u32)context->s2);
+                    debug_printf("s3 0x%08X s4 0x%08X s5 0x%08X\n", (u32)context->s3, (u32)context->s4, (u32)context->s5);
+                    debug_printf("s6 0x%08X s7 0x%08X t8 0x%08X\n", (u32)context->s6, (u32)context->s7, (u32)context->t8);
+                    debug_printf("t9 0x%08X gp 0x%08X sp 0x%08X\n", (u32)context->t9, (u32)context->gp, (u32)context->sp);
+                    debug_printf("s8 0x%08X ra 0x%08X\n\n",         (u32)context->s8, (u32)context->ra);
 
                     // Print the floating point registers
                     debug_printreg(context->fpcsr, "fpcsr", fpcsrDesc);

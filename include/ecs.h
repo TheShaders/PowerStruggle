@@ -29,7 +29,7 @@ enum ComponentBits
 #undef COMPONENT
 
 #define NUM_COMPONENTS(Archetype) (__builtin_popcount(Archetype))
-#define COMPONENT_INDEX(Component, Archetype) (__builtin_popcount((Archetype) & (Bit_##Component - 1)))
+#define COMPONENT_INDEX(Component, Archetype) (1 + (__builtin_popcount((Archetype) & (Bit_##Component - 1))))
 
 #define ARCHETYPE_MODEL (Bit_Position | Bit_Rotation | Bit_Model)
 #define ARCHETYPE_SCALED_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_Scale)
@@ -70,13 +70,18 @@ typedef struct BehaviorParams_t
 template <unsigned int ComponentBit, typename ComponentType>
 constexpr ComponentType* get_component(void **components, archetype_t archetype)
 {
-    return static_cast<ComponentType*>(components[std::popcount(archetype & (ComponentBit - 1))]);
+    return static_cast<ComponentType*>(components[1 + std::popcount(archetype & (ComponentBit - 1))]);
 }
 
 template <unsigned int ComponentBit, typename ComponentType>
 constexpr ComponentType* get_component(const std::unique_ptr<void*[]>& components, archetype_t archetype)
 {
-    return static_cast<ComponentType*>(components[std::popcount(archetype & (ComponentBit - 1))]);
+    return get_component<ComponentBit, ComponentType>(components.get(), archetype);
+}
+
+constexpr Entity* get_entity(void **components)
+{
+    return *static_cast<Entity**>(components[0]);
 }
 
 
@@ -100,8 +105,6 @@ void getEntityComponents(Entity *entity, void **componentArrayOut);
 
 // Finds the entity that has the given archetype and the given archetype array index
 Entity *findEntity(archetype_t archetype, size_t archetypeArrayIndex);
-// Finds the entity that the given component belongs to, given the index of the given component (e.g. Component_Position) and the entity's archetype
-Entity *findEntityFromComponent(archetype_t archetype, int componentArchetypeIndex, void* componentPointer);
 // Deletes all entities (duh)
 void deleteAllEntities(void);
 // Iterates over every behavior entity and processes their behavior

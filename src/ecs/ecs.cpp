@@ -68,7 +68,8 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
             MultiArrayList *arr = &archetypeArrays[curArchetypeIndex];
             MultiArrayListBlock *curBlock = arr->start;
             auto curOffsets = std::unique_ptr<size_t[]>(new size_t[numComponents]);
-            auto curAddresses = std::unique_ptr<void*[]>(new void*[numComponents]);
+            // Array for each component pointer, plus the pointer to the entity itself
+            auto curAddresses = std::unique_ptr<void*[]>(new void*[numComponents + 1]);
             int i;
             
             // Find the offsets for each component
@@ -81,10 +82,12 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
             // Iterate over every block in this multiarray
             while (curBlock)
             {
+                // Address for the entity pointer
+                curAddresses[0] = curBlock;
                 // Get the addresses for each sub-array in the block
                 for (i = 0; i < numComponents; i++)
                 {
-                    curAddresses[i] = (void*)(curOffsets[i] + (uintptr_t)curBlock);
+                    curAddresses[i + 1] = (void*)(curOffsets[i] + (uintptr_t)curBlock);
                 }
                 // Call the provided callback
                 callback(curBlock->numElements, arg, curAddresses.get());
@@ -111,8 +114,8 @@ void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg
             MultiArrayListBlock *curBlock = arr->start;
             auto curComponentSizes = std::unique_ptr<size_t[]>(new size_t[curNumComponents]);
             auto curOffsets = std::unique_ptr<size_t[]>(new size_t[curNumComponents]);
-            auto curAddresses = std::unique_ptr<void*[]>(new void*[curNumComponents]);
-            size_t curOffset = sizeof(MultiArrayListBlock);
+            auto curAddresses = std::unique_ptr<void*[]>(new void*[curNumComponents + 1]);
+            size_t curOffset = sizeof(MultiArrayListBlock) + arr->elementCount * sizeof(Entity*);
             
             // Find all components in the current archetype and determine their size and offset in the multi array block
             curComponentIndex = 0;
@@ -133,10 +136,11 @@ void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg
             while (curBlock)
             {
                 int i;
+                curAddresses[0] = (void*)((uintptr_t)curBlock + sizeof(MultiArrayListBlock));
                 // Get the addresses for each sub-array in the block
                 for (i = 0; i < curNumComponents; i++)
                 {
-                    curAddresses[i] = (void*)(curOffsets[i] + (uintptr_t)curBlock);
+                    curAddresses[i + 1] = (void*)(curOffsets[i] + (uintptr_t)curBlock);
                 }
                 // Call the provided callback
                 callback(curBlock->numElements, arg, curNumComponents, curArchetype, curAddresses.get(), curComponentSizes.get());
@@ -191,7 +195,7 @@ int findNextGap(int prevGap)
     return -1;
 }
 
-void allocEntities(archetype_t archetype, int count)
+void allocEntities(archetype_t archetype, int count, Entity** output)
 {
     // The index of this archetype
     int archetypeIndex = getArchetypeIndex(archetype);
@@ -205,6 +209,8 @@ void allocEntities(archetype_t archetype, int count)
     {
         allEntities[curGap].archetype = archetype;
         allEntities[curGap].archetypeArrayIndex = archetypeEntityCount++;
+        *output = &allEntities[curGap];
+        output++;
         curGap = findNextGap(curGap);
         curNumEntities++;
         numGaps--;
@@ -218,6 +224,8 @@ void allocEntities(archetype_t archetype, int count)
     {
         curEntity->archetype = archetype;
         curEntity->archetypeArrayIndex = archetypeEntityCount++;
+        *output = curEntity;
+        output++;
         curNumEntities++;
     }
 
@@ -361,15 +369,18 @@ void deleteEntityIndex(int index)
 
 void createEntities(archetype_t archetype, int count)
 {
-    // The index of this archetype
-    int archetypeIndex = getArchetypeIndex(archetype);
-    // The arraylist for this archetype
-    MultiArrayList *archetypeList = &archetypeArrays[archetypeIndex];
+    // // The index of this archetype
+    // int archetypeIndex = getArchetypeIndex(archetype);
+    // // The arraylist for this archetype
+    // MultiArrayList *archetypeList = &archetypeArrays[archetypeIndex];
+    // // Array of pointers to each entity created
+    // auto entity_pointers = std::unique_ptr<Entity*[]>(new Entity*[count]);
     
-    // Allocate the components for the given number of the given archetype
-    multiarraylist_alloccount(archetypeList, count);
-    // Allocate the number of entities given of the archetype given
-    allocEntities(archetype, count);
+    // // Allocate the components for the given number of the given archetype
+    // multiarraylist_alloccount(archetypeList, count);
+    // // Allocate the number of entities given of the archetype given
+    // allocEntities(archetype, count, entity_pointers.get());
+    createEntitiesCallback(archetype, nullptr, count, nullptr);
 }
 
 void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityArrayCallback callback)
@@ -386,13 +397,15 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
     auto componentOffsets = std::unique_ptr<size_t[]>(new size_t[numComponents]);
     // Sizes of each component in the arraylist blocks
     auto componentSizes = std::unique_ptr<size_t[]>(new size_t[numComponents]);
+    // Array of pointers to each entity created
+    auto entity_pointers = std::unique_ptr<Entity*[]>(new Entity*[count]);
     // The block being iterated through
     MultiArrayListBlock *curBlock = archetypeList->end;
     // Number of elements in the current block before allocating more
     uint32_t startingElementCount = curBlock->numElements;
     
     // Allocate the number of entities given of the archetype given
-    allocEntities(archetype, count);
+    allocEntities(archetype, count, entity_pointers.get());
     // Increase the entity count for the given archetype by the given amount
     archetypeEntityCounts[archetypeIndex] += count;
     // Allocate the requested number of entities for the given archetype
@@ -419,26 +432,44 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
     // Call the provided callback for modified or new block in the list
     {
         int i;
-        auto componentArrays = std::unique_ptr<void*[]>(new void*[numComponents]);
+        auto componentArrays = std::unique_ptr<void*[]>(new void*[numComponents + 1]);
+        Entity **cur_entity = entity_pointers.get();
 
+        componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock);
         // Call the callback for the original block, which was modified
         for (i = 0; i < numComponents; i++)
         {
-            componentArrays[i] = (void*)((uintptr_t)curBlock + componentOffsets[i] + componentSizes[i] * startingElementCount);
+            componentArrays[i + 1] = (void*)((uintptr_t)curBlock + componentOffsets[i] + componentSizes[i] * startingElementCount);
         }
 
-        callback(curBlock->numElements - startingElementCount, arg, componentArrays.get());
+        // Copy the entity pointers into the 0th component array
+        std::copy_n(cur_entity, curBlock->numElements - startingElementCount, (Entity**)componentArrays[0]);
+        cur_entity += curBlock->numElements - startingElementCount;
+
+        if (callback)
+        {
+            callback(curBlock->numElements - startingElementCount, arg, componentArrays.get());
+        }
         curBlock = curBlock->next;
 
         // Call the callback for any following blocks, which were allocated
         while (curBlock)
         {
+            componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock);
+            cur_entity++;
             for (i = 0; i < numComponents; i++)
             {
                 componentArrays[i] = (void*)((uintptr_t)curBlock + componentOffsets[i]);
             }
+            
+            // Copy the entity pointers into the 0th component array
+            std::copy_n(cur_entity, curBlock->numElements, (Entity**)componentArrays[0]);
+            cur_entity += curBlock->numElements;
 
-            callback(curBlock->numElements, arg, componentArrays.get());
+            if (callback)
+            {
+                callback(curBlock->numElements, arg, componentArrays.get());
+            }
             curBlock = curBlock->next;
         }
     }
@@ -486,20 +517,6 @@ Entity *findEntity(archetype_t archetype, size_t archetypeArrayIndex)
             return curEntity;
     }
     return nullptr;
-}
-
-Entity *findEntityFromComponent(archetype_t archetype, int componentIndex, void* componentPointer)
-{
-    MultiArrayList *archetypeArray = &archetypeArrays[getArchetypeIndex(archetype)];
-    // Take advantage of the fact that array list blocks are chunk aligned and chunk sized,
-    // so round down to the nearest chunk start to get the block this component is in
-    MultiArrayListBlock *archetypeArrayBlock = (MultiArrayListBlock *)ROUND_DOWN((uintptr_t)componentPointer, mem_block_size);
-    // Get the start of the component array for the given component type
-    uintptr_t componentArrayStart = (uintptr_t)archetypeArrayBlock + multiarraylist_get_component_offset(archetypeArray, componentIndex);
-    // Get the index into the array by dividing the offset into the array by the component's size
-    size_t archetypeArrayIndex = ((uintptr_t)componentPointer - componentArrayStart) / g_componentSizes[componentIndex];
-
-    return findEntity(archetype, archetypeArrayIndex);
 }
 
 void deleteAllEntities(void)

@@ -15,7 +15,7 @@ void levelCreateEntitiesCallback(size_t count, void *arg, void **componentArrays
 {
     archetype_t archetype = ((struct LevelCreateEntitiesCallbackArg_t *)arg)->archetype;
     void **curComponentSourceArray = ((struct LevelCreateEntitiesCallbackArg_t *)arg)->componentArrays;
-    void **curComponentDestArray = componentArrays;
+    void **curComponentDestArray = &componentArrays[1];
     archetype_t archetypeBits = archetype;
     int curComponentIndex = 0;
 

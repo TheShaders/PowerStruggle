@@ -33,5 +33,8 @@ size_t multiarraylist_get_component_offset(MultiArrayList *arr, size_t component
 // Returns the new length of the array list
 void multiarraylist_delete(MultiArrayList *arr, size_t arrayIndex);
 
+// Gets the array of Entity pointers for this block
+Entity** multiarraylist_get_block_entity_pointers(MultiArrayListBlock *block);
+
 
 #endif

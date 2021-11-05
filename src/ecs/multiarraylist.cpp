@@ -30,7 +30,8 @@ int lowest_bit(size_t value)
 
 void multiarraylist_init(MultiArrayList *arr, archetype_t archetype)
 {
-    size_t totalElementSize = 0;
+    // Every entity's components has a pointer back to the entity itself
+    size_t totalElementSize = sizeof(Entity*);
     archetype_t archetypeShifted;
     int i;
 
@@ -78,11 +79,17 @@ void multiarraylist_alloccount(MultiArrayList *arr, size_t count)
     }
 }
 
+Entity** multiarraylist_get_block_entity_pointers(MultiArrayListBlock *block)
+{
+    return (Entity**)((uintptr_t)block + sizeof(MultiArrayListBlock));
+}
+
 size_t multiarraylist_get_component_offset(MultiArrayList *arr, size_t componentIndex)
 {
     archetype_t archetype = arr->archetype;
     size_t elementCount = arr->elementCount;
-    size_t offset = sizeof(MultiArrayListBlock); // The arrays start after the segment header
+    // The arrays start after the segment header, and the first array is the pointers to each corresponding entity
+    size_t offset = sizeof(MultiArrayListBlock) + elementCount * sizeof(Entity*);
     size_t curComponentType;
 
     // Iterate over each component in the archetype until we reach the provided one
@@ -110,6 +117,9 @@ void multiarraylist_delete(MultiArrayList *arr, size_t arrayIndex)
         block = block->next;
         arrayIndex -= elementCount;
     }
+
+    // Copy the array pointer from the last element in the last block to the deleted element
+    multiarraylist_get_block_entity_pointers(block)[arrayIndex] = multiarraylist_get_block_entity_pointers(end)[end->numElements - 1];
 
     componentIndex = 0;
 
