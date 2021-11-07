@@ -95,7 +95,7 @@ void GameplayScene::draw()
     setLightDirection(lightDir);
 
     if (g_gameTimer > 30)
-        grid_.draw();
+        grid_.draw(&g_Camera);
 
     // debug_printf("before drawing\n");
     drawAllEntities();

@@ -134,18 +134,7 @@ namespace gfx
         return ret;
     }
 
-    void load_perspective(float fov, float aspect, float near, float far, UNUSED float scale);
-
-    inline void mul_lookat(float eyeX, float eyeY, float eyeZ, float lookX, float lookY, float lookZ, float upX, float upY, float upZ)
-    {
-        // TODO affine matrix optimization
-        MtxF tmp;
-        guLookAtF(tmp,
-            eyeX, eyeY, eyeZ,
-            lookX, lookY, lookZ,
-            upX, upY, upZ);
-        mtxfMul(*g_curMatFPtr, *g_curMatFPtr, tmp);
-    }
+    void load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near, float far, UNUSED float scale);
 
     inline void rotate_axis_angle(float angle, float axisX, float axisY, float axisZ)
     {

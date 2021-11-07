@@ -151,7 +151,7 @@ public:
     void process_loading_chunks();
     float get_height(float x, float z, float radius, float min_y, float max_y);
 
-    void draw();
+    void draw(Camera *camera);
 
     // Grids cannot be copied, only moved, therefore the two following methods are deleted
     // Copy constructor

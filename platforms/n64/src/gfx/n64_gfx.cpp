@@ -287,6 +287,96 @@ void startFrame(void)
     setupDrawLayers();
 }
 
+constinit Mtx fixed_tile_rotation_matrices[] = {
+    float_to_fixed(
+    {
+        { 2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {  0.0f,  0.0f, 2.56f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {  0.0f,  0.0f, 2.56f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {-2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {-2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,-2.56f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {  0.0f,  0.0f,-2.56f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        { 2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+};
+
+// Word sized copies instead of memcpy, which is 1 byte at a time with the implementation available
+void mtx_copy(Mtx* out, Mtx* in)
+{
+    int32_t *out_int = &out->m[0][0];
+    int32_t *in_int = &in->m[0][0];
+    for (int i = 0; i < 16; i++)
+    {
+        out_int[i] = in_int[i];
+    }
+}
+
+// Draws a model with 1 joint and no posing
+// Does not inherit from or affect the matrix stack
+void drawTileModel(Model *toDraw, int x, int y, int z, int rotation)
+{
+    int cur_material = -1;
+
+    if (toDraw == nullptr) return;
+
+    // Draw the model's singular joint
+    const Joint& joint_to_draw = toDraw->joints[0];
+    
+    // Allocate the matrix
+    Mtx* curMtx = (Mtx*)allocGfx(sizeof(Mtx));
+    // Copy from the template matrix based on the rotation
+    mtx_copy(curMtx, &fixed_tile_rotation_matrices[rotation]);
+    // Set up the translation in the matrix
+    curMtx->m[1][2] = ((uint32_t)x & 0xFFFF) << 16 | ((uint32_t)y & 0xFFFF);
+    curMtx->m[1][3] = ((uint32_t)z & 0xFFFF) << 16 | (1 & 0xFFFF);
+
+    // Draw the joint's layers
+    for (size_t cur_layer = 0; cur_layer < gfx::draw_layers; cur_layer++)
+    {
+        const JointMeshLayer *curJointLayer = &joint_to_draw.layers[cur_layer];
+
+        // Don't bother adding a matrix load if there's nothing to draw on this layer for this joint
+        if (curJointLayer->num_draws == 0)
+        {
+            continue;
+        }
+
+        addMtxToDrawLayer(static_cast<DrawLayer>(cur_layer), curMtx);
+        
+        // Draw the layer
+        for (size_t draw_idx = 0; draw_idx < curJointLayer->num_draws; draw_idx++)
+        {
+            auto& cur_draw = curJointLayer->draws[draw_idx];
+            // Check if we've changed materials; if so load the new material
+            if (cur_draw.material_index != cur_material)
+            {
+                cur_material = cur_draw.material_index;
+                addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), toDraw->materials[cur_material]->gfx);
+            }
+            // Check if this draw has any groups and skip it if it doesn't
+            if (cur_draw.num_groups != 0)
+            {
+                addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_draw.gfx);
+            }
+        }
+    }
+}
+
 // Draws a model (TODO add posing)
 void drawModel(Model *toDraw, Animation *anim, u32 frame)
 {
@@ -668,23 +758,50 @@ float get_aspect_ratio()
     return static_cast<float>(screen_width) / static_cast<float>(screen_height);
 }
 
-void gfx::load_perspective(float fov, float aspect, float near, float far, float scale)
+void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near, float far, float scale)
 {
-    Mtx* projMtx;
-
-    guPerspectiveF(g_gfxContexts[g_curGfxContext].projMtxF, &g_perspNorm, fov, aspect, near, far, scale);
-    gSPViewport(g_dlistHead++, &viewport);
-    gSPPerspNormalize(g_dlistHead++, g_perspNorm);
+    Mtx* vp_fixed;
+    Mtx* v_fixed;
+    MtxF vp;
 
     // Set up projection matrix
-    projMtx = (Mtx*)allocGfx(sizeof(Mtx));
-    guMtxF2L(g_gfxContexts[g_curGfxContext].projMtxF, projMtx);
-    
-    gSPMatrix(g_dlistHead++, projMtx,
-        G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    guPerspectiveF(g_gfxContexts[g_curGfxContext].projMtxF, &g_perspNorm, camera->fov, aspect, near, far, scale);
+    gSPViewport(g_dlistHead++, &viewport);
+    gSPPerspNormalize(g_dlistHead++, g_perspNorm);
+        
     // Ortho
     // guOrthoF(g_gfxContexts[g_curGfxContext].projMtxF, -screen_width / 2, screen_width / 2, -screen_height / 2, screen_height / 2, 100.0f, 20000.0f, 1.0f);
     // g_perspNorm = 0xFFFF;
+
+    // Set up view matrix
+    guLookAtF(g_gfxContexts[g_curGfxContext].viewMtxF,
+        eye_pos[0] - camera->model_offset[0],
+        eye_pos[1] - camera->model_offset[1],
+        eye_pos[2] - camera->model_offset[2], // Eye pos
+        camera->target[0] - camera->model_offset[0],
+        camera->target[1] - camera->model_offset[1] + camera->yOffset,
+        camera->target[2] - camera->model_offset[2], // Look pos
+        0.0f, 1.0f, 0.0f); // Up vector
+
+    // mtxfMul(*g_curMatFPtr, *g_curMatFPtr, g_gfxContexts[g_curGfxContext].viewMtxF);
+
+
+    // Load VP matrix
+    vp_fixed = (Mtx*)allocGfx(sizeof(Mtx));
+    
+    v_fixed = (Mtx*)allocGfx(sizeof(Mtx));
+    guMtxF2L(g_gfxContexts[g_curGfxContext].projMtxF, vp_fixed);
+    guMtxF2L(g_gfxContexts[g_curGfxContext].viewMtxF, v_fixed);
+    
+    // Calculate vp matrix
+    // guMtxCatF(g_gfxContexts[g_curGfxContext].projMtxF, g_gfxContexts[g_curGfxContext].viewMtxF, vp);
+    // mtxfMul(vp, g_gfxContexts[g_curGfxContext].viewMtxF, g_gfxContexts[g_curGfxContext].projMtxF);
+    // guMtxF2L(vp, vp_fixed);
+
+    gSPMatrix(g_dlistHead++, vp_fixed,
+        G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(g_dlistHead++, v_fixed,
+        G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
 }
 
 void endFrame()

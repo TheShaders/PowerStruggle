@@ -46,7 +46,7 @@ typedef struct BehaviorParams_t BehaviorParams;
 typedef struct InputData_t InputData;
 
 // Prototypes for camera structs
-typedef struct Camera_t Camera;
+struct Camera;
 
 // Prototypes for level structs
 typedef struct LevelHeader_t LevelHeader;

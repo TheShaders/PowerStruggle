@@ -129,7 +129,7 @@ static std::array<std::array<MtxF, matf_stack_len>, 2> matrix_stacks;
 MtxF *g_curMatFPtr;
 
 
-void gfx::load_perspective(float fov, float aspect, float n, float f, UNUSED float scale)
+void gfx::load_view_proj(float fov, float aspect, float n, float f, UNUSED float scale)
 {
     proj = glm::perspective(glm::radians(fov), aspect, n, f);
 }

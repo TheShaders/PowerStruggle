@@ -44,10 +44,12 @@ constexpr unsigned int screen_height = 240;
 struct GfxContext {
     // Master displaylist
     Gfx dlistBuffer[display_list_len];
-    // Floating point modelview matrix stack
+    // Floating point model matrix stack
     MtxF mtxFStack[matf_stack_len];
     // Floating point projection matrix
     MtxF projMtxF;
+    // Floating point view matrix
+    MtxF viewMtxF;
     // Graphics tasks done message
     OSMesg taskDoneMesg;
     // Graphics tasks done message queue
@@ -79,6 +81,51 @@ namespace gfx
         { screen_width << 1, screen_height << 1, G_MAXZ / 2, 0},
         { screen_width << 1, screen_height << 1, G_MAXZ / 2, 0},
     }};
+}
+
+constexpr uint32_t float_to_fixed(float x)
+{
+    return (uint32_t)(int32_t)(x * (float)0x00010000);
+}
+
+constexpr int32_t fixed_int(float a, float b)
+{
+    uint32_t a_fixed = float_to_fixed(a);
+    uint32_t b_fixed = float_to_fixed(b);
+
+    uint32_t a_int = a_fixed >> 16;
+    uint32_t b_int = b_fixed >> 16;
+
+    return static_cast<int32_t>((a_int << 16) | (b_int << 0));
+}
+
+constexpr int32_t fixed_frac(float a, float b)
+{
+    uint32_t a_fixed = float_to_fixed(a);
+    uint32_t b_fixed = float_to_fixed(b);
+
+    uint32_t a_frac = a_fixed & 0xFFFF;
+    uint32_t b_frac = b_fixed & 0xFFFF;
+
+    return static_cast<int32_t>((a_frac << 16) | (b_frac << 0));
+}
+
+constexpr Mtx float_to_fixed(const MtxF& mat)
+{
+    Mtx ret = 
+    {{
+        // Integer portion
+        { fixed_int (mat[0][0], mat[0][1]), fixed_int (mat[0][2], mat[0][3]),  
+          fixed_int (mat[1][0], mat[1][1]), fixed_int (mat[1][2], mat[1][3]) },
+        { fixed_int (mat[2][0], mat[2][1]), fixed_int (mat[2][2], mat[2][3]),  
+          fixed_int (mat[3][0], mat[3][1]), fixed_int (mat[3][2], mat[3][3]) },
+        // Fractional portion
+        { fixed_frac(mat[0][0], mat[0][1]), fixed_frac(mat[0][2], mat[0][3]),  
+          fixed_frac(mat[1][0], mat[1][1]), fixed_frac(mat[1][2], mat[1][3]) },
+        { fixed_frac(mat[2][0], mat[2][1]), fixed_frac(mat[2][2], mat[2][3]),  
+          fixed_frac(mat[3][0], mat[3][1]), fixed_frac(mat[3][2], mat[3][3]) },
+    }};
+    return ret;
 }
 
 #endif

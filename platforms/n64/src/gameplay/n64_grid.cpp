@@ -12,6 +12,14 @@ extern "C"
 #include <debug.h>
 }
 
+constexpr int visible_inner_range_x = 3000;
+constexpr int visible_inner_range_pos_z = 1500;
+constexpr int visible_inner_range_neg_z = 4000;
+
+constexpr int visible_outer_range_x     = visible_inner_range_x + 64;
+constexpr int visible_outer_range_pos_z = visible_inner_range_pos_z + 64;
+constexpr int visible_outer_range_neg_z = visible_inner_range_neg_z + 64;
+
 struct filerecord { const char *path; uint32_t offset; uint32_t size; };
 
 class FileRecords
@@ -119,16 +127,16 @@ void Grid::load_visible_chunks(Camera& camera)
 {
     int pos_x = static_cast<int>(camera.target[0]);
     int pos_z = static_cast<int>(camera.target[2]);
-    int min_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x - 256);
+    int min_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x - visible_inner_range_x);
     min_chunk_x = std::clamp(min_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int max_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x + 256);
+    int max_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x + visible_inner_range_x);
     max_chunk_x = std::clamp(max_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int min_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z - 256);
+    int min_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z - visible_inner_range_neg_z);
     min_chunk_z = std::clamp(min_chunk_z, 0, definition_.num_chunks_z - 1);
     
-    int max_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z + 256);
+    int max_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z + visible_inner_range_pos_z);
     max_chunk_z = std::clamp(max_chunk_z, 0, definition_.num_chunks_z - 1);
     
     // debug_printf("Visible chunk bounds: [%d, %d], [%d, %d]\n", min_chunk_x, max_chunk_x, min_chunk_z, max_chunk_z);
@@ -160,16 +168,16 @@ void Grid::unload_nonvisible_chunks(Camera& camera)
 {
     int pos_x = static_cast<int>(camera.target[0]);
     int pos_z = static_cast<int>(camera.target[2]);
-    int min_chunk_x = round_down_divide<chunk_size * 256>(pos_x - 320);
+    int min_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x - visible_outer_range_x);
     min_chunk_x = std::clamp(min_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int max_chunk_x = round_down_divide<chunk_size * 256>(pos_x + 320);
+    int max_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x + visible_outer_range_x);
     max_chunk_x = std::clamp(max_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int min_chunk_z = round_down_divide<chunk_size * 256>(pos_z - 320);
+    int min_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z - visible_outer_range_neg_z);
     min_chunk_z = std::clamp(min_chunk_z, 0, definition_.num_chunks_z - 1);
     
-    int max_chunk_z = round_down_divide<chunk_size * 256>(pos_z + 320);
+    int max_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z + visible_outer_range_pos_z);
     max_chunk_z = std::clamp(max_chunk_z, 0, definition_.num_chunks_z - 1);
 
     for (auto it = loaded_chunks_.begin(); it != loaded_chunks_.end(); )
@@ -277,18 +285,20 @@ MtxF tile_rotation_matrices[] = {
     },
 };
 
-void Grid::draw()
+void drawTileModel(Model *toDraw, int x, int y, int z, int rotation);
+
+void Grid::draw(Camera *camera)
 {
     for (auto& entry : loaded_chunks_)
     {
         // debug_printf("Drawing chunk {%d, %d}\n", entry.pos.first, entry.pos.second);
-        float chunk_world_x = entry.pos.first * static_cast<float>(tile_size * chunk_size) + tile_size / 2;
-        float chunk_world_z = entry.pos.second * static_cast<float>(tile_size * chunk_size) + tile_size / 2;
+        int32_t chunk_world_x = entry.pos.first  * static_cast<int32_t>(tile_size * chunk_size) + tile_size / 2 - camera->model_offset[0];
+        int32_t chunk_world_z = entry.pos.second * static_cast<int32_t>(tile_size * chunk_size) + tile_size / 2 - camera->model_offset[2];
         auto& chunk = entry.chunk;
-        float cur_x = chunk_world_x;
+        int32_t cur_x = chunk_world_x;
         for (unsigned int x = 0; x < chunk_size; x++)
         {
-            float cur_z = chunk_world_z;
+            int32_t cur_z = chunk_world_z;
             for (unsigned int z = 0; z < chunk_size; z++)
             {
                 const ChunkColumn &col = chunk->columns[x][z];
@@ -299,21 +309,12 @@ void Grid::draw()
                     const auto& tile = col.tiles[tile_idx];
                     if (tile.id != 0xFF)
                     {
-                        // Combine the rotation and translation into one matrix to cut down on matrix multiplications
-                        MtxF cur_mat;
-                        memcpy(cur_mat, tile_rotation_matrices[tile.rotation], sizeof(MtxF));
-                        cur_mat[3][0] = cur_x;
-                        cur_mat[3][1] = 256.0f * y;
-                        cur_mat[3][2] = cur_z;
-                        gfx::push_mat();
-                          gfx::apply_matrix(&cur_mat);
-                          drawModel(tile_types_[tile.id].model, nullptr, 0);
-                        gfx::pop_mat();
+                        drawTileModel(tile_types_[tile.id].model, cur_x, y * 256, cur_z, tile.rotation);
                     }
                 }
-                cur_z += 256.0f;
+                cur_z += 256;
             }
-            cur_x += 256.0f;
+            cur_x += 256;
         }
     }
 }
@@ -352,8 +353,8 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
     // Default to an unreasonably low grid height
     float found_y = std::numeric_limits<decltype(ChunkColumn::base_height)>::min() * static_cast<float>(tile_size);
 
-    debug_printf("get_height([%5.2f, %5.2f], %5.2f, [%5.2f, %5.2f])\n", x, z, radius, min_y, max_y);
-    debug_printf("-> pos (%d, %d)\n", x_int, z_int);
+    // debug_printf("get_height([%5.2f, %5.2f], %5.2f, [%5.2f, %5.2f])\n", x, z, radius, min_y, max_y);
+    // debug_printf("-> pos (%d, %d)\n", x_int, z_int);
 
     // This would be 1 more, but we need to find slopes too which can take up the entire tile they're in
     int min_pos_y = round_down_divide<tile_size>(lfloor(min_y));
@@ -397,7 +398,7 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
         // Check if the current chunk is within the calculated chunk bounds
         if (between_inclusive(min_chunk_x, max_chunk_x, chunk_x) && between_inclusive(min_chunk_z, max_chunk_z, chunk_z))
         {
-            debug_printf("    Chunk %d, %d intersects with the region\n", chunk_x, chunk_z);
+            // debug_printf("    Chunk %d, %d intersects with the region\n", chunk_x, chunk_z);
             // Get the tile bounds of this chunk
             int cur_chunk_min_x = chunk_x * chunk_size;
             int cur_chunk_max_x = cur_chunk_min_x + chunk_size;
@@ -436,8 +437,8 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
                     int local_x = x_int - tile_x;
                     int local_z = z_int - tile_z;
 
-                    debug_printf("      Checking tiles %d through %d in column [%d, %d]\n", min_tile_index, num_tiles, local_tile_x, local_tile_z);
-                    debug_printf("      -> local (%d, %d)\n", local_x, local_z);
+                    // debug_printf("      Checking tiles %d through %d in column [%d, %d]\n", min_tile_index, num_tiles, local_tile_x, local_tile_z);
+                    // debug_printf("      -> local (%d, %d)\n", local_x, local_z);
 
                     for (int tile_index = min_tile_index + num_tiles - 1; tile_index >= min_tile_index; tile_index--)
                     {
@@ -490,7 +491,7 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
                             }
                             if (tile_y_world > found_y && tile_y_world >= min_y && tile_y_world < max_y)
                             {
-                                debug_printf("        Found new max height at %5.2f\n", tile_y_world);
+                                // debug_printf("        Found new max height at %5.2f\n", tile_y_world);
                                 found_y = tile_y_world;
                                 // This is the highest tile in the column that fits the query, so don't check any more in the column
                                 break;

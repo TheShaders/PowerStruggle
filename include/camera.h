@@ -3,15 +3,16 @@
 
 #include <types.h>
 
-typedef struct Camera_t {
+struct Camera {
     Vec3 target;
+    int32_t model_offset[3];
     float yOffset;
     float fov;
     float distance;
     int16_t pitch;
     int16_t yaw;
     int16_t roll;
-} Camera;
+};
 
 extern Camera g_Camera;
 
