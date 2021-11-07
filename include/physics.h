@@ -14,6 +14,6 @@ typedef struct GravityParams_t {
     float terminalVelocity;
 } GravityParams;
 
-void physicsTick(void);
+void physicsTick(Grid&);
 
 #endif

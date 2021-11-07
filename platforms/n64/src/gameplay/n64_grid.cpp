@@ -119,16 +119,16 @@ void Grid::load_visible_chunks(Camera& camera)
 {
     int pos_x = static_cast<int>(camera.target[0]);
     int pos_z = static_cast<int>(camera.target[2]);
-    int min_chunk_x = round_down_divide<chunk_size * 256>(pos_x - 256);
+    int min_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x - 256);
     min_chunk_x = std::clamp(min_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int max_chunk_x = round_down_divide<chunk_size * 256>(pos_x + 256);
+    int max_chunk_x = round_down_divide<chunk_size * tile_size>(pos_x + 256);
     max_chunk_x = std::clamp(max_chunk_x, 0, definition_.num_chunks_x - 1);
 
-    int min_chunk_z = round_down_divide<chunk_size * 256>(pos_z - 256);
+    int min_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z - 256);
     min_chunk_z = std::clamp(min_chunk_z, 0, definition_.num_chunks_z - 1);
     
-    int max_chunk_z = round_down_divide<chunk_size * 256>(pos_z + 256);
+    int max_chunk_z = round_down_divide<chunk_size * tile_size>(pos_z + 256);
     max_chunk_z = std::clamp(max_chunk_z, 0, definition_.num_chunks_z - 1);
     
     // debug_printf("Visible chunk bounds: [%d, %d], [%d, %d]\n", min_chunk_x, max_chunk_x, min_chunk_z, max_chunk_z);
@@ -149,7 +149,7 @@ void Grid::load_visible_chunks(Camera& camera)
         {
             if (!mem[x * num_chunks_z + z])
             {
-                // debug_printf("Loading chunk %d, %d\n", x + min_chunk_x, z + min_chunk_z);
+                debug_printf("Loading chunk %d, %d\n", x + min_chunk_x, z + min_chunk_z);
                 load_chunk({x + min_chunk_x, z + min_chunk_z});
             }
         }
@@ -178,7 +178,7 @@ void Grid::unload_nonvisible_chunks(Camera& camera)
         int chunk_z = it->pos.second;
         if (!between_inclusive(min_chunk_x, max_chunk_x, chunk_x) || !between_inclusive(min_chunk_z, max_chunk_z, chunk_z))
         {
-            // debug_printf("Unloading nonvisible chunk {%d, %d}\n", chunk_x, chunk_z);
+            debug_printf("Unloading nonvisible chunk {%d, %d}\n", chunk_x, chunk_z);
             it = unload_chunk(it);
         }
         else
@@ -227,7 +227,7 @@ void Grid::process_loading_chunks()
         if (it->second.is_finished() && !loaded_chunks_.full())
         {
             Chunk *chunk = reinterpret_cast<Chunk*>(it->second.join());
-            // debug_printf("Chunk %08X {%d, %d} finished loading\n", chunk, it->first.first, it->first.second);
+            debug_printf("Chunk %08X {%d, %d} finished loading\n", chunk, it->first.first, it->first.second);
             chunk->adjust_offsets();
             std::unique_ptr<Chunk, alloc_deleter> chunk_ptr{chunk};
             loaded_chunks_.emplace(it->first, std::move(chunk_ptr));
@@ -282,8 +282,8 @@ void Grid::draw()
     for (auto& entry : loaded_chunks_)
     {
         // debug_printf("Drawing chunk {%d, %d}\n", entry.pos.first, entry.pos.second);
-        float chunk_world_x = entry.pos.first * (256.0f * chunk_size);
-        float chunk_world_z = entry.pos.second * (256.0f * chunk_size);
+        float chunk_world_x = entry.pos.first * static_cast<float>(tile_size * chunk_size) + tile_size / 2;
+        float chunk_world_z = entry.pos.second * static_cast<float>(tile_size * chunk_size) + tile_size / 2;
         auto& chunk = entry.chunk;
         float cur_x = chunk_world_x;
         for (unsigned int x = 0; x < chunk_size; x++)
@@ -316,4 +316,223 @@ void Grid::draw()
             cur_x += 256.0f;
         }
     }
+}
+
+inline int32_t lround(float x)
+{
+    float retf;
+    int ret;
+    __asm__ __volatile__("round.w.s %0, %1" : "=f"(retf) : "f"(x));
+    __asm__ __volatile__("mfc1 %0, %1" : "=r"(ret) : "f"(retf));
+    return ret;
+}
+
+inline int32_t lfloor(float x)
+{
+    float retf;
+    int ret;
+    __asm__ __volatile__("floor.w.s %0, %1" : "=f"(retf) : "f"(x));
+    __asm__ __volatile__("mfc1 %0, %1" : "=r"(ret) : "f"(retf));
+    return ret;
+}
+
+inline int32_t lceil(float x)
+{
+    float retf;
+    int ret;
+    __asm__ __volatile__("ceil.w.s %0, %1" : "=f"(retf) : "f"(x));
+    __asm__ __volatile__("mfc1 %0, %1" : "=r"(ret) : "f"(retf));
+    return ret;
+}
+
+float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
+{
+    int x_int = lround(x);
+    int z_int = lround(z);
+    // Default to an unreasonably low grid height
+    float found_y = std::numeric_limits<decltype(ChunkColumn::base_height)>::min() * static_cast<float>(tile_size);
+
+    debug_printf("get_height([%5.2f, %5.2f], %5.2f, [%5.2f, %5.2f])\n", x, z, radius, min_y, max_y);
+    debug_printf("-> pos (%d, %d)\n", x_int, z_int);
+
+    // This would be 1 more, but we need to find slopes too which can take up the entire tile they're in
+    int min_pos_y = round_down_divide<tile_size>(lfloor(min_y));
+    int max_pos_y = round_down_divide<tile_size>(lceil(max_y));
+
+    // debug_printf("  y tile bounds: [%d, %d]\n", min_pos_y, max_pos_y);
+
+    if (min_pos_y > max_pos_y) return found_y; // If no tile boundaries are crossed, there's nothing that can be found
+
+    // Get the positional bounds of the query
+    int min_x = lfloor(x - radius);
+    int max_x = lceil(x + radius);
+    int min_z = lfloor(z - radius);
+    int max_z = lceil(z + radius);
+
+    // Get the tile bounds of the query
+    int min_pos_x = round_down_divide<tile_size>(min_x);
+    int max_pos_x = round_down_divide<tile_size>(max_x);
+    int min_pos_z = round_down_divide<tile_size>(min_z);
+    int max_pos_z = round_down_divide<tile_size>(max_z);
+
+    // Get the chunk bounds of the query
+    int min_chunk_x = round_down_divide<chunk_size>(min_pos_x);
+    int max_chunk_x = round_down_divide<chunk_size>(max_pos_x);
+    int min_chunk_z = round_down_divide<chunk_size>(min_pos_z);
+    int max_chunk_z = round_down_divide<chunk_size>(max_pos_z);
+
+    // Convert the tile bounds to exclusive upper bounds
+    max_pos_x += 1;
+    max_pos_y += 1;
+    max_pos_z += 1;
+
+    // debug_printf("  Looking for tiles in region [%d, %d], (%d, %d)\n", min_pos_x, min_pos_z, max_pos_x, max_pos_z);
+    
+    // Iterate over every loaded chunk to see which ones exist that contain tiles in the query
+    for (const auto& chunk_entry : loaded_chunks_)
+    {
+        // Get the position of this chunk
+        int chunk_x = chunk_entry.pos.first;
+        int chunk_z = chunk_entry.pos.second;
+        // Check if the current chunk is within the calculated chunk bounds
+        if (between_inclusive(min_chunk_x, max_chunk_x, chunk_x) && between_inclusive(min_chunk_z, max_chunk_z, chunk_z))
+        {
+            debug_printf("    Chunk %d, %d intersects with the region\n", chunk_x, chunk_z);
+            // Get the tile bounds of this chunk
+            int cur_chunk_min_x = chunk_x * chunk_size;
+            int cur_chunk_max_x = cur_chunk_min_x + chunk_size;
+            int cur_chunk_min_z = chunk_z * chunk_size;
+            int cur_chunk_max_z = cur_chunk_min_z + chunk_size;
+
+            // Get the tile bounds of the intersection of the chunk and the query
+            int cur_check_min_x = std::max(cur_chunk_min_x, min_pos_x);
+            int cur_check_max_x = std::min(cur_chunk_max_x, max_pos_x);
+            int cur_check_min_z = std::max(cur_chunk_min_z, min_pos_z);
+            int cur_check_max_z = std::min(cur_chunk_max_z, max_pos_z);
+
+            // Convert the bounds to local coordinates in the chunk
+            int cur_local_min_x = cur_check_min_x - cur_chunk_min_x;
+            int cur_local_max_x = cur_check_max_x - cur_chunk_min_x;
+            int cur_local_min_z = cur_check_min_z - cur_chunk_min_z;
+            int cur_local_max_z = cur_check_max_z - cur_chunk_min_z;
+
+            // debug_printf("    Checking local tile region [%d, %d], (%d %d)\n", cur_local_min_x, cur_local_min_z, cur_local_max_x, cur_local_max_z);
+
+            const auto& chunk_columns = chunk_entry.chunk->columns;
+
+            // Check the columns in the current chunk to see if they contain any floors in the given bounds
+            for (int local_tile_x = cur_local_min_x; local_tile_x < cur_local_max_x; local_tile_x++)
+            {
+                for (int local_tile_z = cur_local_min_z; local_tile_z < cur_local_max_z; local_tile_z++)
+                {
+                    const auto& cur_column = chunk_columns[local_tile_x][local_tile_z];
+
+                    // Get the start and end tiles to search through in this column
+                    int min_tile_index = std::max(0, min_pos_y - cur_column.base_height);
+                    int num_tiles = std::min(cur_column.num_tiles - min_tile_index, max_pos_y + 1 - cur_column.base_height);
+
+                    int tile_x = (local_tile_x + cur_chunk_min_x) * static_cast<int>(tile_size);
+                    int tile_z = (local_tile_z + cur_chunk_min_z) * static_cast<int>(tile_size);
+                    int local_x = x_int - tile_x;
+                    int local_z = z_int - tile_z;
+
+                    debug_printf("      Checking tiles %d through %d in column [%d, %d]\n", min_tile_index, num_tiles, local_tile_x, local_tile_z);
+                    debug_printf("      -> local (%d, %d)\n", local_x, local_z);
+
+                    for (int tile_index = min_tile_index + num_tiles - 1; tile_index >= min_tile_index; tile_index--)
+                    {
+                        int tile_id = cur_column.tiles[tile_index].id;
+                        int rotation = cur_column.tiles[tile_index].rotation;
+                        if (tile_id != -1)
+                        {
+                            TileCollision tile_collision = tile_types_[tile_id].flags;
+                            int tile_y = tile_index + cur_column.base_height;
+                            float tile_y_world;
+                            int tile_bottom = tile_y * static_cast<int>(tile_size);
+                            switch (tile_collision)
+                            {
+                                case TileCollision::floor:
+                                    tile_y_world = static_cast<float>(tile_bottom);
+                                    break;
+                                case TileCollision::slope:
+                                    {
+                                        int radius_int = lround(radius);
+                                        int slope_y;
+                                        switch (rotation)
+                                        {
+                                            default:
+                                                slope_y = static_cast<int>(tile_size) + tile_bottom - local_z;
+                                                break;
+                                            case 1:
+                                                slope_y = tile_bottom + local_x;
+                                                break;
+                                            case 2:
+                                                slope_y = tile_bottom + local_z;
+                                                break;
+                                            case 3:
+                                                slope_y = static_cast<int>(tile_size) + tile_bottom - local_x;
+                                                break;
+                                        }
+                                        slope_y += radius_int;
+                                        if (slope_y > tile_bottom && slope_y < (tile_bottom + static_cast<int>(tile_size)))
+                                        {
+                                            tile_y_world = static_cast<float>(slope_y);
+                                        }
+                                        else
+                                        {
+                                            tile_y_world = static_cast<float>(tile_bottom);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    tile_y_world = found_y;
+                                    break;
+                            }
+                            if (tile_y_world > found_y && tile_y_world >= min_y && tile_y_world < max_y)
+                            {
+                                debug_printf("        Found new max height at %5.2f\n", tile_y_world);
+                                found_y = tile_y_world;
+                                // This is the highest tile in the column that fits the query, so don't check any more in the column
+                                break;
+                            }
+                        }
+                    }
+
+                    
+                    // const auto& cur_column = chunk_columns[x][z];
+
+                    // // Get the start and end tiles to search through in this column
+                    // int min_tile_index = std::max(0, min_pos_y - cur_column.base_height);
+                    // int max_tile_index = std::min(static_cast<int>(cur_column.num_tiles), max_pos_y - cur_column.base_height);
+
+                    // debug_printf("      Checking tiles [%d, %d) in column [%d, %d]\n", min_tile_index, max_tile_index, x, z);
+
+                    // for (int tile_index = max_tile_index - 1; tile_index >= min_tile_index; tile_index--)
+                    // {
+                    //     int tile_id = cur_column.tiles[tile_index].id;
+                    //     if (tile_id != -1 && tile_types_[tile_id].flags == TileCollision::floor)
+                    //     {
+                    //         int y = tile_index + cur_column.base_height;
+
+                    //         if (y > found_y)
+                    //         {
+                    //             debug_printf("        Found new max height at %d\n", y);
+                    //             found_y = y;
+                    //         }
+
+                    //         // This is the highest tile in the column that fits the query, so don't check any more in the column
+                    //         break;
+                    //     }
+                    // }
+                }
+            }
+        }
+        else
+        {
+            // debug_printf("    Chunk %d, %d does not intersect with the region\n", chunk_x, chunk_z);
+        }
+    }
+
+    // debug_printf("-> found_y: %d\n", found_y);
+    return found_y;
 }

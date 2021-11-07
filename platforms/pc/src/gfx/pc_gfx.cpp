@@ -455,7 +455,6 @@ void setLightDirection(Vec3 lightDir) {}
 void drawModel(Model *toDraw, Animation* anim, uint32_t frame) {}
 void drawAABB(DrawLayer layer, AABB *toDraw, uint32_t color) {}
 void drawLine(DrawLayer layer, Vec3 start, Vec3 end, uint32_t color) {}
-void drawColTris(DrawLayer layer, ColTri *tris, uint32_t count, uint32_t color) {}
 
 void scrollTextures() {}
 void animateTextures() {}

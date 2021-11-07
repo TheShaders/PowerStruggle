@@ -19,18 +19,18 @@ void setupCameraMatrices(Camera *camera)
         camera->distance * cossf(camera->yaw) * cossf(camera->pitch)
     };
     float cameraHitDist;
-    ColTri *cameraHitTri;
+    // ColTri *cameraHitTri;
     SurfaceType cameraHitSurface;
 
     VEC3_COPY(targetPos, camera->target);
     targetPos[1] += camera->yOffset;
 
-    cameraHitDist = raycast(targetPos, eyeOffset, 0.0f, 1.1f, &cameraHitTri, &cameraHitSurface);
+    // cameraHitDist = raycast(targetPos, eyeOffset, 0.0f, 1.1f, &cameraHitTri, &cameraHitSurface);
 
-    if (cameraHitTri != nullptr)
-    {
-        VEC3_SCALE(eyeOffset, eyeOffset, MIN(MAX(cameraHitDist - 0.1f, 0.1f), 1.0f));
-    }
+    // if (cameraHitTri != nullptr)
+    // {
+    //     VEC3_SCALE(eyeOffset, eyeOffset, MIN(MAX(cameraHitDist - 0.1f, 0.1f), 1.0f));
+    // }
     VEC3_ADD(eyePos, eyeOffset, targetPos);
 
     // // Set up view matrix

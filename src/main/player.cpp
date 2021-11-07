@@ -38,12 +38,11 @@ void updateGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED 
     (void)input;
 }
 
-void processGround(UNUSED PlayerState *state, InputData *input, Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
+void processGround(UNUSED PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
 {
     float targetSpeed = MAX_PLAYER_SPEED * input->magnitude;
     vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
     vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
-    VEC3_ADD(pos, pos, vel);
 }
 
 void updateAir(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
@@ -108,7 +107,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     // debug_printf(" model %08X\n", model);
     
     // Set up gravity
-    gravity->accel = 0; //-PLAYER_GRAVITY;
+    gravity->accel = -PLAYER_GRAVITY;
     gravity->terminalVelocity = -PLAYER_TERMINAL_VELOCITY;
 
     // Set up behavior code
@@ -121,18 +120,20 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
 
     // Set up collider
     collider->radius = PLAYER_RADIUS;
-    collider->numHeights = PLAYER_WALL_RAYCAST_HEIGHT_COUNT;
-    collider->startOffset = PLAYER_WALL_RAYCAST_OFFSET;
-    collider->ySpacing = PLAYER_WALL_RAYCAST_SPACING;
-    collider->frictionDamping = 1.0f;
-    collider->floor = nullptr;
+    collider->height = PLAYER_HEIGHT;
+    // collider->numHeights = PLAYER_WALL_RAYCAST_HEIGHT_COUNT;
+    // collider->startOffset = PLAYER_WALL_RAYCAST_OFFSET;
+    // collider->ySpacing = PLAYER_WALL_RAYCAST_SPACING;
+    collider->friction_damping = 1.0f;
+    // collider->floor = nullptr;
+    collider->floor_surface_type = surface_none;
     
     setAnim(animState, nullptr);
     *model = load_model("models/Box");
 
-    (*pos)[0] = 512.0f;
-    (*pos)[1] = 0.0f;
-    (*pos)[2] = 512.0f;
+    (*pos)[0] = 2229.0f;
+    (*pos)[1] = 512.0f;
+    (*pos)[2] = 26620.0f;
 
     // debug_printf("Set up player entity: 0x%08X\n", state->playerEntity);
 
@@ -186,6 +187,13 @@ void playerCallback(UNUSED void **components, void *data)
     if (g_PlayerInput.buttonsHeld & D_CBUTTONS)
     {
         g_Camera.distance += 50.0f;
+    }
+
+    if (g_PlayerInput.buttonsPressed & Z_TRIG)
+    {
+        (*pos)[0] = 2229.0f;
+        (*pos)[1] = 512.0f;
+        (*pos)[2] = 26620.0f;
     }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);

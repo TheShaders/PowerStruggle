@@ -118,7 +118,7 @@ void multiarraylist_delete(MultiArrayList *arr, size_t arrayIndex)
         arrayIndex -= elementCount;
     }
 
-    // Copy the array pointer from the last element in the last block to the deleted element
+    // Copy the element pointer from the last element in the last block's components to the deleted element's components
     multiarraylist_get_block_entity_pointers(block)[arrayIndex] = multiarraylist_get_block_entity_pointers(end)[end->numElements - 1];
 
     componentIndex = 0;

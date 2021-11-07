@@ -18,6 +18,7 @@ constexpr T round_up_divide(T x, T y)
 }
 
 constexpr size_t chunk_size = 16;
+constexpr size_t tile_size = 256;
 constexpr size_t max_loaded_chunks = 64;
 constexpr size_t max_loading_chunks = 16;
 
@@ -25,8 +26,16 @@ using tile_id = uint8_t;
 using grid_pos = std::pair<unsigned int, unsigned int>;
 using chunk_pos = std::pair<uint16_t, uint16_t>;
 
+enum class TileCollision : uint8_t {
+    none,
+    floor,
+    wall,
+    slope,
+};
+
 struct TileType {
     Model *model;
+    TileCollision flags;
 };
 
 // A tile is a single element in the grid. It has an associated tile id and a rotation.
@@ -88,6 +97,14 @@ constexpr T round_down_divide(T x)
     return x >> log;
 }
 
+// Same deal as above, but for modulo
+template <size_t D, typename T>
+constexpr T round_down_modulo(T x)
+{
+    // Compiler optimizes this to a simple bitwise and
+    return x - D * round_down_divide<D>(x);
+}
+
 constexpr chunk_pos chunk_from_pos(grid_pos pos)
 {
     return chunk_pos{round_down_divide<chunk_size>(pos.first), round_down_divide<chunk_size>(pos.second)};
@@ -132,6 +149,7 @@ public:
     void unload_nonvisible_chunks(Camera& camera);
     void load_chunk(chunk_pos pos);
     void process_loading_chunks();
+    float get_height(float x, float z, float radius, float min_y, float max_y);
 
     void draw();
 

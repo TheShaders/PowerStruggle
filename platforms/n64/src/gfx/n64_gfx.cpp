@@ -631,52 +631,6 @@ void drawLine(DrawLayer layer, Vec3 start, Vec3 end, u32 color)
     gSPEndDisplayList(dlist++);
 }
 
-void drawColTris(DrawLayer layer, ColTri *tris, u32 count, u32 color)
-{
-    Mtx *curMtx = (Mtx*)allocGfx(sizeof(Mtx));
-    Gfx *dlist = (Gfx*)allocGfx(sizeof(Gfx) * (8 + count * 2));
-    u32 i;
-    
-    addGfxToDrawLayer(layer, dlist);
-    
-    gDPPipeSync(dlist++);
-    gDPSetColor(dlist++, G_SETENVCOLOR, color);
-    gDPSetCombineLERP(dlist++, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1);
-
-    guMtxF2L(*g_curMatFPtr, curMtx);
-    gSPMatrix(dlist++, curMtx,
-	       G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    gSPTexture(dlist++, 0xFFFF, 0xFFFF, 0, 0, G_OFF);
-    gSPClearGeometryMode(dlist++, G_SHADING_SMOOTH);
-
-    for (i = 0; i < count; i++)
-    {
-        Vtx *verts = (Vtx*)allocGfx(sizeof(Vtx) * 3);
-
-        verts[0].v.ob[0] = static_cast<s16>(tris[i].vertex[0]);
-        verts[0].v.ob[1] = static_cast<s16>(tris[i].vertex[1]);
-        verts[0].v.ob[2] = static_cast<s16>(tris[i].vertex[2]);
-        
-        verts[1].v.ob[0] = static_cast<s16>(tris[i].vertex[0] + tris[i].u[0]);
-        verts[1].v.ob[1] = static_cast<s16>(tris[i].vertex[1] + tris[i].u[1]);
-        verts[1].v.ob[2] = static_cast<s16>(tris[i].vertex[2] + tris[i].u[2]);
-        
-        verts[2].v.ob[0] = static_cast<s16>(tris[i].vertex[0] + tris[i].v[0]);
-        verts[2].v.ob[1] = static_cast<s16>(tris[i].vertex[1] + tris[i].v[1]);
-        verts[2].v.ob[2] = static_cast<s16>(tris[i].vertex[2] + tris[i].v[2]);
-
-        verts[0].n.n[0] = verts[1].n.n[0] = verts[2].n.n[0] = static_cast<s8>(120.0f * tris[i].normal[0]);
-        verts[0].n.n[1] = verts[1].n.n[1] = verts[2].n.n[1] = static_cast<s8>(120.0f * tris[i].normal[1]);
-        verts[0].n.n[2] = verts[1].n.n[2] = verts[2].n.n[2] = static_cast<s8>(120.0f * tris[i].normal[2]);
-
-        gSPVertex(dlist++, verts, 3, 0);
-        gSP1Triangle(dlist++, 0, 1, 2, 0x00);
-    }
-    
-    gSPSetGeometryMode(dlist++, G_SHADING_SMOOTH);
-    gSPEndDisplayList(dlist++);
-}
-
 u8* allocGfx(s32 size)
 {
     u8* retVal = curGfxPoolPtr;

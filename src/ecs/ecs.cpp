@@ -83,7 +83,7 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
             while (curBlock)
             {
                 // Address for the entity pointer
-                curAddresses[0] = curBlock;
+                curAddresses[0] = multiarraylist_get_block_entity_pointers(curBlock);
                 // Get the addresses for each sub-array in the block
                 for (i = 0; i < numComponents; i++)
                 {

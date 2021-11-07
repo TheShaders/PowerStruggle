@@ -1,6 +1,5 @@
 COMPONENT(Position, Vec3)
 COMPONENT(Velocity, Vec3)
-COMPONENT(Collision, BVHTree*)
 COMPONENT(Collider, ColliderParams)
 COMPONENT(Rotation, Vec3s)
 COMPONENT(Behavior, BehaviorParams)

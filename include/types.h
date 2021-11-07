@@ -24,12 +24,12 @@ struct Animation;
 struct AnimState;
 
 // Prototypes for collision structs
-typedef struct AABB_t AABB;
-typedef struct ColTri_t ColTri;
-typedef struct BVHNode_t BVHNodeBase;
-typedef struct BVHTree_t BVHTree;
+struct AABB;
 typedef uint8_t SurfaceType;
-typedef struct ColliderParams_t ColliderParams;
+
+constexpr SurfaceType surface_none = 0;
+
+struct ColliderParams;
 
 typedef float MtxF[4][4];
 typedef float Vec3[3];
@@ -56,6 +56,9 @@ typedef struct GravityParams_t GravityParams;
 
 // Prototypes for player structs
 struct PlayerState;
+
+// Prototype for the grid
+class Grid;
 
 // Components
 // #define COMPONENT(Name, Type) typedef Type Name;
