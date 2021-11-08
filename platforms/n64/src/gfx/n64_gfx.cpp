@@ -7,6 +7,7 @@
 #include <n64_gfx.h>
 #include <n64_mem.h>
 #include <mathutils.h>
+#include <n64_mathutils.h>
 #include <gfx.h>
 #include <mem.h>
 #include <model.h>
@@ -14,6 +15,8 @@
 #include <camera.h>
 #include <audio.h>
 #include <n64_task_sched.h>
+#include <ecs.h>
+#include <interaction.h>
 
 alignas(64) std::array<std::array<u16, screen_width * screen_height>, num_frame_buffers> g_frameBuffers;
 alignas(64) std::array<u16, screen_width * screen_height> g_depthBuffer;
@@ -30,7 +33,8 @@ u8* introSegAddr;
 u8 *curGfxPoolPtr;
 u8 *curGfxPoolEnd;
 
-Gfx *g_dlistHead;
+Gfx *g_dlist_head;
+Gfx *g_gui_dlist_head;
 
 MtxF *g_curMatFPtr;
 // The index of the context for the task being constructed
@@ -93,7 +97,7 @@ void initGfx(void)
         gfxTasks[i].list.t.output_buff = &taskOutputBuffer[0];
         gfxTasks[i].list.t.output_buff_size = &taskOutputBuffer[output_buff_len];
 
-        gfxTasks[i].list.t.data_ptr = (u64*)&g_gfxContexts[i].dlistBuffer[0];
+        gfxTasks[i].list.t.data_ptr = (u64*)&g_gfxContexts[i].dlist_buffer[0];
 
         gfxTasks[i].list.t.yield_data_ptr = &taskYieldBuffer[0];
         gfxTasks[i].list.t.yield_data_size = OS_YIELD_DATA_SIZE;
@@ -159,7 +163,8 @@ void addMtxToDrawLayer(DrawLayer drawLayer, Mtx* mtx)
 void resetGfxFrame(void)
 {
     // Set up the master displaylist head
-    g_dlistHead = &g_gfxContexts[g_curGfxContext].dlistBuffer[0];
+    g_dlist_head = &g_gfxContexts[g_curGfxContext].dlist_buffer[0];
+    g_gui_dlist_head = &g_gfxContexts[g_curGfxContext].gui_dlist_buffer[0];
     curGfxPoolPtr = (u8*)&g_gfxContexts[g_curGfxContext].pool[0];
     curGfxPoolEnd = (u8*)&g_gfxContexts[g_curGfxContext].pool[gfx_pool_size64];
 
@@ -176,7 +181,7 @@ void resetGfxFrame(void)
 
 void sendGfxTask(void)
 {
-    gfxTasks[g_curGfxContext].list.t.data_size = (u32)g_dlistHead - (u32)&g_gfxContexts[g_curGfxContext].dlistBuffer[0];
+    gfxTasks[g_curGfxContext].list.t.data_size = (u32)g_dlist_head - (u32)&g_gfxContexts[g_curGfxContext].dlist_buffer[0];
 
     // Writeback cache for graphics task data
     osWritebackDCacheAll();
@@ -236,11 +241,11 @@ const Gfx clearDepthBuffer[] = {
 
 void rspUcodeLoadInit(void)
 {
-    gSPLoadGeometryMode(g_dlistHead++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
-    gSPTexture(g_dlistHead++, 0, 0, 0, 0, G_OFF);
+    gSPLoadGeometryMode(g_dlist_head++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
+    gSPTexture(g_dlist_head++, 0, 0, 0, 0, G_OFF);
     
-    gSPSetLights1(g_dlistHead++, (*light));
-    gSPLookAt(g_dlistHead++, lookAt);
+    gSPSetLights1(g_dlist_head++, (*light));
+    gSPLookAt(g_dlist_head++, lookAt);
 }
 
 u32 fillColor = GPACK_RGBA5551(0, 61, 8, 1) << 16 | GPACK_RGBA5551(0, 61, 8, 1);
@@ -250,15 +255,15 @@ void startFrame(void)
     int segIndex;
     resetGfxFrame();
 
-    gSPSegment(g_dlistHead++, 0x00, 0x00000000);
-    gSPSegment(g_dlistHead++, BUFFER_SEGMENT, g_frameBuffers[g_curGfxContext].data());
+    gSPSegment(g_dlist_head++, 0x00, 0x00000000);
+    gSPSegment(g_dlist_head++, BUFFER_SEGMENT, g_frameBuffers[g_curGfxContext].data());
 
     for (segIndex = 2; segIndex < NUM_SEGMENTS; segIndex++)
     {
         uintptr_t segOffset = (uintptr_t) getSegment(segIndex);
         if (segOffset != 0)
         {
-            gSPSegment(g_dlistHead++, segIndex, segOffset);
+            gSPSegment(g_dlist_head++, segIndex, segOffset);
         }
     }
 
@@ -272,15 +277,15 @@ void startFrame(void)
         gDPSetScissor(g_dlistHead++, G_SC_ODD_INTERLACE, 0, 0, screen_width, screen_height);
     }
 #endif
-    gSPDisplayList(g_dlistHead++, rdpInitDL);
-    gSPDisplayList(g_dlistHead++, clearDepthBuffer);
+    gSPDisplayList(g_dlist_head++, rdpInitDL);
+    gSPDisplayList(g_dlist_head++, clearDepthBuffer);
     
-    gDPSetCycleType(g_dlistHead++, G_CYC_FILL);
-    gDPSetColorImage(g_dlistHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, screen_width, BUFFER_SEGMENT << 24);
-    gDPSetFillColor(g_dlistHead++, fillColor);
-    gSPDisplayList(g_dlistHead++, clearScreenDL);
+    gDPSetCycleType(g_dlist_head++, G_CYC_FILL);
+    gDPSetColorImage(g_dlist_head++, G_IM_FMT_RGBA, G_IM_SIZ_16b, screen_width, BUFFER_SEGMENT << 24);
+    gDPSetFillColor(g_dlist_head++, fillColor);
+    gSPDisplayList(g_dlist_head++, clearScreenDL);
     
-    gDPSetCycleType(g_dlistHead++, G_CYC_1CYCLE);
+    gDPSetCycleType(g_dlist_head++, G_CYC_1CYCLE);
     
     rspUcodeLoadInit();
 
@@ -549,7 +554,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             //     // If the callback returned a displaylist, draw it
             //     if (callbackReturn)
             //     {
-            //         gSPDisplayList(g_dlistHead++, callbackReturn);
+            //         gSPDisplayList(g_dlist_head++, callbackReturn);
             //     }
             // }
             
@@ -577,7 +582,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             //     // If the callback returned a displaylist, draw it
             //     if (callbackReturn)
             //     {
-            //         gSPDisplayList(g_dlistHead++, callbackReturn);
+            //         gSPDisplayList(g_dlist_head++, callbackReturn);
             //     }
             // }
         }
@@ -598,11 +603,11 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
 // {
 //     if (joint->index == 0)
 //     {
-//         gDPSetEnvColor(g_dlistHead++, 255, 0, 0, 0);
+//         gDPSetEnvColor(g_dlist_head++, 255, 0, 0, 0);
 //     }
 //     else if (joint->index == 1)
 //     {
-//         gDPSetEnvColor(g_dlistHead++, 0, 255, 0, 0);
+//         gDPSetEnvColor(g_dlist_head++, 0, 255, 0, 0);
 //     }
 //     return nullptr;
 // }
@@ -784,8 +789,8 @@ void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near,
 
     // Set up projection matrix
     guPerspectiveF(g_gfxContexts[g_curGfxContext].projMtxF, &g_perspNorm, camera->fov, aspect, near, far, scale);
-    gSPViewport(g_dlistHead++, &viewport);
-    gSPPerspNormalize(g_dlistHead++, g_perspNorm);
+    gSPViewport(g_dlist_head++, &viewport);
+    gSPPerspNormalize(g_dlist_head++, g_perspNorm);
         
     // Ortho
     // guOrthoF(g_gfxContexts[g_curGfxContext].projMtxF, -screen_width / 2, screen_width / 2, -screen_height / 2, screen_height / 2, 100.0f, 20000.0f, 1.0f);
@@ -813,12 +818,12 @@ void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near,
     
     // Calculate vp matrix
     // guMtxCatF(g_gfxContexts[g_curGfxContext].projMtxF, g_gfxContexts[g_curGfxContext].viewMtxF, vp);
-    // mtxfMul(vp, g_gfxContexts[g_curGfxContext].viewMtxF, g_gfxContexts[g_curGfxContext].projMtxF);
+    mtxfMul(g_gfxContexts[g_curGfxContext].viewProjMtxF, g_gfxContexts[g_curGfxContext].projMtxF, g_gfxContexts[g_curGfxContext].viewMtxF);
     // guMtxF2L(vp, vp_fixed);
 
-    gSPMatrix(g_dlistHead++, vp_fixed,
+    gSPMatrix(g_dlist_head++, vp_fixed,
         G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
-    gSPMatrix(g_dlistHead++, v_fixed,
+    gSPMatrix(g_dlist_head++, v_fixed,
         G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
 }
 
@@ -830,7 +835,7 @@ void endFrame()
     for (i = 0; i < gfx::draw_layers; i++)
     {
         // Pipe sync before switching draw layers
-        gDPPipeSync(g_dlistHead++);
+        gDPPipeSync(g_dlist_head++);
 
         // No sprite or line microcode anymore
         // switch (static_cast<DrawLayer>(i))
@@ -838,35 +843,57 @@ void endFrame()
         //     // Switch to l3dex2 for line layers
         //     case DrawLayer::opa_line:
         //     case DrawLayer::xlu_line:
-        //         gSPLoadUcodeL(g_dlistHead++, gspL3DEX2_fifo);
+        //         gSPLoadUcodeL(g_dlist_head++, gspL3DEX2_fifo);
         //         rspUcodeLoadInit();
         //         break;
         //     // Switch back to f3dex2 for sprite layers
         //     case (static_cast<DrawLayer>(static_cast<int>(DrawLayer::opa_line) + 1)):
         //     case (static_cast<DrawLayer>(static_cast<int>(DrawLayer::xlu_line) + 1)):
-        //         gSPLoadUcodeL(g_dlistHead++, gspF3DEX2_fifo);
+        //         gSPLoadUcodeL(g_dlist_head++, gspF3DEX2_fifo);
         //         rspUcodeLoadInit();
         //         break;
         //     // Switch to s2dex2 for the two sprite layers (only one switch needed because they are the last two layers)
         //     case DrawLayer::opa_sprite:
-        //         gSPLoadUcodeL(g_dlistHead++, gspS2DEX2_fifo);
+        //         gSPLoadUcodeL(g_dlist_head++, gspS2DEX2_fifo);
         //         break;
         //     default:
         //         break;
         // }
 
         // Set up the render mode for this draw layer
-        gSPDisplayList(g_dlistHead++, drawLayerRenderModes1Cycle[i].data());
+        gSPDisplayList(g_dlist_head++, drawLayerRenderModes1Cycle[i].data());
 
         // Link this layer's displaylist to the main displaylist
-        gSPDisplayList(g_dlistHead++, drawLayerStarts[i]);
+        gSPDisplayList(g_dlist_head++, drawLayerStarts[i]);
 
         // Terminate this draw layer's displaylist
         gSPEndDisplayList(drawLayerHeads[i]);
     }
+    
+    // Set up ortho projection matrix and identity view matrix
+    Mtx *ortho = (Mtx *)allocGfx(sizeof(Mtx));
+    Mtx *ident = (Mtx *)allocGfx(sizeof(Mtx));
+    Gfx *fadeDL = (Gfx *)allocGfx(sizeof(Gfx) * 11);
+    Gfx *fadeDLHead = fadeDL;
 
-    gDPFullSync(g_dlistHead++);
-    gSPEndDisplayList(g_dlistHead++);
+    guOrtho(ortho, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f);
+    guMtxIdent(ident);
+
+    gSPMatrix(fadeDLHead++, ident, G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(fadeDLHead++, ortho, G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+
+    // Disable perspective correction
+    gSPPerspNormalize(g_dlist_head++, 0xFFFF);
+    // Turn off z buffering
+    gSPClearGeometryMode(fadeDLHead++, G_ZBUFFER);
+    gDPPipeSync(fadeDLHead++);
+
+    // Terminate and append the gui displaylist
+    gSPEndDisplayList(g_gui_dlist_head++);
+    gSPDisplayList(g_dlist_head++, &g_gfxContexts[g_curGfxContext].gui_dlist_buffer[0]);
+
+    gDPFullSync(g_dlist_head++);
+    gSPEndDisplayList(g_dlist_head++);
 
     sendGfxTask();
 }
@@ -911,4 +938,75 @@ void shadeScreen(float alphaPercent)
     gSPEndDisplayList(fadeDLHead++);
 
     addGfxToDrawLayer(DrawLayer::xlu_surf, fadeDL);
+}
+
+extern "C" {
+#include <debug.h>
+}
+
+glm::vec2 calculate_normalized_device_coords(const Vec3& pos, const MtxF* mat)
+{
+    // Multiple by MVP matrix
+    glm::vec4 clip_pos = *reinterpret_cast<const glm::mat4*>(mat) * glm::vec4{reinterpret_cast<const glm::vec3&>(pos), 1.0f};
+    // Perspective divide to convert from clip space to NDC
+    return glm::vec2{clip_pos[0] / clip_pos[3], clip_pos[1] / clip_pos[3]};
+}
+
+void drawHealthBars(size_t count, void *, void **componentArrays)
+{
+    HealthState *cur_health_state = static_cast<HealthState*>(componentArrays[COMPONENT_INDEX(Health, ARCHETYPE_HEALTHBAR)]);
+    Vec3 *cur_position = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_HEALTHBAR)]);
+    gDPPipeSync(g_gui_dlist_head++);
+    gDPSetCycleType(g_gui_dlist_head++, G_CYC_1CYCLE);
+    gDPSetTexturePersp(g_gui_dlist_head++, G_TP_NONE);
+    gDPSetCombineLERP(g_gui_dlist_head++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1);
+    while (count)
+    {
+        if (cur_health_state->maxHealth > 0)
+        {
+            size_t cur_health_bar_size = cur_health_state->maxHealth / health_per_pixel;
+            size_t filled_size = cur_health_state->health / health_per_pixel;
+            size_t empty_size = cur_health_bar_size - filled_size;
+            Vec3 cur_pos_corrected;
+            cur_pos_corrected[0] = (*cur_position)[0] - g_Camera.model_offset[0];
+            cur_pos_corrected[1] = (*cur_position)[1] - g_Camera.model_offset[1] + 256.0f;
+            cur_pos_corrected[2] = (*cur_position)[2] - g_Camera.model_offset[2];
+            glm::vec2 entity_ndc = calculate_normalized_device_coords(cur_pos_corrected, &g_gfxContexts[g_curGfxContext].viewProjMtxF);
+
+            unsigned int screen_space_x = lround(entity_ndc[0] *  ((int)screen_width  / 2)) + screen_width  / 2;
+            unsigned int screen_space_y = lround(entity_ndc[1] * -((int)screen_height / 2)) + screen_height / 2;
+            
+            int cur_health_bar_pos_x = (screen_space_x - cur_health_bar_size / 2);
+            int cur_health_bar_pos_y = (screen_space_y - health_bar_height / 2);
+
+            if (cur_health_bar_pos_x < 16)
+            {
+                cur_health_bar_pos_x = 16;
+            }
+            if (cur_health_bar_pos_x > (int)(screen_width - 16 - 16))
+            {
+                cur_health_bar_pos_x = screen_width - 16 - 16;
+            }
+            
+            if (cur_health_bar_pos_y < 16)
+            {
+                cur_health_bar_pos_y = 16;
+            }
+            if (cur_health_bar_pos_y > static_cast<int>(screen_height - 16 - health_bar_height))
+            {
+                cur_health_bar_pos_y = static_cast<int>(screen_height - 16 - health_bar_height);
+            }
+
+            gDPPipeSync(g_gui_dlist_head++);
+            gDPSetEnvColor(g_gui_dlist_head++, 255, 153, 0, 255);
+            gDPFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x, cur_health_bar_pos_y, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y + health_bar_height);
+            gDPPipeSync(g_gui_dlist_head++);
+            gDPSetEnvColor(g_gui_dlist_head++, 60, 60, 60, 255);
+            gDPFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y, cur_health_bar_pos_x + cur_health_bar_size, cur_health_bar_pos_y + health_bar_height);
+        }
+
+        cur_health_state++;
+        cur_position++;
+        count--;
+    }
 }

@@ -7,6 +7,7 @@
 #include <model.h>
 #include <collision.h>
 #include <physics.h>
+#include <interaction.h>
 
 #include <memory>
 

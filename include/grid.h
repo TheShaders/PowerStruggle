@@ -10,6 +10,7 @@
 #include <model.h>
 #include <mem.h>
 #include <files.h>
+#include <mathutils.h>
 
 template <typename T>
 constexpr T round_up_divide(T x, T y)
@@ -84,26 +85,6 @@ struct GridDefinition {
     }
     void get_chunk_offset_size(unsigned int x, unsigned int z, uint32_t *offset, uint32_t *size);
 };
-
-// Division in C rounds towards 0, rather than towards negative infinity
-// Rounding towards negative infinity is quicker for powers of two (just a right arithmetic shift)
-// This also ensure correctness for negative chunk positions (which don't exist currently, but might in the future)
-template <size_t D, typename T>
-constexpr T round_down_divide(T x)
-{
-    static_assert(D && !(D & (D - 1)), "Can only round down divide by a power of 2!");
-    // This log is evaluated at compile time
-    size_t log = static_cast<size_t>(std::log2(D));
-    return x >> log;
-}
-
-// Same deal as above, but for modulo
-template <size_t D, typename T>
-constexpr T round_down_modulo(T x)
-{
-    // Compiler optimizes this to a simple bitwise and
-    return x - D * round_down_divide<D>(x);
-}
 
 constexpr chunk_pos chunk_from_pos(grid_pos pos)
 {

@@ -57,6 +57,9 @@ typedef struct GravityParams_t GravityParams;
 // Prototypes for player structs
 struct PlayerState;
 
+// Prototypes for various gameplay strucs
+struct HealthState;
+
 // Prototype for the grid
 class Grid;
 

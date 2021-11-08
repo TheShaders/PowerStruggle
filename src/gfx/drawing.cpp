@@ -218,6 +218,12 @@ void drawAllEntities()
     scrollTextures();
 }
 
+void drawAllEntitiesHealth()
+{
+    // Iterate over everything that has a health bar
+    iterateOverEntities(drawHealthBars, nullptr, ARCHETYPE_HEALTHBAR, 0);
+}
+
 Gfx *gfxCbBeforeBillboard(UNUSED Joint* bone, UNUSED JointMeshLayer *layer)
 {
     MtxF billboardMtx;

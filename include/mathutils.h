@@ -2,6 +2,7 @@
 #define __MATHUTILS_H__
 
 #include <types.h>
+#include <cmath>
 
 #ifndef MAX
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -24,6 +25,26 @@
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 #define POW2(x) ((x) * (x))
+
+// Division in C rounds towards 0, rather than towards negative infinity
+// Rounding towards negative infinity is quicker for powers of two (just a right arithmetic shift)
+// This also ensure correctness for negative chunk positions (which don't exist currently, but might in the future)
+template <size_t D, typename T>
+constexpr T round_down_divide(T x)
+{
+    static_assert(D && !(D & (D - 1)), "Can only round down divide by a power of 2!");
+    // This log is evaluated at compile time
+    size_t log = static_cast<size_t>(std::log2(D));
+    return x >> log;
+}
+
+// Same deal as above, but for modulo
+template <size_t D, typename T>
+constexpr T round_down_modulo(T x)
+{
+    // Compiler optimizes this to a simple bitwise and
+    return x - D * round_down_divide<D>(x);
+}
 
 #define M_PIf (3.14159265358979323846f)
 #define M_PIf_2 (1.57079632679489661923f)

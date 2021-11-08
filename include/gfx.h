@@ -41,7 +41,11 @@ void drawModel(Model *toDraw, Animation* anim, uint32_t frame);
 void drawAABB(DrawLayer layer, AABB *toDraw, uint32_t color);
 void drawLine(DrawLayer layer, Vec3 start, Vec3 end, uint32_t color);
 
+
 void drawAllEntities(void);
+void drawAllEntitiesHealth(void);
+
+void drawHealthBars(size_t count, void *, void **componentArrays);
 
 void scrollTextures();
 void animateTextures();

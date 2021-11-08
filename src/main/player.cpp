@@ -97,6 +97,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     Model **model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_PLAYER);
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(componentArrays, ARCHETYPE_PLAYER);
     AnimState *animState = get_component<Bit_AnimState, AnimState>(componentArrays, ARCHETYPE_PLAYER);
+    HealthState *health = get_component<Bit_Health, HealthState>(componentArrays, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)arg;
     // *model = &character_model;
     // debug_printf("Player components\n");
@@ -134,6 +135,9 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     (*pos)[0] = 2229.0f;
     (*pos)[1] = 512.0f;
     (*pos)[2] = 26620.0f;
+
+    health->maxHealth = 200;
+    health->health = 150;
 
     // debug_printf("Set up player entity: 0x%08X\n", state->playerEntity);
 

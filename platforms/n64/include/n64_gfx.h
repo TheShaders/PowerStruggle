@@ -19,6 +19,7 @@
 constexpr unsigned int output_buff_len = 1024;
 
 constexpr unsigned int display_list_len = 1024;
+constexpr unsigned int gui_display_list_len = 1024;
 constexpr unsigned int gfx_pool_size = 65536 * 8;
 constexpr unsigned int gfx_pool_size64 = gfx_pool_size / 8;
 
@@ -43,13 +44,17 @@ constexpr unsigned int screen_height = 240;
 
 struct GfxContext {
     // Master displaylist
-    Gfx dlistBuffer[display_list_len];
+    Gfx dlist_buffer[display_list_len];
+    // Gui displaylist
+    Gfx gui_dlist_buffer[gui_display_list_len];
     // Floating point model matrix stack
     MtxF mtxFStack[matf_stack_len];
     // Floating point projection matrix
     MtxF projMtxF;
     // Floating point view matrix
     MtxF viewMtxF;
+    // Floating point view*proj matrix
+    MtxF viewProjMtxF;
     // Graphics tasks done message
     OSMesg taskDoneMesg;
     // Graphics tasks done message queue
@@ -63,7 +68,7 @@ extern struct GfxContext g_gfxContexts[num_frame_buffers];
 extern Mtx *g_curMatPtr;
 extern u32 g_curGfxContext;
 extern u16 g_perspNorm;
-extern Gfx *g_dlistHead;
+extern Gfx *g_dlist_head;
 
 #include <array>
 extern std::array<std::array<u16, screen_width * screen_height>, num_frame_buffers> g_frameBuffers;

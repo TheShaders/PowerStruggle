@@ -35,8 +35,8 @@ enum ComponentBits
 #define ARCHETYPE_SCALED_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_Scale)
 #define ARCHETYPE_ANIM_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_AnimState)
 #define ARCHETYPE_SCALED_ANIM_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_AnimState | Bit_Scale)
-#define ARCHETYPE_PLAYER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity)
-#define ARCHETYPE_STATIC_COL (Bit_Position | Bit_Collision)
+#define ARCHETYPE_PLAYER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health)
+#define ARCHETYPE_HEALTHBAR (Bit_Position | Bit_Health)
 
 typedef struct Entity_t {
     // The archetype of this entity

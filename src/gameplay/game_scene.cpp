@@ -99,6 +99,7 @@ void GameplayScene::draw()
 
     // debug_printf("before drawing\n");
     drawAllEntities();
+    drawAllEntitiesHealth();
 }
 
 void GameplayScene::after_gfx()
