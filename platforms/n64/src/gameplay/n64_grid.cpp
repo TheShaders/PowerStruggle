@@ -13,14 +13,6 @@ extern "C"
 #include <debug.h>
 }
 
-constexpr int visible_inner_range_x = 3000;
-constexpr int visible_inner_range_pos_z = 1500;
-constexpr int visible_inner_range_neg_z = 4000;
-
-constexpr int visible_outer_range_x     = visible_inner_range_x + 64;
-constexpr int visible_outer_range_pos_z = visible_inner_range_pos_z + 64;
-constexpr int visible_outer_range_neg_z = visible_inner_range_neg_z + 64;
-
 struct filerecord { const char *path; uint32_t offset; uint32_t size; };
 
 class FileRecords
@@ -510,4 +502,21 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
 
     // debug_printf("-> found_y: %d\n", found_y);
     return found_y;
+}
+
+chunk_pos Grid::get_minimum_loaded_chunk()
+{
+    chunk_pos ret {std::numeric_limits<decltype(chunk_pos::first)>::max(), std::numeric_limits<decltype(chunk_pos::second)>::max()};
+    for (const auto& entry : loaded_chunks_)
+    {
+        if (entry.pos.first < ret.first)
+        {
+            ret.first = entry.pos.first;
+        }
+        if (entry.pos.second < ret.second)
+        {
+            ret.second = entry.pos.second;
+        }
+    }
+    return ret;
 }

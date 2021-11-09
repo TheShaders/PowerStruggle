@@ -9,6 +9,7 @@
 #include <main.h>
 #include <files.h>
 #include <input.h>
+#include <collision.h>
 
 extern "C" {
 #include <debug.h>
@@ -21,6 +22,41 @@ GameplayScene::GameplayScene() : grid_{}
 }
 
 // LoadHandle handle;
+
+#define ARCHETYPE_TESTHITBOX (ARCHETYPE_HITBOX | Bit_Rotation | Bit_Model)
+
+void createHitboxCallback(UNUSED size_t count, void *arg, void **componentArrays)
+{
+    // Components: Position, Rotation Model, Hitbox
+    Vec3* pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_TESTHITBOX);
+    Vec3s* rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_TESTHITBOX);
+    Model** model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_TESTHITBOX);
+    Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_TESTHITBOX);
+
+    Model* sphere = load_model("models/Sphere");
+
+    while (count)
+    {
+        (*pos)[0] = 2229.0f + -16.0f + 32.0f * (guRandom() % 16);
+        (*pos)[1] = 0.0f;
+        (*pos)[2] = 26620.0f + -16.0f + 32.0f * (guRandom() % 16);
+
+        (*rot)[0] = 0;
+        (*rot)[1] = 0;
+        (*rot)[2] = 0;
+
+        hitbox->radius = 50.0f;
+        hitbox->height = 100.0f;
+
+        *model = sphere;
+
+        pos++;
+        rot++;
+        hitbox++;
+        model++;
+        count--;
+    }
+}
 
 bool GameplayScene::load()
 {
@@ -66,6 +102,8 @@ bool GameplayScene::load()
 
     debug_printf("Finished GameplayScene::load\n");
 
+    createEntitiesCallback(ARCHETYPE_TESTHITBOX, nullptr, 32, createHitboxCallback);
+
     return true;
 }
 
@@ -79,6 +117,7 @@ void GameplayScene::update()
         // Increment the physics state
         // debug_printf("before physics tick\n");
         physicsTick(grid_);
+        find_collisions(grid_);
         // Process all entities that have a behavior
         // debug_printf("before behaviors\n");
         iterateBehaviorEntities();

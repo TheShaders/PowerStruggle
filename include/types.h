@@ -59,6 +59,7 @@ struct PlayerState;
 
 // Prototypes for various gameplay strucs
 struct HealthState;
+struct Hitbox;
 
 // Prototype for the grid
 class Grid;

@@ -33,4 +33,12 @@ struct ColliderParams {
     SurfaceType floor_surface_type; // The surface type of the floor
 };
 
+struct Hitbox
+{
+    uint16_t radius;
+    uint16_t height;
+};
+
+void find_collisions(Grid& grid);
+
 #endif

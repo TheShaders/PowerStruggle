@@ -17,7 +17,7 @@ namespace js = nlohmann;
 
 
 template <typename T>
-constexpr T round_up_divide(T x, T y)
+constexpr T round_away_divide(T x, T y)
 {
     return (x - 1) / y + 1;
 }
@@ -227,8 +227,8 @@ int main(int argc, char *argv[])
         // );
         size_t num_cells_x = max_x - min_x;
         size_t num_cells__z = max_z - min_z;
-        size_t num_chunks_x = round_up_divide(num_cells_x, chunk_size);
-        size_t num_chunks_z = round_up_divide(num_cells__z, chunk_size);
+        size_t num_chunks_x = round_away_divide(num_cells_x, chunk_size);
+        size_t num_chunks_z = round_away_divide(num_cells__z, chunk_size);
 
         dynamic_array_2d<Chunk> chunks(num_chunks_x, num_chunks_z);
 

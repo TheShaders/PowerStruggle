@@ -12,7 +12,7 @@ extern "C" {
 
 #define ARCHETYPE_POSVEL       (Bit_Position | Bit_Velocity)
 #define ARCHETYPE_GRAVITY      (Bit_Velocity | Bit_Gravity)
-#define ARCHETYPE_COLLIDER     (Bit_Position | Bit_Velocity | Bit_Collider)
+#define ARCHETYPE_VEL_COLLIDER (Bit_Position | Bit_Velocity | Bit_Collider)
 
 void applyGravityCallback(size_t count, UNUSED void *arg, void **componentArrays)
 {
@@ -55,9 +55,9 @@ void resolveGridCollisionsCallback(size_t count, void *arg, void **componentArra
 {
     Grid* grid = static_cast<Grid*>(arg);
     // Components: Position, Velocity, Collider
-    Vec3 *curPos = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_COLLIDER)]);
-    Vec3 *curVel = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Velocity, ARCHETYPE_COLLIDER)]);
-    ColliderParams *curCollider = static_cast<ColliderParams*>(componentArrays[COMPONENT_INDEX(Collider, ARCHETYPE_COLLIDER)]);
+    Vec3 *curPos = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_VEL_COLLIDER)]);
+    Vec3 *curVel = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Velocity, ARCHETYPE_VEL_COLLIDER)]);
+    ColliderParams *curCollider = static_cast<ColliderParams*>(componentArrays[COMPONENT_INDEX(Collider, ARCHETYPE_VEL_COLLIDER)]);
     Entity **cur_entity = static_cast<Entity**>(componentArrays[0]);
 
     while (count)
@@ -96,5 +96,5 @@ void physicsTick(Grid& grid)
     iterateOverEntities(applyVelocityCallback, nullptr, ARCHETYPE_POSVEL, 0);
 
     // Resolve collisions with the grid
-    iterateOverEntities(resolveGridCollisionsCallback, &grid, ARCHETYPE_COLLIDER, 0);
+    iterateOverEntities(resolveGridCollisionsCallback, &grid, ARCHETYPE_VEL_COLLIDER, 0);
 }

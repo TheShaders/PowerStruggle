@@ -12,8 +12,16 @@
 #include <files.h>
 #include <mathutils.h>
 
+constexpr int visible_inner_range_x = 3000;
+constexpr int visible_inner_range_pos_z = 1500;
+constexpr int visible_inner_range_neg_z = 4000;
+
+constexpr int visible_outer_range_x     = visible_inner_range_x + 64;
+constexpr int visible_outer_range_pos_z = visible_inner_range_pos_z + 64;
+constexpr int visible_outer_range_neg_z = visible_inner_range_neg_z + 64;
+
 template <typename T>
-constexpr T round_up_divide(T x, T y)
+constexpr T round_away_divide(T x, T y)
 {
     return (x - 1) / y + 1;
 }
@@ -131,6 +139,7 @@ public:
     void load_chunk(chunk_pos pos);
     void process_loading_chunks();
     float get_height(float x, float z, float radius, float min_y, float max_y);
+    chunk_pos get_minimum_loaded_chunk();
 
     void draw(Camera *camera);
 

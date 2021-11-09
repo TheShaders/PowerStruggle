@@ -46,6 +46,16 @@ constexpr T round_down_modulo(T x)
     return x - D * round_down_divide<D>(x);
 }
 
+// Same deal above, but rounds towards positive infinity
+template <size_t D, typename T>
+constexpr T round_up_divide(T x)
+{
+    static_assert(D && !(D & (D - 1)), "Can only round up divide by a power of 2!");
+    // This log is evaluated at compile time
+    size_t log = static_cast<size_t>(std::log2(D));
+    return ((x - 1) >> log) + 1;
+}
+
 #define M_PIf (3.14159265358979323846f)
 #define M_PIf_2 (1.57079632679489661923f)
 
