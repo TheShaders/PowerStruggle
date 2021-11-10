@@ -31,12 +31,25 @@ struct ColliderParams {
     float friction_damping; // The fraction of velocity maintained while on the ground each physics frame (e.g. if it's 0 then the object will instantly stop)
     float floor_height; // The height of the floor that the collider is on
     SurfaceType floor_surface_type; // The surface type of the floor
+    Hit* hits; // The list of hitboxes this collider is intersecting with
+    uint16_t mask; // The mask applied to hitboxes to restrict intersections
 };
 
 struct Hitbox
 {
     uint16_t radius;
     uint16_t height;
+    uint16_t mask;
+};
+
+constexpr uint16_t player_hitbox_mask = 0x0001;
+constexpr uint16_t enemy_hitbox_mask  = 0x0002;
+
+struct Hit
+{
+    Hit* next;
+    Entity* entity;
+    Hitbox* hitbox;
 };
 
 void find_collisions(Grid& grid);

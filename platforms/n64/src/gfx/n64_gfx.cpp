@@ -785,7 +785,7 @@ void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near,
 {
     Mtx* vp_fixed;
     Mtx* v_fixed;
-    MtxF vp;
+    // MtxF vp;
 
     // Set up projection matrix
     guPerspectiveF(g_gfxContexts[g_curGfxContext].projMtxF, &g_perspNorm, camera->fov, aspect, near, far, scale);
@@ -966,7 +966,6 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
         {
             size_t cur_health_bar_size = cur_health_state->maxHealth / health_per_pixel;
             size_t filled_size = cur_health_state->health / health_per_pixel;
-            size_t empty_size = cur_health_bar_size - filled_size;
             Vec3 cur_pos_corrected;
             cur_pos_corrected[0] = (*cur_position)[0] - g_Camera.model_offset[0];
             cur_pos_corrected[1] = (*cur_position)[1] - g_Camera.model_offset[1] + 256.0f;

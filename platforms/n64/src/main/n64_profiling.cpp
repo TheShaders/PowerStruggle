@@ -33,11 +33,11 @@ void profileEndMainLoop()
     ProfilerData.rdpPipeTime = IO_READ(DPC_PIPEBUSY_REG);
     ProfilerData.rdpTmemTime = IO_READ(DPC_TMEM_REG);
 
-    debug_printf(
-        // "CPU:  %8u RSP:  %8u CLK:  %8u\n"
-        // "CMD:  %8u PIPE: %8u TMEM: %8u\n"
-        "  CPU us: %u\n",
-        // ProfilerData.cpuTime, ProfilerData.rspTime, ProfilerData.rdpClockTime, ProfilerData.rdpCmdTime,
-        // ProfilerData.rdpPipeTime, ProfilerData.rdpTmemTime,
-        (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
+    // debug_printf(
+    //     // "CPU:  %8u RSP:  %8u CLK:  %8u\n"
+    //     // "CMD:  %8u PIPE: %8u TMEM: %8u\n"
+    //     "  CPU us: %u\n",
+    //     // ProfilerData.cpuTime, ProfilerData.rspTime, ProfilerData.rdpClockTime, ProfilerData.rdpCmdTime,
+    //     // ProfilerData.rdpPipeTime, ProfilerData.rdpTmemTime,
+    //     (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
 }

@@ -8,8 +8,13 @@
 #include <collision.h>
 #include <physics.h>
 #include <interaction.h>
+#include <block_vector.h>
 
 #include <memory>
+
+extern "C" {
+#include <debug.h>
+}
 
 #define COMPONENT(Name, Type) sizeof(Type),
 
@@ -42,6 +47,24 @@ extern "C" int numberOfSetBits(uint32_t i)
      return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 }
 
+block_vector<Entity*> queued_deletions;
+
+
+void queue_entity_deletion(Entity *e)
+{
+    debug_printf("Entity %08X queued for deletion\n", e);
+    queued_deletions.emplace_back(e);
+}
+
+void process_deletion_queue()
+{
+    for (Entity* to_delete : queued_deletions)
+    {
+        debug_printf("Deleting entity %08X\n", to_delete);
+        deleteEntity(to_delete);
+    }
+}
+
 void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t componentMask, archetype_t rejectMask)
 {
     int componentIndex, curArchetypeIndex;
@@ -49,6 +72,9 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
     int numComponentsFound = 0;
     auto components = std::unique_ptr<size_t[]>(new size_t[numComponents]);
     archetype_t componentBits = componentMask;
+
+    // Clear the deletion queue
+    queued_deletions = {};
 
     componentIndex = 0;
     while (componentBits)
@@ -97,11 +123,17 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
             }
         }
     }
+
+    process_deletion_queue();
 }
 
 void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg, archetype_t componentMask, archetype_t rejectMask)
 {
     int curArchetypeIndex;
+
+    // Clear the deletion queue
+    queued_deletions = {};
+
     for (curArchetypeIndex = 0; curArchetypeIndex < numArchetypes; curArchetypeIndex++)
     {
         archetype_t curArchetype = currentArchetypes[curArchetypeIndex];
@@ -150,6 +182,8 @@ void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg
             }
         }
     }
+
+    process_deletion_queue();
 }
 
 // TODO sort upon add, use binary search to check if already exists
@@ -279,11 +313,11 @@ void deleteEntity(Entity *e)
     int archetypeIndex = getArchetypeIndex(e->archetype);
     size_t newLength = --archetypeEntityCounts[archetypeIndex];
     Entity *curEntity;
-    int i;
 
     multiarraylist_delete(&archetypeArrays[archetypeIndex], e->archetypeArrayIndex);
 
     // Ugly linear search over all entities to update the archetype array index of the entity that was moved in the delete
+    // e->archetypeArrayIndex = 
     // TODO keep the entity list sorted?
     for (curEntity = &allEntities[0]; curEntity != &allEntities[entitiesEnd]; curEntity++)
     {
@@ -295,29 +329,23 @@ void deleteEntity(Entity *e)
     }
     
     // Find the deleted entity in the list and clear its data
-    for (i = 0; i < entitiesEnd; i++)
+    int entityIndex = e - &allEntities[0];
+    e->archetype = 0;
+    e->archetypeArrayIndex = 0;
+    numEntities--;
+    // If this is the last entity, update the end index
+    if (entityIndex == entitiesEnd - 1)
     {
-        if (&allEntities[i] == e)
+        entitiesEnd--;
+    }
+    // Otherwise, increase the number of gaps
+    else
+    {
+        numGaps++;
+        // If this new gap is less than the previous first gap, update the first gap to this one
+        if (entityIndex < firstGap)
         {
-            allEntities[i].archetype = 0;
-            allEntities[i].archetypeArrayIndex = 0;
-            numEntities--;
-            // If this is the last entity, update the end index
-            if (i == entitiesEnd - 1)
-            {
-                entitiesEnd--;
-            }
-            // Otherwise, increase the number of gaps
-            else
-            {
-                numGaps++;
-                // If this new gap is less than the previous first gap, update the first gap to this one
-                if (i < firstGap)
-                {
-                    firstGap = i;
-                }
-            }
-            break;
+            firstGap = entityIndex;
         }
     }
 }

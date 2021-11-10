@@ -6,7 +6,7 @@
 #include <collision.h>
 #include <surface_types.h>
 
-float raycastVertical(Vec3 rayOrigin, float rayLength, float tmin, float tmax, SurfaceType *floorSurface)
+float raycastVertical(UNUSED Vec3 rayOrigin, UNUSED float rayLength, UNUSED float tmin, UNUSED float tmax, UNUSED SurfaceType *floorSurface)
 {
     // TODO Search the grid
 
@@ -14,7 +14,7 @@ float raycastVertical(Vec3 rayOrigin, float rayLength, float tmin, float tmax, S
     return FLT_MAX;
 }
 
-float raycast(Vec3 rayOrigin, Vec3 rayDir, float tmin, float tmax, SurfaceType *floorSurface)
+float raycast(UNUSED Vec3 rayOrigin, UNUSED Vec3 rayDir, UNUSED float tmin, UNUSED float tmax, UNUSED SurfaceType *floorSurface)
 {
     // TODO search the grid
 

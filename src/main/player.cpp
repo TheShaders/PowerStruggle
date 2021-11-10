@@ -128,6 +128,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     collider->friction_damping = 1.0f;
     // collider->floor = nullptr;
     collider->floor_surface_type = surface_none;
+    collider->mask = player_hitbox_mask;
     
     setAnim(animState, nullptr);
     *model = load_model("models/Box");
@@ -136,8 +137,8 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     (*pos)[1] = 512.0f;
     (*pos)[2] = 26620.0f;
 
-    health->maxHealth = 200;
-    health->health = 150;
+    health->health = health->maxHealth = 200;
+    // health->health = 150;
 
     // debug_printf("Set up player entity: 0x%08X\n", state->playerEntity);
 
@@ -165,6 +166,34 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     // *model = testmodel;
 }
 
+uint32_t last_player_hit_time = 0;
+constexpr uint32_t player_iframes = 0;
+
+void take_damage(HealthState* health_state, int damage)
+{
+    if (damage >= health_state->health)
+    {
+        health_state->health = 0;
+        *(volatile int*)0 = 0;
+    }
+    health_state->health -= damage;
+}
+
+void handle_player_hits(ColliderParams* collider, HealthState* health_state)
+{
+    Hit* cur_hit = collider->hits;
+    if (g_gameTimer - last_player_hit_time >= player_iframes)
+    {
+        while (cur_hit != nullptr)
+        {
+            take_damage(health_state, 5);
+            last_player_hit_time = g_gameTimer;
+            queue_entity_deletion(cur_hit->entity);
+            cur_hit = cur_hit->next;
+        }
+    }
+}
+
 void playerCallback(UNUSED void **components, void *data)
 {
     // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
@@ -174,18 +203,24 @@ void playerCallback(UNUSED void **components, void *data)
     AnimState *animState = get_component<Bit_AnimState, AnimState>(components, ARCHETYPE_PLAYER);
     ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_PLAYER);
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(components, ARCHETYPE_PLAYER);
+    HealthState *health_state = get_component<Bit_Health, HealthState>(components, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)data;
     
     // Transition between states if applicable
     stateUpdateCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
     // Process the current state
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
+    handle_player_hits(collider, health_state);
 
     VEC3_COPY(g_Camera.target, *pos);
 
     if (g_PlayerInput.buttonsHeld & U_CBUTTONS)
     {
         g_Camera.distance -= 50.0f;
+        if (g_Camera.distance <= 50.0f)
+        {
+            g_Camera.distance = 50.0f;
+        }
     }
 
     if (g_PlayerInput.buttonsHeld & D_CBUTTONS)

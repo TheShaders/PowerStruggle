@@ -100,6 +100,9 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
 void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t componentMask, archetype_t rejectMask);
 // Same as above, but this time an array of ALL components is passed (not just the masked ones), as well as an array of component sizes
 void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg, archetype_t componentMask, archetype_t rejectMask);
+// Used to delete an entity during entity iteration
+// Queued entities will all get deleted after the current iteration is over
+void queue_entity_deletion(Entity*);
 // Registers a new archetype
 void registerArchetype(archetype_t archetype);
 // Outputs the component pointers for the given entity into the provided pointer array

@@ -11,6 +11,8 @@ extern "C" {
 #include <debug.h>
 }
 
+constexpr int max_hitbox_entities_checked = 256;
+
 consteval unsigned int nearest_pow_2(unsigned int x)
 {
     // If x is already a power of 2, return it
@@ -51,7 +53,10 @@ struct HitboxNode
 
 // Array of the list of hitboxes for each tile
 std::array<std::array<HitboxNode*, max_tiles_x>, max_tiles_z> tile_hitboxes;
+// Pool for hitbox nodes, used to group hitbox entities into lists by tile
 block_vector<HitboxNode> node_pool;
+// Pool for hits, used to create lists for every entity containing the hitboxes they intersect with
+block_vector<Hit> hit_pool;
 
 struct GatherHitboxesParams
 {
@@ -125,10 +130,11 @@ void gather_hitboxes(size_t count, void *arg, void **componentArrays)
 }
 
 FORCEINLINE void test_collider(
-    Entity* entity, ColliderParams* collider, Vec3 pos,
+    UNUSED Entity* entity, ColliderParams* collider, Vec3 pos,
     int min_array_x, int min_array_z, int max_array_x, int max_array_z,
-    skipfield<Entity*, 16>& checked_entities)
+    skipfield<Entity*, max_hitbox_entities_checked>& checked_entities)
 {
+    Hit* cur_hit = nullptr;
     // debug_printf("Testing collider entity %08X at {%4.0f %4.0f %4.0f}\n", pos[0], pos[1], pos[2]);
     // Iterate over the tile extents and insert a new node into each tile pointing to the current hitbox
     for (int x = min_array_x; x <= max_array_x; x++)
@@ -138,7 +144,7 @@ FORCEINLINE void test_collider(
             // Get the hitbox list for this tile
             HitboxNode* cur_node = tile_hitboxes[x][z];
             // Ensure that the tile has an associated hitbox list
-            if (cur_node != nullptr)
+            while (cur_node != nullptr)
             {
                 Hitbox* cur_hitbox = cur_node->hitbox;
                 Entity* hitbox_entity = cur_node->entity;
@@ -151,18 +157,24 @@ FORCEINLINE void test_collider(
                     checked_entities.emplace(hitbox_entity);
 
                     // Check if the collider and hitbox intersect
-                    // Start by checking if their y ranges overlap
-                    if (pos[1] < hitbox_pos[1] + cur_hitbox->height &&
-                        hitbox_pos[1] < pos[1] + collider->height)
+                    // Start by checking if the masks match
+                    if ((cur_hitbox->mask & collider->mask) != 0)
                     {
-                        // Now check if the circles of the collider and hitbox intersect
-                        float x_dist_sqr = std::pow(pos[0] - hitbox_pos[0], 2.0f);
-                        float z_dist_sqr = std::pow(pos[2] - hitbox_pos[2], 2.0f);
-                        float radii_sum_sqr = std::pow(collider->radius + cur_hitbox->radius, 2.0f);
-                        if (radii_sum_sqr > x_dist_sqr + z_dist_sqr)
+                        // Now check if their y ranges overlap
+                        if (pos[1] < hitbox_pos[1] + cur_hitbox->height &&
+                            hitbox_pos[1] < pos[1] + collider->height)
                         {
-                            // The collider intersects with the hitbox
-                            // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
+                            // Now check if the circles of the collider and hitbox intersect
+                            float x_dist_sqr = std::pow(pos[0] - hitbox_pos[0], 2.0f);
+                            float z_dist_sqr = std::pow(pos[2] - hitbox_pos[2], 2.0f);
+                            float radii_sum_sqr = std::pow(collider->radius + cur_hitbox->radius, 2.0f);
+                            if (radii_sum_sqr > x_dist_sqr + z_dist_sqr)
+                            {
+                                // The collider intersects with the hitbox
+                                // Allocate a new hit node and swap the current one with it
+                                cur_hit = &(*hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
+                            }
                         }
                     }
 
@@ -174,11 +186,13 @@ FORCEINLINE void test_collider(
                 }
                 else
                 {
-                    // debug_printf("already checked %d %d\n", x, z);
+                    // debug_printf("already checked %08X\n", hitbox_entity);
                 }
+                cur_node = cur_node->next;
             }
         }
     }
+    collider->hits = cur_hit;
 }
 
 void test_hitboxes(size_t count, void *arg, void **componentArrays)
@@ -193,7 +207,7 @@ void test_hitboxes(size_t count, void *arg, void **componentArrays)
     ColliderParams *cur_collider = static_cast<ColliderParams*>(componentArrays[COMPONENT_INDEX(Collider, ARCHETYPE_COLLIDER)]);
     // Skipfield for holding the entities that have been checked
     // TODO replace this with a custom fixed-capacity stack-allocated vector type instead
-    skipfield<Entity*, 16> checked_entities{};
+    skipfield<Entity*, max_hitbox_entities_checked> checked_entities{};
     // Iterate over every entity
     while (count)
     {
@@ -229,9 +243,10 @@ void find_collisions(Grid& grid)
     int start_tile_z = min_chunk.second * chunk_size;
     // debug_printf("start_x %d start_z %d\n", start_tile_x, start_tile_z);
 
-    // Initialize the node pool
-    // This will free the previous frame's node pool's memory via move assignment
+    // Initialize the node and hit pools
+    // This will free the previous frame's pools' memory via move assignment
     node_pool = {};
+    hit_pool = {};
     GatherHitboxesParams params {
         start_tile_x,
         start_tile_z

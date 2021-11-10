@@ -25,7 +25,7 @@ GameplayScene::GameplayScene() : grid_{}
 
 #define ARCHETYPE_TESTHITBOX (ARCHETYPE_HITBOX | Bit_Rotation | Bit_Model)
 
-void createHitboxCallback(UNUSED size_t count, void *arg, void **componentArrays)
+void createHitboxCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
     // Components: Position, Rotation Model, Hitbox
     Vec3* pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_TESTHITBOX);
@@ -37,9 +37,9 @@ void createHitboxCallback(UNUSED size_t count, void *arg, void **componentArrays
 
     while (count)
     {
-        (*pos)[0] = 2229.0f + -16.0f + 32.0f * (guRandom() % 16);
+        (*pos)[0] = 2229.0f + -512.0f + 4.0f * RAND(256);
         (*pos)[1] = 0.0f;
-        (*pos)[2] = 26620.0f + -16.0f + 32.0f * (guRandom() % 16);
+        (*pos)[2] = 26620.0f + -512.0f + 4.0f * RAND(256);
 
         (*rot)[0] = 0;
         (*rot)[1] = 0;
@@ -47,6 +47,7 @@ void createHitboxCallback(UNUSED size_t count, void *arg, void **componentArrays
 
         hitbox->radius = 50.0f;
         hitbox->height = 100.0f;
+        hitbox->mask = player_hitbox_mask;
 
         *model = sphere;
 
