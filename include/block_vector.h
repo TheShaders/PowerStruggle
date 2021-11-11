@@ -108,7 +108,11 @@ public:
     using const_iterator         = ConstIterator;
 
     // Default constructor
-    block_vector() : first_(new Block{}), last_(first_) {}
+    block_vector() : first_(new Block), last_(first_)
+    {
+        first_->next = nullptr;
+        first_->count = 0;
+    }
     // Destructor
     ~block_vector()
     {
@@ -151,7 +155,7 @@ public:
 private:
     void add_block()
     {
-        Block* new_block = new Block{};
+        Block* new_block = new Block;
         last_->next = new_block;
         last_ = new_block;
     }

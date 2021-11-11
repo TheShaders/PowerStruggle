@@ -52,7 +52,7 @@ block_vector<Entity*> queued_deletions;
 
 void queue_entity_deletion(Entity *e)
 {
-    debug_printf("Entity %08X queued for deletion\n", e);
+    // debug_printf("Entity %08X queued for deletion\n", e);
     queued_deletions.emplace_back(e);
 }
 
@@ -60,7 +60,7 @@ void process_deletion_queue()
 {
     for (Entity* to_delete : queued_deletions)
     {
-        debug_printf("Deleting entity %08X\n", to_delete);
+        // debug_printf("Deleting entity %08X\n", to_delete);
         deleteEntity(to_delete);
     }
 }

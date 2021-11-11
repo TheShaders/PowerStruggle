@@ -11,7 +11,7 @@ extern "C" {
 #include <debug.h>
 }
 
-constexpr int max_hitbox_entities_checked = 256;
+constexpr int max_hitbox_entities_checked = 32;
 
 consteval unsigned int nearest_pow_2(unsigned int x)
 {
@@ -232,10 +232,26 @@ void test_hitboxes(size_t count, void *arg, void **componentArrays)
     }
 }
 
+// memset was doing it 1 byte at a time which was taking ~2ms, we can do better
+inline void zero_tile_hitboxes()
+{
+    HitboxNode** nodes = &tile_hitboxes[0][0];
+    // bzero(nodes, sizeof(nodes[0]) * max_tiles_x * max_tiles_z);
+    __asm__ __volatile__(".set gp=64");
+    static_assert(((max_tiles_x * max_tiles_z) & 1) == 0, "Collision tile count must be divisible by 2");
+    for (size_t i = 0; i < max_tiles_x * max_tiles_z / 2; i++)
+    {
+        __asm__ __volatile__("sd $zero, 0(%0)" : : "r"(nodes));
+        nodes += 2;
+    }
+    __asm__ __volatile__(".set gp=32");
+}
+
 void find_collisions(Grid& grid)
 {
     // Clear the tile hitbox list
-    std::fill_n(&tile_hitboxes[0][0], max_tiles_x * max_tiles_z, nullptr);
+    zero_tile_hitboxes();
+    // std::fill_n(&tile_hitboxes[0][0], max_tiles_x * max_tiles_z, nullptr);
 
     // Get the minimum tile index, which will be used to offset all entity positions
     chunk_pos min_chunk = grid.get_minimum_loaded_chunk();

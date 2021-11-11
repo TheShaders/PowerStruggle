@@ -62,3 +62,37 @@ extern "C" void abort()
 {
     while (1);
 }
+
+extern "C" void* memset(void* ptr, int value, size_t num)
+{
+    uint8_t val_8 = static_cast<uint8_t>(value);
+    uint32_t val_word = 
+        (val_8 << 24) |
+        (val_8 << 16) |
+        (val_8 <<  8) |
+        (val_8);
+
+    uintptr_t bytes_end = reinterpret_cast<uintptr_t>(ptr) + num;
+    uintptr_t words_end = bytes_end & ~(0b11);
+    uintptr_t ptr_uint = reinterpret_cast<uintptr_t>(ptr);
+
+    while (ptr_uint & 0b11)
+    {
+        *reinterpret_cast<uint8_t*>(ptr_uint) = value;
+        ptr_uint += 1;
+    }
+
+    while (ptr_uint != words_end)
+    {
+        *reinterpret_cast<uint32_t*>(ptr_uint) = val_word;
+        ptr_uint += 4;
+    }
+
+    while (ptr_uint != bytes_end)
+    {
+        *reinterpret_cast<uint8_t*>(ptr_uint) = value;
+        ptr_uint += 1;
+    }
+
+	return ptr;
+}

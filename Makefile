@@ -224,8 +224,8 @@ CXXFLAGS     := -march=vr4300 -mtune=vr4300 -mfix4300 -mabi=32 -mno-shared -G 0 
         -fno-rtti -std=c++20 -D_LANGUAGE_C_PLUS_PLUS -ffunction-sections -fno-exceptions
 
 else
-CFLAGS     := -mabi=32 -ffreestanding -G 0 -D_LANGUAGE_C -ffunction-sections
-CXXFLAGS   := -mabi=32 -std=c++20 -fno-rtti -G 0 -D_LANGUAGE_C_PLUS_PLUS -ffunction-sections -fno-exceptions
+CFLAGS     := -mabi=32 -ffreestanding -G 0 -D_LANGUAGE_C -ffunction-sections -fno-builtin-memset
+CXXFLAGS   := -mabi=32 -std=c++20 -fno-rtti -G 0 -D_LANGUAGE_C_PLUS_PLUS -ffunction-sections -fno-exceptions -fno-builtin-memset
 endif
 CPPFLAGS   := -I include -I $(PLATFORM_DIR)/include -I . -I src/ -Ilib/glm $(SDK_INCLUDE) -D_FINALROM -D_MIPS_SZLONG=32 -D_MIPS_SZINT=32 -D_ULTRA64 -D__EXTENSIONS__ -DF3DEX_GBI_2
 WARNFLAGS  := -Wall -Wextra -Wpedantic -Wdouble-promotion -Wfloat-conversion

@@ -28,6 +28,18 @@ int lowest_bit(size_t value)
     return i16 + i8 + i4 + i2 + i1;
 }
 
+inline void clear_block(MultiArrayListBlock* block)
+{
+    uint64_t* cur_ptr = reinterpret_cast<uint64_t*>(block);
+    __asm__ __volatile__(".set gp=64");
+    for (size_t i = 0; i < mem_block_size / 8; i++)
+    {
+        __asm__ __volatile__("sd $zero, 0(%0)" : : "r"(cur_ptr));
+        cur_ptr++;
+    }
+    __asm__ __volatile__(".set gp=32");
+}
+
 void multiarraylist_init(MultiArrayList *arr, archetype_t archetype)
 {
     // Every entity's components has a pointer back to the entity itself
@@ -50,7 +62,8 @@ void multiarraylist_init(MultiArrayList *arr, archetype_t archetype)
     arr->totalElementSize = totalElementSize;
     arr->elementCount = ROUND_DOWN((mem_block_size - sizeof(MultiArrayListBlock)) / totalElementSize, 4);
     arr->end = arr->start = (MultiArrayListBlock*) allocChunks(1, ALLOC_ECS);
-    memset(arr->start, 0, mem_block_size);
+    clear_block(arr->start);
+    // memset(arr->start, 0, mem_block_size);
 }
 
 void multiarraylist_alloccount(MultiArrayList *arr, size_t count)
@@ -68,7 +81,8 @@ void multiarraylist_alloccount(MultiArrayList *arr, size_t count)
         while (count > 0)
         {
             MultiArrayListBlock *newSeg = (MultiArrayListBlock*) allocChunks(1, ALLOC_ECS);
-            memset(newSeg, 0, mem_block_size);
+            clear_block(newSeg);
+            // memset(newSeg, 0, mem_block_size);
 
             arr->end->next = newSeg;
             arr->end = newSeg;
