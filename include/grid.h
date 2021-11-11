@@ -12,6 +12,8 @@
 #include <files.h>
 #include <mathutils.h>
 
+#include <platform_grid.h>
+
 constexpr int visible_inner_range_x = 3000;
 constexpr int visible_inner_range_pos_z = 1500;
 constexpr int visible_inner_range_neg_z = 4000;
@@ -107,9 +109,13 @@ struct GridPosProxy {
     inline Tile& operator[](unsigned int col);
 };
 
+// Defined per-platform
+struct ChunkGfx;
+
 struct ChunkEntry {
     chunk_pos pos;
     std::unique_ptr<Chunk, alloc_deleter> chunk;
+    ChunkGfx gfx;
 };
 
 // Represents the level grid, which contains a definition of tile types and an array containing all of the level's tiles

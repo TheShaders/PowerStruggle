@@ -292,64 +292,9 @@ void startFrame(void)
     setupDrawLayers();
 }
 
-constinit Mtx fixed_tile_rotation_matrices[] = {
-    float_to_fixed(
-    {
-        { 2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {  0.0f,  0.0f, 2.56f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    }),
-    float_to_fixed({
-        {  0.0f,  0.0f, 2.56f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {-2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    }),
-    float_to_fixed({
-        {-2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,-2.56f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    }),
-    float_to_fixed({
-        {  0.0f,  0.0f,-2.56f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        { 2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    }),
-};
-
-// Copies the first 3 rows of the input matrix into the output one (the rows containing the rotation and scale)
-// Doubleword sized copies instead of memcpy, which is 1 byte at a time with the implementation available
-// Word copies are just as fast because of 32-bit data bus, but this is fewer instructions and so better icache usage
-inline void copy_rotation_scale(Mtx* out, Mtx* in)
-{
-    uint64_t *out_int = (uint64_t*)&out->m[0][0];
-    uint64_t *in_int = (uint64_t*)&in->m[0][0];
-    uint64_t a;
-    uint64_t b;
-    uint64_t c;
-
-    __asm__ __volatile__(".set gp=64");
-    __asm__ __volatile__("ld %0,  0(%1)" : "=r"(a) : "r"(in_int));
-    __asm__ __volatile__("ld %0,  8(%1)" : "=r"(b) : "r"(in_int));
-    __asm__ __volatile__("ld %0, 16(%1)" : "=r"(c) : "r"(in_int));
-    __asm__ __volatile__("sd %0,  0(%1)" : : "r"(a), "r"(out_int));
-    __asm__ __volatile__("sd %0,  8(%1)" : : "r"(b), "r"(out_int));
-    __asm__ __volatile__("sd %0, 16(%1)" : : "r"(c), "r"(out_int));
-    __asm__ __volatile__("ld %0, 32(%1)" : "=r"(a) : "r"(in_int));
-    __asm__ __volatile__("ld %0, 40(%1)" : "=r"(b) : "r"(in_int));
-    __asm__ __volatile__("ld %0, 48(%1)" : "=r"(c) : "r"(in_int));
-    __asm__ __volatile__("sd %0, 32(%1)" : : "r"(a), "r"(out_int));
-    __asm__ __volatile__("sd %0, 40(%1)" : : "r"(b), "r"(out_int));
-    __asm__ __volatile__("sd %0, 48(%1)" : : "r"(c), "r"(out_int));
-    __asm__ __volatile__(".set gp=32");
-}
-
 // Draws a model with 1 joint and no posing
 // Does not inherit from or affect the matrix stack
-void drawTileModel(Model *toDraw, int x, int y, int z, int rotation)
+void drawTileModel(Model *toDraw, Mtx* curMtx)
 {
     int cur_material = -1;
 
@@ -357,16 +302,6 @@ void drawTileModel(Model *toDraw, int x, int y, int z, int rotation)
 
     // Draw the model's singular joint
     const Joint& joint_to_draw = toDraw->joints[0];
-    
-    // Allocate the matrix
-    Mtx* curMtx = (Mtx*)allocGfx(sizeof(Mtx));
-    // Copy from the template matrix based on the rotation
-    copy_rotation_scale(curMtx, &fixed_tile_rotation_matrices[rotation]);
-    // Set up the translation in the matrix
-    curMtx->m[1][2] = ((uint32_t)x & 0xFFFF) << 16 | ((uint32_t)y & 0xFFFF);
-    curMtx->m[1][3] = ((uint32_t)z & 0xFFFF) << 16 | (1 & 0xFFFF);
-    curMtx->m[3][2] = 0;
-    curMtx->m[3][3] = 0;
 
     // Draw the joint's layers
     for (size_t cur_layer = 0; cur_layer < gfx::draw_layers; cur_layer++)

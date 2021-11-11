@@ -214,6 +214,93 @@ extern "C" {
 #include <debug.h>
 }
 
+constinit Mtx fixed_tile_rotation_matrices[] = {
+    float_to_fixed(
+    {
+        { 2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {  0.0f,  0.0f, 2.56f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {  0.0f,  0.0f, 2.56f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {-2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {-2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,-2.56f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+    float_to_fixed({
+        {  0.0f,  0.0f,-2.56f,  0.0f},
+        {  0.0f, 2.56f,  0.0f,  0.0f},
+        { 2.56f,  0.0f,  0.0f,  0.0f},
+        {  0.0f,  0.0f,  0.0f,  1.0f},
+    }),
+};
+
+// Copies the first 3 rows of the input matrix into the output one (the rows containing the rotation and scale)
+// Doubleword sized copies instead of memcpy, which is 1 byte at a time with the implementation available
+// Word copies are just as fast because of 32-bit data bus, but this is fewer instructions and so better icache usage
+void copy_rotation_scale(Mtx* out, Mtx* in)
+{
+    uint64_t *out_int = (uint64_t*)&out->m[0][0];
+    uint64_t *in_int = (uint64_t*)&in->m[0][0];
+    uint64_t a;
+    uint64_t b;
+    uint64_t c;
+
+    __asm__ __volatile__(".set gp=64");
+    __asm__ __volatile__("ld %0,  0(%1)" : "=r"(a) : "r"(in_int));
+    __asm__ __volatile__("ld %0,  8(%1)" : "=r"(b) : "r"(in_int));
+    __asm__ __volatile__("ld %0, 16(%1)" : "=r"(c) : "r"(in_int));
+    __asm__ __volatile__("sd %0,  0(%1)" : : "r"(a), "r"(out_int));
+    __asm__ __volatile__("sd %0,  8(%1)" : : "r"(b), "r"(out_int));
+    __asm__ __volatile__("sd %0, 16(%1)" : : "r"(c), "r"(out_int));
+    __asm__ __volatile__("ld %0, 32(%1)" : "=r"(a) : "r"(in_int));
+    __asm__ __volatile__("ld %0, 40(%1)" : "=r"(b) : "r"(in_int));
+    __asm__ __volatile__("ld %0, 48(%1)" : "=r"(c) : "r"(in_int));
+    __asm__ __volatile__("sd %0, 32(%1)" : : "r"(a), "r"(out_int));
+    __asm__ __volatile__("sd %0, 40(%1)" : : "r"(b), "r"(out_int));
+    __asm__ __volatile__("sd %0, 48(%1)" : : "r"(c), "r"(out_int));
+    __asm__ __volatile__(".set gp=32");
+}
+
+std::array<block_vector<Mtx>, num_frame_buffers> get_matrices(Chunk* chunk)
+{
+    std::array<block_vector<Mtx>, num_frame_buffers> ret{};
+
+    for (unsigned int x = 0; x < chunk_size; x++)
+    {
+        for (unsigned int z = 0; z < chunk_size; z++)
+        {
+            const ChunkColumn &col = chunk->columns[x][z];
+            unsigned int tile_idx;
+            for (tile_idx = 0; tile_idx < col.num_tiles; tile_idx++)
+            {
+                const auto& tile = col.tiles[tile_idx];
+                if (tile.id != 0xFF)
+                {
+                    for (unsigned int i = 0; i < num_frame_buffers; i++)
+                    {
+                        // Allocate the matrix
+                        Mtx* curMtx = &(*ret[i].emplace_back());
+                        // Copy from the template matrix based on the rotation
+                        copy_rotation_scale(curMtx, &fixed_tile_rotation_matrices[tile.rotation]);
+                        curMtx->m[3][2] = 0;
+                        curMtx->m[3][3] = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
 void Grid::process_loading_chunks()
 {
     int i = 0;
@@ -231,7 +318,8 @@ void Grid::process_loading_chunks()
             debug_printf("Chunk %08X {%d, %d} finished loading\n", chunk, it->first.first, it->first.second);
             chunk->adjust_offsets();
             std::unique_ptr<Chunk, alloc_deleter> chunk_ptr{chunk};
-            loaded_chunks_.emplace(it->first, std::move(chunk_ptr));
+            std::array<block_vector<Mtx>, num_frame_buffers> chunk_matrices = get_matrices(chunk);
+            loaded_chunks_.emplace(it->first, std::move(chunk_ptr), ChunkGfx{std::move(chunk_matrices)});
             it = loading_chunks_.erase(it);
             i++;
             if (loaded_chunks_.full()) break;
@@ -247,38 +335,7 @@ void Grid::process_loading_chunks()
     }
 }
 
-float tile_rotations[] = {
-    0.0f, 90.0f, 180.0f, 270.0f
-};
-
-MtxF tile_rotation_matrices[] = {
-    {
-        { 2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {  0.0f,  0.0f, 2.56f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    },
-    {
-        {  0.0f,  0.0f, 2.56f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {-2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    },
-    {
-        {-2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,-2.56f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    },
-    {
-        {  0.0f,  0.0f,-2.56f,  0.0f},
-        {  0.0f, 2.56f,  0.0f,  0.0f},
-        { 2.56f,  0.0f,  0.0f,  0.0f},
-        {  0.0f,  0.0f,  0.0f,  1.0f},
-    },
-};
-
-void drawTileModel(Model *toDraw, int x, int y, int z, int rotation);
+void drawTileModel(Model *toDraw, Mtx* curMtx);
 
 void Grid::draw(Camera *camera)
 {
@@ -289,6 +346,8 @@ void Grid::draw(Camera *camera)
         int32_t chunk_world_z = entry.pos.second * static_cast<int32_t>(tile_size * chunk_size) + tile_size / 2 - camera->model_offset[2];
         auto& chunk = entry.chunk;
         int32_t cur_x = chunk_world_x;
+        auto& cur_matrices = entry.gfx.matrices[g_curGfxContext];
+        auto mtx_iter = cur_matrices.begin();
         for (unsigned int x = 0; x < chunk_size; x++)
         {
             int32_t cur_z = chunk_world_z;
@@ -302,12 +361,24 @@ void Grid::draw(Camera *camera)
                     const auto& tile = col.tiles[tile_idx];
                     if (tile.id != 0xFF)
                     {
-                        drawTileModel(tile_types_[tile.id].model, cur_x, y * 256, cur_z, tile.rotation);
+                        Mtx* cur_mtx = &(*mtx_iter);
+    
+                        // Set up the translation in the matrix
+                        cur_mtx->m[1][2] = ((uint32_t)cur_x & 0xFFFF) << 16 | ((uint32_t)(y * tile_size) & 0xFFFF);
+                        cur_mtx->m[1][3] = ((uint32_t)cur_z & 0xFFFF) << 16 | (1 & 0xFFFF);
+
+                        drawTileModel(tile_types_[tile.id].model, cur_mtx);
+
+                        ++mtx_iter;
                     }
                 }
                 cur_z += 256;
             }
             cur_x += 256;
+        }
+        for (auto block_it = cur_matrices.blocks_begin(); block_it != cur_matrices.blocks_end(); ++block_it)
+        {
+            osWritebackDCache(&(*block_it), mem_block_size);
         }
     }
 }

@@ -152,12 +152,39 @@ public:
 
     const_iterator end() const noexcept { return {last_, last_->count}; }
     iterator       end()       noexcept { return {last_, last_->count}; }
+
+    struct BlockIterator
+    {
+        constexpr BlockIterator(Block* block) : block_(block) {}
+        constexpr Block& operator*() const { return *block_; }
+        constexpr Block* operator->() { return block_; }
+        constexpr BlockIterator& operator++()
+        {
+            block_ = block_->next;
+            return *this;
+        }
+        constexpr BlockIterator operator++(int)
+        {
+            BlockIterator tmp = *this;
+            block_ = block_->next;
+            return tmp;
+        }
+        friend constexpr bool operator== (const BlockIterator& a, const BlockIterator& b) { return a.block_ == b.block_; }
+        friend constexpr bool operator!= (const BlockIterator& a, const BlockIterator& b) { return a.block_ != b.block_; }
+    private:
+        Block* block_;
+    };
+
+    BlockIterator blocks_begin() const noexcept { return {first_}; }
+    BlockIterator blocks_end()   const noexcept { return {nullptr}; }
 private:
     void add_block()
     {
         Block* new_block = new Block;
         last_->next = new_block;
         last_ = new_block;
+        new_block->next = nullptr;
+        new_block->count = 0;
     }
     void free_chain(Block *start)
     {
