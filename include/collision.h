@@ -4,8 +4,6 @@
 #include <grid.h>
 #include <types.h>
 
-#define EPSILON 0.0001f
-
 #define IS_NOT_LEAF_NODE(bvhNode) ((bvhNode).triCount != 0)
 #define IS_LEAF_NODE(bvhNode) ((bvhNode).triCount == 0)
 

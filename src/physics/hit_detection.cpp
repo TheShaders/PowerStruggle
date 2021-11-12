@@ -51,8 +51,8 @@ struct HitboxNode
     Vec3 *pos;
 };
 
-// Array of the list of hitboxes for each tile
-std::array<std::array<HitboxNode*, max_tiles_x>, max_tiles_z> tile_hitboxes;
+// Array of the list of hitboxes for each tile (doubleword aligned to ensure `sd` can be used to zero memory)
+std::array<std::array<HitboxNode*, max_tiles_x>, max_tiles_z> tile_hitboxes alignas(8);
 // Pool for hitbox nodes, used to group hitbox entities into lists by tile
 block_vector<HitboxNode> node_pool;
 // Pool for hits, used to create lists for every entity containing the hitboxes they intersect with

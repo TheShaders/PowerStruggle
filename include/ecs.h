@@ -59,12 +59,11 @@ typedef void (*EntityArrayCallbackAll)(size_t count, void *arg, int numComponent
 // Second argument is the value of data in the behavior parameters
 typedef void (*EntityBehaviorCallback)(void **components, void *data);
 
-typedef struct BehaviorParams_t
+struct BehaviorState
 {
     EntityBehaviorCallback callback;
-    void *data;
-} BehaviorParams;
-
+    std::array<uint8_t, 16> data;
+};
 
 #include <bit>
 #include <memory>
@@ -103,6 +102,9 @@ void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg
 // Used to delete an entity during entity iteration
 // Queued entities will all get deleted after the current iteration is over
 void queue_entity_deletion(Entity*);
+// Used to create entities during entity iteration
+// Queued entities will all get created after the current iteration is over
+void queue_entity_creation(archetype_t archetype, void* arg, int count, EntityArrayCallback callback);
 // Registers a new archetype
 void registerArchetype(archetype_t archetype);
 // Outputs the component pointers for the given entity into the provided pointer array

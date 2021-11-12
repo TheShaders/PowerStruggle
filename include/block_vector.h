@@ -177,6 +177,8 @@ public:
 
     BlockIterator blocks_begin() const noexcept { return {first_}; }
     BlockIterator blocks_end()   const noexcept { return {nullptr}; }
+
+    bool empty() const noexcept { return first_ == nullptr || first_->count == 0; }
 private:
     void add_block()
     {

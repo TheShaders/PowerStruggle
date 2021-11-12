@@ -21,7 +21,6 @@ public:
     // Called every frame while the scene is being unloaded
     void unloading_update() override final;
 private:
-    PlayerState playerState_;
     Grid grid_;
 };
 

@@ -40,7 +40,7 @@ typedef struct Entity_t Entity;
 typedef uint32_t archetype_t;
 typedef struct MultiArrayListBlock_t MultiArrayListBlock;
 typedef struct MultiArrayList_t MultiArrayList;
-typedef struct BehaviorParams_t BehaviorParams;
+struct BehaviorState;
 
 // Prototypes for input structs
 typedef struct InputData_t InputData;

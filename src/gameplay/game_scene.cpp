@@ -10,6 +10,7 @@
 #include <files.h>
 #include <input.h>
 #include <collision.h>
+#include <behaviors.h>
 
 extern "C" {
 #include <debug.h>
@@ -62,7 +63,10 @@ void createHitboxCallback(UNUSED size_t count, UNUSED void *arg, void **componen
 bool GameplayScene::load()
 {
     // Create the player entity
-    createPlayer(&playerState_);
+    createPlayer();
+
+    create_shooter(0, 2629.0f, 0.0f, 26620.0f);
+    create_shooter(0, 2229.0f, 0.0f, 27020.0f);
 
     debug_printf("Loading tiles\n");
 
@@ -103,7 +107,7 @@ bool GameplayScene::load()
 
     debug_printf("Finished GameplayScene::load\n");
 
-    createEntitiesCallback(ARCHETYPE_TESTHITBOX, nullptr, 32, createHitboxCallback);
+    // createEntitiesCallback(ARCHETYPE_TESTHITBOX, nullptr, 32, createHitboxCallback);
 
     return true;
 }
@@ -135,11 +139,13 @@ void GameplayScene::draw()
     setLightDirection(lightDir);
 
     if (g_gameTimer > 30)
+    {
+        // debug_printf("before drawing\n");
         grid_.draw(&g_Camera);
 
-    // debug_printf("before drawing\n");
-    drawAllEntities();
-    drawAllEntitiesHealth();
+        drawAllEntities();
+        drawAllEntitiesHealth();
+    }
 }
 
 void GameplayScene::after_gfx()

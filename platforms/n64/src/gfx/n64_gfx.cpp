@@ -18,6 +18,10 @@
 #include <ecs.h>
 #include <interaction.h>
 
+extern "C" {
+#include <debug.h>
+}
+
 alignas(64) std::array<std::array<u16, screen_width * screen_height>, num_frame_buffers> g_frameBuffers;
 alignas(64) std::array<u16, screen_width * screen_height> g_depthBuffer;
 
@@ -831,6 +835,8 @@ void endFrame()
     gSPEndDisplayList(g_dlist_head++);
 
     sendGfxTask();
+
+    // debug_printf("Pool usage: %d bytes remaining\n", curGfxPoolEnd - curGfxPoolPtr);
 }
 
 #define NUM_TEXTURE_SCROLLS (sizeof(textureScrolls) / sizeof(textureScrolls[0]))
@@ -895,7 +901,7 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
     gDPSetCycleType(g_gui_dlist_head++, G_CYC_1CYCLE);
     gDPSetTexturePersp(g_gui_dlist_head++, G_TP_NONE);
     gDPSetCombineLERP(g_gui_dlist_head++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1);
-    while (count)
+    while (count--)
     {
         if (cur_health_state->maxHealth > 0)
         {
@@ -913,34 +919,47 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
             int cur_health_bar_pos_x = (screen_space_x - cur_health_bar_size / 2);
             int cur_health_bar_pos_y = (screen_space_y - health_bar_height / 2);
 
-            if (cur_health_bar_pos_x < 16)
-            {
-                cur_health_bar_pos_x = 16;
-            }
-            if (cur_health_bar_pos_x > (int)(screen_width - 16 - 16))
-            {
-                cur_health_bar_pos_x = screen_width - 16 - 16;
-            }
+            // if (cur_health_bar_pos_x < 16)
+            // {
+            //     cur_health_bar_pos_x = 16;
+            // }
+            // if (cur_health_bar_pos_x > (int)(screen_width - 16 - 16))
+            // {
+            //     cur_health_bar_pos_x = screen_width - 16 - 16;
+            // }
             
-            if (cur_health_bar_pos_y < 16)
+            if (cur_health_bar_pos_y > (int)screen_height)
             {
-                cur_health_bar_pos_y = 16;
+                continue;
             }
-            if (cur_health_bar_pos_y > static_cast<int>(screen_height - 16 - health_bar_height))
+            if (cur_health_bar_pos_y + (int)health_bar_height < 0)
             {
-                cur_health_bar_pos_y = static_cast<int>(screen_height - 16 - health_bar_height);
+                continue;
             }
+            // if (cur_health_bar_pos_y < 16)
+            // {
+            //     cur_health_bar_pos_y = 16;
+            // }
+            // if (cur_health_bar_pos_y > static_cast<int>(screen_height - 16 - health_bar_height))
+            // {
+            //     cur_health_bar_pos_y = static_cast<int>(screen_height - 16 - health_bar_height);
+            // }
 
-            gDPPipeSync(g_gui_dlist_head++);
-            gDPSetEnvColor(g_gui_dlist_head++, 255, 153, 0, 255);
-            gDPFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x, cur_health_bar_pos_y, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y + health_bar_height);
-            gDPPipeSync(g_gui_dlist_head++);
-            gDPSetEnvColor(g_gui_dlist_head++, 60, 60, 60, 255);
-            gDPFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y, cur_health_bar_pos_x + cur_health_bar_size, cur_health_bar_pos_y + health_bar_height);
+            if (cur_health_bar_pos_x < (int)screen_width && cur_health_bar_pos_x + (int)filled_size > 0)
+            {
+                gDPPipeSync(g_gui_dlist_head++);
+                gDPSetEnvColor(g_gui_dlist_head++, 255, 153, 0, 255);
+                gDPScisFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x, cur_health_bar_pos_y, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y + health_bar_height);
+            }
+            if (cur_health_bar_pos_x + filled_size < screen_width && cur_health_bar_pos_x + (int)cur_health_bar_size > 0)
+            {
+                gDPPipeSync(g_gui_dlist_head++);
+                gDPSetEnvColor(g_gui_dlist_head++, 60, 60, 60, 255);
+                gDPScisFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y, cur_health_bar_pos_x + cur_health_bar_size, cur_health_bar_pos_y + health_bar_height);
+            }
         }
 
         cur_health_state++;
         cur_position++;
-        count--;
     }
 }

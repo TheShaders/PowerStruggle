@@ -69,10 +69,10 @@ void (*stateProcessCallbacks[])(PlayerState *state, InputData *input, Vec3 pos, 
     processAir, // Air
 };
 
-void createPlayer(PlayerState *state)
+void createPlayer()
 {
     // debug_printf("Creating player entity\n");
-    createEntitiesCallback(ARCHETYPE_PLAYER, state, 1, createPlayerCallback);
+    createEntitiesCallback(ARCHETYPE_PLAYER, nullptr, 1, createPlayerCallback);
 }
 
 extern Model *get_cube_model();
@@ -85,20 +85,24 @@ extern Model *get_cube_model();
 
 #include <n64_mem.h>
 
+Entity* g_PlayerEntity;
+
 void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     // debug_printf("Creating player entity\n");
 
-    // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
+    // Components: Position, Velocity, Rotation, BehaviorState, Model, AnimState, Gravity
+    Entity* entity = get_entity(componentArrays);
     Vec3 *pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_PLAYER);
     UNUSED Vec3s *rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_PLAYER);
     ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(componentArrays, ARCHETYPE_PLAYER);
-    BehaviorParams *bhvParams = get_component<Bit_Behavior, BehaviorParams>(componentArrays, ARCHETYPE_PLAYER);
+    BehaviorState *bhv = get_component<Bit_Behavior, BehaviorState>(componentArrays, ARCHETYPE_PLAYER);
     Model **model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_PLAYER);
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(componentArrays, ARCHETYPE_PLAYER);
     AnimState *animState = get_component<Bit_AnimState, AnimState>(componentArrays, ARCHETYPE_PLAYER);
     HealthState *health = get_component<Bit_Health, HealthState>(componentArrays, ARCHETYPE_PLAYER);
-    PlayerState *state = (PlayerState *)arg;
+    PlayerState *state = reinterpret_cast<PlayerState*>(bhv->data.data());
+    g_PlayerEntity = entity;
     // *model = &character_model;
     // debug_printf("Player components\n");
     // debug_printf(" pos %08X\n", pos);
@@ -112,8 +116,7 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     gravity->terminalVelocity = -PLAYER_TERMINAL_VELOCITY;
 
     // Set up behavior code
-    bhvParams->callback = playerCallback;
-    bhvParams->data = arg;
+    bhv->callback = playerCallback;
     state->playerEntity = get_entity(componentArrays);
     state->state = PSTATE_GROUND;
     state->subState = PGSUBSTATE_WALKING;
@@ -194,9 +197,9 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state)
     }
 }
 
-void playerCallback(UNUSED void **components, void *data)
+void playerCallback(void **components, void *data)
 {
-    // Components: Position, Velocity, Rotation, BehaviorParams, Model, AnimState, Gravity
+    // Components: Position, Velocity, Rotation, BehaviorState, Model, AnimState, Gravity
     Vec3 *pos = get_component<Bit_Position, Vec3>(components, ARCHETYPE_PLAYER);
     Vec3 *vel = get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_PLAYER);
     Vec3s *rot = get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_PLAYER);

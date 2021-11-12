@@ -47,7 +47,15 @@ extern "C" int numberOfSetBits(uint32_t i)
      return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
 }
 
+struct EntityCreationParams {
+    archetype_t archetype;
+    void* arg;
+    int count;
+    EntityArrayCallback callback;
+};
+
 block_vector<Entity*> queued_deletions;
+block_vector<EntityCreationParams> queued_creations;
 
 
 void queue_entity_deletion(Entity *e)
@@ -56,12 +64,30 @@ void queue_entity_deletion(Entity *e)
     queued_deletions.emplace_back(e);
 }
 
-void process_deletion_queue()
+void queue_entity_creation(archetype_t archetype, void* arg, int count, EntityArrayCallback callback)
 {
+    queued_creations.emplace_back(archetype, arg, count, callback);
+}
+
+void process_entity_queues()
+{
+    // Process deletion queue
     for (Entity* to_delete : queued_deletions)
     {
         // debug_printf("Deleting entity %08X\n", to_delete);
         deleteEntity(to_delete);
+    }
+    
+    // The callbacks are allowed to create more entities, so we need to repeat processing of the creation queue.
+    while (!queued_creations.empty())
+    {
+        // Move the current creation queue into a temporary to allow callbacks to spawn more entities
+        // This also clears queued_creations via the move operation
+        block_vector<EntityCreationParams> cur_queued_creations = std::move(queued_creations);
+        for (const EntityCreationParams& params : cur_queued_creations)
+        {
+            createEntitiesCallback(params.archetype, params.arg, params.count, params.callback);
+        }
     }
 }
 
@@ -73,8 +99,9 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
     auto components = std::unique_ptr<size_t[]>(new size_t[numComponents]);
     archetype_t componentBits = componentMask;
 
-    // Clear the deletion queue
+    // Clear the entity queues
     queued_deletions = {};
+    queued_creations = {};
 
     componentIndex = 0;
     while (componentBits)
@@ -124,15 +151,16 @@ void iterateOverEntities(EntityArrayCallback callback, void *arg, archetype_t co
         }
     }
 
-    process_deletion_queue();
+    process_entity_queues();
 }
 
 void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg, archetype_t componentMask, archetype_t rejectMask)
 {
     int curArchetypeIndex;
 
-    // Clear the deletion queue
+    // Clear the entity queues
     queued_deletions = {};
+    queued_creations = {};
 
     for (curArchetypeIndex = 0; curArchetypeIndex < numArchetypes; curArchetypeIndex++)
     {
@@ -183,7 +211,7 @@ void iterateOverEntitiesAllComponents(EntityArrayCallbackAll callback, void *arg
         }
     }
 
-    process_deletion_queue();
+    process_entity_queues();
 }
 
 // TODO sort upon add, use binary search to check if already exists
@@ -287,6 +315,9 @@ Entity *createEntity(archetype_t archetype)
     // Allocate the components for the new entity
     multiarraylist_alloccount(archetypeList, 1);
 
+    MultiArrayListBlock* endBlock = archetypeList->end;
+    Entity** block_entry = reinterpret_cast<Entity**>(reinterpret_cast<uintptr_t>(endBlock) + sizeof(MultiArrayListBlock) + sizeof(Entity*) * (endBlock->numElements - 1));
+
     if (numGaps)
     {
         curEntity = &allEntities[firstGap];
@@ -298,6 +329,7 @@ Entity *createEntity(archetype_t archetype)
         entitiesEnd++;
     }
 
+    *block_entry = curEntity;
     curEntity->archetype = archetype;
     curEntity->archetypeArrayIndex = archetypeEntityCounts[archetypeIndex];
 
@@ -435,8 +467,6 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
     
     // Allocate the number of entities given of the archetype given
     allocEntities(archetype, count, entity_pointers.get());
-    // Increase the entity count for the given archetype by the given amount
-    archetypeEntityCounts[archetypeIndex] += count;
     // Allocate the requested number of entities for the given archetype
     multiarraylist_alloccount(archetypeList, count);
 
@@ -513,7 +543,7 @@ void getEntityComponents(Entity *entity, void **componentArrayOut)
     size_t arrayIndex = entity->archetypeArrayIndex;
     MultiArrayListBlock *curBlock = archetypeArray->start;
     int componentIndex = 0; // Index of the component in all components
-    int componentArrayIndex = 0; // Index of the component in those in the archetype
+    int componentArrayIndex = 1; // Index of the component in those in the archetype
 
     while (arrayIndex >= blockElementCount)
     {
@@ -521,14 +551,21 @@ void getEntityComponents(Entity *entity, void **componentArrayOut)
         arrayIndex -= blockElementCount;
     }
 
+    componentArrayOut[0] = entity;
+
+    // Keep track of the position of the current component's array in the block
+    uintptr_t block_offset = sizeof(Entity*) * blockElementCount + sizeof(MultiArrayListBlock);
+
     while (archetype)
     {
         if (archetype & 0x01)
         {
+            size_t cur_component_size = g_componentSizes[componentIndex];
             componentArrayOut[componentArrayIndex] = (void *)(
-                (uintptr_t)curBlock + // skip the block header
-                multiarraylist_get_component_offset(archetypeArray, componentIndex) + // go to the start of the component array for this component
-                g_componentSizes[componentIndex] * arrayIndex), // index the component array
+                (uintptr_t)curBlock +
+                block_offset        + // go to the start of the component array for this component
+                cur_component_size * arrayIndex), // index the component array
+            block_offset += cur_component_size * blockElementCount;
             componentArrayIndex++;
         }
         componentIndex++;
@@ -579,21 +616,23 @@ void deleteAllEntities(void)
 void processBehaviorEntities(size_t count, UNUSED void *arg, int numComponents, archetype_t archetype, void **componentArrays, size_t *componentSizes)
 {
     int i = 0;
-    // Get the index of the BehaviorParams component in the component array and iterate over it
-    BehaviorParams *curBhvParams = static_cast<BehaviorParams*>(componentArrays[COMPONENT_INDEX(Behavior, archetype)]);
+    // Get the index of the BehaviorState component in the component array and iterate over it
+    BehaviorState *cur_bhv = static_cast<BehaviorState*>(componentArrays[COMPONENT_INDEX(Behavior, archetype)]);
     // Iterate over every entity in the given array
     while (count)
     {
         // Call the entity's callback with the component pointers and it's data pointer
-        curBhvParams->callback(componentArrays, curBhvParams->data);
+        cur_bhv->callback(componentArrays, cur_bhv->data.data());
+
+        componentArrays[0] = static_cast<uint8_t*>(componentArrays[0]) + sizeof(Entity*);
 
         // Increment the component pointers so they are valid for the next entity
         for (i = 0; i < numComponents; i++)
         {
-            componentArrays[i] = static_cast<uint8_t*>(componentArrays[i]) + componentSizes[i];
+            componentArrays[i + 1] = static_cast<uint8_t*>(componentArrays[i + 1]) + componentSizes[i];
         }
         // Increment to the next entity's behavior params
-        curBhvParams++;
+        cur_bhv++;
         // Decrement the remaining entity count
         count--;
     }

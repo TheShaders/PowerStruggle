@@ -12,6 +12,8 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 
+#define EPSILON 0.0001f
+
 // TODO these can be vectorized with gcc for modern platforms
 #define VEC3_DOT(a,b) ((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
 #define VEC3_COPY(out,a) \

@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include <types.h>
+#include <ecs.h>
 #include <stdint.h>
 
 struct PlayerState
@@ -11,6 +12,8 @@ struct PlayerState
     uint8_t subState;
     uint16_t stateArg;
 };
+
+static_assert(sizeof(PlayerState) <= sizeof(BehaviorState::data), "PlayerState does not fit in behavior data!");
 
 #define MAX_PLAYER_SPEED 8.0f
 #define MAX_PLAYER_SPEED_SQ POW2(MAX_PLAYER_SPEED)
@@ -27,7 +30,7 @@ struct PlayerState
 #define PLAYER_TERMINAL_VELOCITY 30.0f
 #define PLAYER_SLOW_TERMINAL_VELOCITY 5.0f
 
-void createPlayer(PlayerState *state);
+void createPlayer();
 void createPlayerCallback(size_t count, void *arg, void **componentArrays);
 void playerCallback(void **components, void *data);
 
@@ -43,5 +46,7 @@ void playerCallback(void **components, void *data);
 // Air substates
 #define PASUBSTATE_FALLING  0
 #define PASUBSTATE_JUMPING  1
+
+extern Entity* g_PlayerEntity;
 
 #endif
