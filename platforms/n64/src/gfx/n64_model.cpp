@@ -107,21 +107,34 @@ size_t Model::gfx_length() const
 
 Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos)
 {
-    int rand_val = guRandom() % 3;
+    const char* material_data = reinterpret_cast<const char*>(this) + sizeof(*this);
     gDPPipeSync(gfx_pos++);
-    switch (rand_val)
+    if ((flags & MaterialFlags::set_rendermode) != MaterialFlags::none)
     {
-        case 0:
-            gDPSetEnvColor(gfx_pos++, 0xFF, 0xFF, 0xFF, 0xFF);
-            break;
-        case 1:
-            gDPSetEnvColor(gfx_pos++, 0xFF, 0xFF, 0xFF, 0xFF);
-            break;
-        case 2:
-            gDPSetEnvColor(gfx_pos++, 0xFF, 0x00, 0x00, 0xFF);
-            break;
+        gfx_pos->words.w0 = ((uint32_t*)material_data)[0];
+        gfx_pos->words.w1 = ((uint32_t*)material_data)[1];
+        material_data += sizeof(Gfx);
+        gfx_pos++;
     }
-    gDPSetCombineLERP(gfx_pos++, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1);
+    if ((flags & MaterialFlags::set_combiner) != MaterialFlags::none)
+    {
+        gfx_pos->words.w0 = ((uint32_t*)material_data)[0];
+        gfx_pos->words.w1 = ((uint32_t*)material_data)[1];
+        material_data += sizeof(Gfx);
+        gfx_pos++;
+    }
+    if ((flags & MaterialFlags::set_env) != MaterialFlags::none)
+    {
+        uint32_t env = *(uint32_t*)material_data;
+        gDPSetColor(gfx_pos++, G_SETENVCOLOR, env);
+        material_data += sizeof(uint32_t);
+    }
+    if ((flags & MaterialFlags::set_prim) != MaterialFlags::none)
+    {
+        uint32_t prim = *(uint32_t*)material_data;
+        gDPSetColor(gfx_pos++, G_SETPRIMCOLOR, prim);
+        material_data += sizeof(uint32_t);
+    }
     gSPEndDisplayList(gfx_pos++);
     return gfx_pos;
 }

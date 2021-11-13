@@ -131,7 +131,7 @@ void GameplayScene::update()
 
 void GameplayScene::draw()
 {
-    Vec3 lightDir = { 100.0f * sinf((M_PIf / 180.0f) * 45.0f), 100.0f * cosf((M_PIf / 180.0f) * 45.0f), 0.0f};
+    Vec3 lightDir = { 100.0f * sinf((M_PIf / 180.0f) * 30.0f), 100.0f * cosf((M_PIf / 180.0f) * 30.0f), 0.0f};
     // Set up the camera
     // debug_printf("before camera\n");
     setupCameraMatrices(&g_Camera);

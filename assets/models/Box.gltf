@@ -3,6 +3,10 @@
         "generator" : "Khronos glTF Blender I/O v1.6.16",
         "version" : "2.0"
     },
+    "extensionsUsed" : [
+        "N64_materials_gltf64",
+        "N64_texture_inputs"
+    ],
     "scene" : 0,
     "scenes" : [
         {
@@ -20,17 +24,40 @@
     ],
     "materials" : [
         {
-            "doubleSided" : true,
-            "name" : "Material",
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "ENVIRONMENT",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "ENVIRONMENT",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "envColor" : [
+                        0,
+                        0.10946200042963028,
+                        0.10461650788784027,
+                        1
+                    ],
+                    "drawLayer" : "Opaque"
+                }
+            },
+            "name" : "f3dlite_material.002",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929,
-                    1
-                ],
+                "extensions" : {},
                 "metallicFactor" : 0,
-                "roughnessFactor" : 0.4000000059604645
+                "roughnessFactor" : 0.5
             }
         }
     ],

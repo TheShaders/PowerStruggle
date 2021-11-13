@@ -217,7 +217,8 @@ const Gfx rdpInitDL[] = {
 #ifndef INTERLACED
     gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, screen_width, screen_height),
 #endif
-    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetCombineLERP(ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1),
+    gsDPSetEnvColor(0xFF, 0xFF, 0xFF, 0xFF),
     gsDPSetPrimColor(0, 0, 0x00, 0xFF, 0x00, 0xFF),
     gsSPEndDisplayList(),
 };
@@ -702,9 +703,9 @@ void setLightDirection(Vec3 lightDir)
     light->l->l.col[1] = light->l->l.colc[1] = 0x7F;
     light->l->l.col[2] = light->l->l.colc[2] = 0x7F;
 
-    light->l->l.dir[0] = (s8)(lightDir[0] * (*g_curMatFPtr)[0][0] + lightDir[1] * (*g_curMatFPtr)[1][0] + lightDir[2] * (*g_curMatFPtr)[2][0]);
-    light->l->l.dir[1] = (s8)(lightDir[0] * (*g_curMatFPtr)[0][1] + lightDir[1] * (*g_curMatFPtr)[1][1] + lightDir[2] * (*g_curMatFPtr)[2][1]);
-    light->l->l.dir[2] = (s8)(lightDir[0] * (*g_curMatFPtr)[0][2] + lightDir[1] * (*g_curMatFPtr)[1][2] + lightDir[2] * (*g_curMatFPtr)[2][2]);
+    light->l->l.dir[0] = (s8)(s32)lightDir[0];
+    light->l->l.dir[1] = (s8)(s32)lightDir[1];
+    light->l->l.dir[2] = (s8)(s32)lightDir[2];
 
     lookAt->l[0].l.dir[0] = -light->l->l.dir[0];
     lookAt->l[0].l.dir[1] = -light->l->l.dir[1];
