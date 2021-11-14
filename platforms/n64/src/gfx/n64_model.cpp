@@ -1,5 +1,6 @@
 #include <n64_model.h>
 #include <model.h>
+#include <files.h>
 
 extern "C" {
 #include <debug.h>
@@ -80,6 +81,7 @@ void Model::adjust_offsets()
     debug_printf("  Joints: %d Materials: %d\n", num_joints, num_materials);
     joints    = ::add_offset(joints, base_addr);
     materials = ::add_offset(materials, base_addr);
+    images    = ::add_offset(images, base_addr);
     verts     = ::add_offset(verts, base_addr);
     for (size_t joint_idx = 0; joint_idx < num_joints; joint_idx++)
     {
@@ -88,6 +90,10 @@ void Model::adjust_offsets()
     for (size_t mat_idx = 0; mat_idx < num_materials; mat_idx++)
     {
         materials[mat_idx] = ::add_offset(materials[mat_idx], base_addr);
+    }
+    for (size_t img_idx = 0; img_idx < num_images; img_idx++)
+    {
+        images[img_idx] = ::add_offset(images[img_idx], base_addr);
     }
 }
 
@@ -105,7 +111,71 @@ size_t Model::gfx_length() const
     return num_commands;
 }
 
-Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos)
+Gfx *process_texture_params(TextureParams* params, Gfx *cur_gfx, char const* const* images, int tex_index)
+{
+    const char* image = images[params->image_index];
+    uint32_t width = params->image_width;
+    uint32_t height = params->image_height;
+    uint32_t format = params->image_format;
+    uint32_t format_type = format >> 4;
+    uint32_t format_size = format & 0b1111;
+    uint32_t tmem_word_addr = params->tmem_word_address;
+    uint32_t cwm = params->clamp_wrap_mirror;
+    uint32_t cwm_s = cwm & 0b1111;
+    uint32_t cwm_t = cwm >> 4;
+    uint32_t mask_shift_s = params->mask_shift_s;
+    uint32_t mask_shift_t = params->mask_shift_t;
+    uint32_t settile_bits =
+        (cwm_t        << 18) |
+        (mask_shift_t << 10) |
+        (cwm_s        <<  8) |
+        (mask_shift_s <<  0);
+    uint32_t tmem_size = width * height;
+    uint32_t dxt = 0;
+    uint32_t row_bytes = 0;
+    switch (format_size)
+    {
+        case G_IM_SIZ_32b:
+            tmem_size *= 4;
+            row_bytes = width * 4;
+            dxt = CALC_DXT(width, G_IM_SIZ_32b_BYTES);
+            while (1);
+            break;
+        case G_IM_SIZ_16b:
+            tmem_size *= 2;
+            row_bytes = width * 2;
+            dxt = CALC_DXT(width, G_IM_SIZ_16b_BYTES);
+            break;
+        case G_IM_SIZ_8b:
+            tmem_size *= 1;
+            row_bytes = width;
+            dxt = CALC_DXT(width, G_IM_SIZ_8b_BYTES);
+            break;
+        case G_IM_SIZ_4b:
+            tmem_size = round_up_divide<2>(tmem_size);
+            row_bytes = round_up_divide<2>(width);
+            dxt = CALC_DXT_4b(width);
+            break;
+    }
+    uint32_t lines = round_up_divide<sizeof(uint64_t)>(row_bytes);
+
+    gDPSetTextureImage(cur_gfx++, format_type, G_IM_SIZ_16b, 1, get_or_load_image(image));
+    gDPSetTile(cur_gfx, format_type, G_IM_SIZ_16b, 0, tmem_word_addr, G_TX_LOADTILE - tex_index, 0,    0, 5, 0, 0, 5, 0);
+    cur_gfx->words.w1 |= settile_bits;
+    cur_gfx++;
+    gDPLoadSync(cur_gfx++);
+    gDPLoadBlock(cur_gfx++, G_TX_LOADTILE - tex_index, 0, 0, round_up_divide<2>(tmem_size) - 1, dxt);
+    // gDPPipeSync(cur_gfx++);
+    gSPTexture(cur_gfx++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE + tex_index, G_ON);
+    gDPSetTile(cur_gfx, format_type, format_size, lines, tmem_word_addr, G_TX_RENDERTILE + tex_index, 0,    0, 5, 0, 0, 5, 0);
+    cur_gfx->words.w1 |= settile_bits;
+    cur_gfx++;
+    gDPSetTileSize(cur_gfx++, G_TX_RENDERTILE + tex_index, 0, 0, (width - 1) << G_TEXTURE_IMAGE_FRAC, (height - 1) << G_TEXTURE_IMAGE_FRAC);
+
+    return cur_gfx;
+}
+
+Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos, char const* const* images)
 {
     const char* material_data = reinterpret_cast<const char*>(this) + sizeof(*this);
     gDPPipeSync(gfx_pos++);
@@ -134,6 +204,16 @@ Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos)
         uint32_t prim = *(uint32_t*)material_data;
         gDPSetColor(gfx_pos++, G_SETPRIMCOLOR, prim);
         material_data += sizeof(uint32_t);
+    }
+    if ((flags & MaterialFlags::tex0) != MaterialFlags::none)
+    {
+        gfx_pos = process_texture_params((TextureParams*)material_data, gfx_pos, images, 0);
+        material_data += sizeof(TextureParams);
+    }
+    if ((flags & MaterialFlags::tex1) != MaterialFlags::none)
+    {
+        gfx_pos = process_texture_params((TextureParams*)material_data, gfx_pos, images, 1);
+        material_data += sizeof(TextureParams);
     }
     gSPEndDisplayList(gfx_pos++);
     return gfx_pos;
@@ -183,7 +263,7 @@ void Model::setup_gfx()
     for (size_t material_idx = 0; material_idx < num_materials; material_idx++)
     {
         materials[material_idx]->gfx = cur_gfx;
-        cur_gfx = materials[material_idx]->setup_gfx(cur_gfx);
+        cur_gfx = materials[material_idx]->setup_gfx(cur_gfx, images);
     }
     // Set up the DLs for every joint
     for (size_t joint_idx = 0; joint_idx < num_joints; joint_idx++)

@@ -358,7 +358,7 @@ $(GLTF64) :
 # Convert models
 $(MODELS_OUT) : $(BUILD_ROOT)/% : %.gltf | $(BUILD_DIRS) $(GLTF64)
 	@$(PRINT)$(GREEN)Converting model: $(ENDGREEN)$(BLUE)$<$(ENDBLUE)$(ENDLINE)
-	@$(GLTF64) $< $@
+	@$(GLTF64) $< $@ $(BUILD_ROOT)/$(ASSET_ROOT)
 
 # Compile levelconv
 $(LEVELCONV) :

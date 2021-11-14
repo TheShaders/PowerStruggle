@@ -25,7 +25,7 @@ struct MaterialHeader {
     // Automatic alignment padding
     Gfx *gfx;
 
-    Gfx *setup_gfx(Gfx *gfx_pos);
+    Gfx *setup_gfx(Gfx *gfx_pos, char const* const* images);
 };
 
 // A sequence of vertices to load from a model's vertex list
@@ -83,12 +83,26 @@ struct Joint {
     size_t gfx_length() const;
 };
 
+struct TextureParams {
+    uint16_t image_index;
+    uint16_t image_width;
+    uint16_t image_height;
+    uint16_t tmem_word_address;
+    uint8_t image_format; // upper 4 bits are type, lower 4 bits are size
+    uint8_t clamp_wrap_mirror; // upper 4 bits are t, lower 4 bits are s
+    uint8_t mask_shift_s; // upper 4 bits are mask, lower 4 bits are shift
+    uint8_t mask_shift_t; // upper 4 bits are mask, lower 4 bits are shift
+};
+
 struct Model {
     uint16_t num_joints;
     uint16_t num_materials;
+    uint16_t num_images;
+    uint16_t padding; // Would be automatically added for alignment
     Joint *joints;
     MaterialHeader **materials; // pointer to array of material pointers
     Vtx *verts; // pointer to all vertices
+    char** images; // pointer to array of image paths
     std::unique_ptr<Gfx[]> gfx;
 
     void adjust_offsets();

@@ -17,6 +17,7 @@ LoadHandle start_data_load(void* ret, uint32_t rom_pos, uint32_t size); // TODO 
 [[nodiscard]] void *load_data(uint32_t rom_pos, uint32_t size); // Same as above
 void *load_data(void* ret, uint32_t rom_pos, uint32_t size); // Same as above
 [[nodiscard]] Model *load_model(const char *path);
+[[nodiscard]] void* get_or_load_image(const char* path);
 
 template <typename T>
 [[nodiscard]] T* load_file(const char *path)
