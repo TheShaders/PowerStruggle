@@ -1,13 +1,13 @@
 #include <cmath>
 #include <mathutils.h>
 
-void approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3 target_pos)
+float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos)
 {
     // Get the displacement vector from the player to this enemy
     float dx = pos[0] - target_pos[0];
     float dz = pos[2] - target_pos[2];
     float dist_sq = dx * dx + dz * dz;
-    if (dist_sq < EPSILON) return;
+    if (dist_sq < EPSILON) return 0.0f;
     float dist = sqrtf(dist_sq);
     // Check if the player can be seen
     if (dist < sight_radius)
@@ -39,10 +39,13 @@ void approach_target(float sight_radius, float follow_distance, float move_speed
 
         vel[0] = approachFloatLinear(vel[0], target_vel_x, 1.0f);
         vel[2] = approachFloatLinear(vel[2], target_vel_z, 1.0f);
+
+        rot[1] = atan2s(dz, dx);
     }
     else
     {
         vel[0] = approachFloatLinear(vel[0], 0.0f, 1.0f);
         vel[2] = approachFloatLinear(vel[2], 0.0f, 1.0f);
     }
+    return dist;
 }

@@ -8,12 +8,14 @@
 #include <interaction.h>
 
 ShooterDefinition shooter_definitions[] = {
-    {                // 0
-        "models/Box", // model_name
-        nullptr,       // model
-        {              // params
+    { // 0
+        { // base
+            "models/Box", // model_name
+            nullptr,      // model
+        },
+        { // params
             1536.0f,   // sight_radius
-            512.0f,   // follow_distance
+            512.0f,    // follow_distance
             5.0f,      // move_speed
             32.0f,     // shot_speed
             15,        // shot_rate
@@ -37,7 +39,7 @@ void shooter_callback(void **components, void *data)
 
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
 
-    approach_target(params->sight_radius, params->follow_distance, params->move_speed, pos, vel, player_pos);
+    approach_target(params->sight_radius, params->follow_distance, params->move_speed, pos, vel, rot, player_pos);
 }
 
 Entity* create_shooter(int subtype, float x, float y, float z)
@@ -68,7 +70,6 @@ Entity* create_shooter(int subtype, float x, float y, float z)
     collider->mask = enemy_hitbox_mask;
     
     animState->anim = nullptr;
-    *model = load_model("models/Box");
 
     health->health = health->maxHealth = 200;
 
@@ -83,11 +84,11 @@ Entity* create_shooter(int subtype, float x, float y, float z)
 
     // Set up the entity's model
     // Load the model if it isn't already loaded
-    if (definition.model == nullptr)
+    if (definition.base.model == nullptr)
     {
-        definition.model = load_model(definition.model_name);
+        definition.base.model = load_model(definition.base.model_name);
     }
-    *model = definition.model;
+    *model = definition.base.model;
 
     return shooter;
 }

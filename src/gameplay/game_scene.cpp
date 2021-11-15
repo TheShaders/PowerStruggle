@@ -65,6 +65,11 @@ bool GameplayScene::load()
 
     // create_shooter(0, 2629.0f, 0.0f, 26620.0f);
     // create_shooter(0, 2229.0f, 0.0f, 27020.0f);
+    create_slasher(0, 3229.0f, 0.0f, 26620.0f);
+    create_slasher(0, 3229.0f, 0.0f, 26120.0f);
+    create_slasher(0, 3229.0f, 0.0f, 27120.0f);
+    create_slasher(0, 2729.0f, 0.0f, 26120.0f);
+    create_slasher(0, 3729.0f, 0.0f, 27120.0f);
 
     debug_printf("Loading tiles\n");
 

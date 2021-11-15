@@ -58,6 +58,11 @@ constexpr T round_up_divide(T x)
     return ((x - 1) >> log) + 1;
 }
 
+constexpr uint16_t degrees_to_angle(float degrees)
+{
+    return (uint16_t)((degrees / 360.0f) * 0x10000L);
+}
+
 #define M_PIf (3.14159265358979323846f)
 #define M_PIf_2 (1.57079632679489661923f)
 

@@ -131,34 +131,39 @@ void multiarraylist_delete(MultiArrayList *arr, size_t arrayIndex)
         block_array_index -= elementCount;
     }
 
-    Entity** end_block_entities = multiarraylist_get_block_entity_pointers(end);
-    Entity* repointed_entity = end_block_entities[end->numElements - 1];
-
-    // Copy the entity pointer from the last element in the last block's components to the deleted entity's components
-    multiarraylist_get_block_entity_pointers(block)[block_array_index] = repointed_entity;
-    // Update the repointed entity's component index
-    repointed_entity->archetypeArrayIndex = arrayIndex;
-
-    // Swap the last element's components into the position of the deleted element's components
-    size_t current_array_offset = sizeof(MultiArrayListBlock) + elementCount * sizeof(Entity*);
-
-    // Iterate over every component in the archetype
-    archetype_t component_bits = archetype;
-    while (component_bits != 0)
+    // Copy the components of the last element in the array to the position of the deleted one, but only
+    // if the deleted entity is not the last in the multi array list
+    if (!(block == end && block_array_index == end->numElements - 1))
     {
-        // Get the component type (global component index) of the next component in the component bits
-        size_t cur_component_type = lowest_bit(component_bits);
-        // Get the size of the current component type
-        size_t cur_component_size = g_componentSizes[cur_component_type];
-        // Get the addresses of the component to delete and the component to replace it with
-        void *deletedComponent = (void *)((uintptr_t)block + current_array_offset + cur_component_size * block_array_index);
-        void *endComponent = (void *)((uintptr_t)end + current_array_offset + cur_component_size * (end->numElements - 1));
-        // Replace the contents of the current component
-        memcpy(deletedComponent, endComponent, cur_component_size);
-        // Update the offset for the array for the next component
-        current_array_offset += cur_component_size * elementCount;
-        // Clear the current component from the component bits
-        component_bits &= ~(1 << cur_component_type);
+        Entity** end_block_entities = multiarraylist_get_block_entity_pointers(end);
+        Entity* repointed_entity = end_block_entities[end->numElements - 1];
+
+        // Copy the entity pointer from the last element in the last block's components to the deleted entity's components
+        multiarraylist_get_block_entity_pointers(block)[block_array_index] = repointed_entity;
+        // Update the repointed entity's component index
+        repointed_entity->archetypeArrayIndex = arrayIndex;
+
+        // Swap the last element's components into the position of the deleted element's components
+        size_t current_array_offset = sizeof(MultiArrayListBlock) + elementCount * sizeof(Entity*);
+
+        // Iterate over every component in the archetype
+        archetype_t component_bits = archetype;
+        while (component_bits != 0)
+        {
+            // Get the component type (global component index) of the next component in the component bits
+            size_t cur_component_type = lowest_bit(component_bits);
+            // Get the size of the current component type
+            size_t cur_component_size = g_componentSizes[cur_component_type];
+            // Get the addresses of the component to delete and the component to replace it with
+            void *deletedComponent = (void *)((uintptr_t)block + current_array_offset + cur_component_size * block_array_index);
+            void *endComponent = (void *)((uintptr_t)end + current_array_offset + cur_component_size * (end->numElements - 1));
+            // Replace the contents of the current component
+            memcpy(deletedComponent, endComponent, cur_component_size);
+            // Update the offset for the array for the next component
+            current_array_offset += cur_component_size * elementCount;
+            // Clear the current component from the component bits
+            component_bits &= ~(1 << cur_component_type);
+        }
     }
 
     // Decrement the number of elements in the last block

@@ -264,7 +264,7 @@ int findNextGap(int prevGap)
             return retVal;
         }
     }
-    return -1;
+    return INT32_MAX;
 }
 
 void allocEntities(archetype_t archetype, int count, Entity** output)
@@ -277,7 +277,7 @@ void allocEntities(archetype_t archetype, int count, Entity** output)
     int curGap = firstGap;
 
     // Fill in any gaps in the entity array
-    while (numGaps)
+    while (numGaps > 0 && count > 0)
     {
         allEntities[curGap].archetype = archetype;
         allEntities[curGap].archetypeArrayIndex = archetypeEntityCount++;
@@ -331,6 +331,7 @@ Entity *createEntity(archetype_t archetype)
     {
         curEntity = &allEntities[firstGap];
         firstGap = findNextGap(firstGap);
+        numGaps--;
     }
     else
     {
@@ -352,22 +353,22 @@ void deleteEntity(Entity *e)
 {
     // The index of this archetype
     int archetypeIndex = getArchetypeIndex(e->archetype);
-    size_t newLength = --archetypeEntityCounts[archetypeIndex];
-    Entity *curEntity;
+    --archetypeEntityCounts[archetypeIndex];
+    // Entity *curEntity;
 
     multiarraylist_delete(&archetypeArrays[archetypeIndex], e->archetypeArrayIndex);
 
     // Ugly linear search over all entities to update the archetype array index of the entity that was moved in the delete
     // e->archetypeArrayIndex = 
     // TODO keep the entity list sorted?
-    for (curEntity = &allEntities[0]; curEntity != &allEntities[entitiesEnd]; curEntity++)
-    {
-        if (curEntity->archetypeArrayIndex == newLength)
-        {
-            curEntity->archetypeArrayIndex = e->archetypeArrayIndex;
-            break;
-        }
-    }
+    // for (curEntity = &allEntities[0]; curEntity != &allEntities[entitiesEnd]; curEntity++)
+    // {
+    //     if (curEntity->archetypeArrayIndex == newLength)
+    //     {
+    //         curEntity->archetypeArrayIndex = e->archetypeArrayIndex;
+    //         break;
+    //     }
+    // }
     
     // Find the deleted entity in the list and clear its data
     int entityIndex = e - &allEntities[0];
@@ -398,22 +399,22 @@ void deleteEntityIndex(int index)
     size_t archetypeArrayIndex = allEntities[index].archetypeArrayIndex;
     // The index of this archetype
     int archetypeIndex = getArchetypeIndex(archetype);
-    size_t newLength = --archetypeEntityCounts[archetypeIndex];
-    Entity *curEntity;
+    --archetypeEntityCounts[archetypeIndex];
+    // Entity *curEntity;
 
     // Delete this entity's component info
     multiarraylist_delete(&archetypeArrays[archetypeIndex], archetypeArrayIndex);
 
     // Ugly linear search over all entities to update the archetype array index of the entity that was moved in the delete
     // TODO keep the entity list sorted?
-    for (curEntity = &allEntities[0]; curEntity != &allEntities[entitiesEnd]; curEntity++)
-    {
-        if (curEntity->archetypeArrayIndex == newLength)
-        {
-            curEntity->archetypeArrayIndex = archetypeArrayIndex;
-            break;
-        }
-    }
+    // for (curEntity = &allEntities[0]; curEntity != &allEntities[entitiesEnd]; curEntity++)
+    // {
+    //     if (curEntity->archetypeArrayIndex == newLength)
+    //     {
+    //         curEntity->archetypeArrayIndex = archetypeArrayIndex;
+    //         break;
+    //     }
+    // }
     
     // Clear the deleted entity's data
     allEntities[index].archetype = 0;
@@ -503,7 +504,7 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
         auto componentArrays = std::unique_ptr<void*[]>(new void*[numComponents + 1]);
         Entity **cur_entity = entity_pointers.get();
 
-        componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock);
+        componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock) + startingElementCount;
         // Call the callback for the original block, which was modified
         for (i = 0; i < numComponents; i++)
         {
