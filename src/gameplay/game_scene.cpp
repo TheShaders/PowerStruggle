@@ -24,13 +24,12 @@ GameplayScene::GameplayScene() : grid_{}
 
 // LoadHandle handle;
 
-#define ARCHETYPE_TESTHITBOX (ARCHETYPE_HITBOX | Bit_Rotation | Bit_Model)
+#define ARCHETYPE_TESTHITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model)
 
 void createHitboxCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
     // Components: Position, Rotation Model, Hitbox
     Vec3* pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_TESTHITBOX);
-    Vec3s* rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_TESTHITBOX);
     Model** model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_TESTHITBOX);
     Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_TESTHITBOX);
 
@@ -42,31 +41,30 @@ void createHitboxCallback(UNUSED size_t count, UNUSED void *arg, void **componen
         (*pos)[1] = 0.0f;
         (*pos)[2] = 26620.0f + -512.0f + 4.0f * RAND(256);
 
-        (*rot)[0] = 0;
-        (*rot)[1] = 0;
-        (*rot)[2] = 0;
-
         hitbox->radius = 50.0f;
-        hitbox->height = 100.0f;
+        hitbox->size_y = 100.0f;
         hitbox->mask = player_hitbox_mask;
 
         *model = sphere;
 
         pos++;
-        rot++;
         hitbox++;
         model++;
         count--;
     }
 }
 
+#define ARCHETYPE_TEST_RECTANGLE_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
+
+Entity* rect_hitbox;
+
 bool GameplayScene::load()
 {
     // Create the player entity
     createPlayer();
 
-    create_shooter(0, 2629.0f, 0.0f, 26620.0f);
-    create_shooter(0, 2229.0f, 0.0f, 27020.0f);
+    // create_shooter(0, 2629.0f, 0.0f, 26620.0f);
+    // create_shooter(0, 2229.0f, 0.0f, 27020.0f);
 
     debug_printf("Loading tiles\n");
 
@@ -109,6 +107,28 @@ bool GameplayScene::load()
 
     // createEntitiesCallback(ARCHETYPE_TESTHITBOX, nullptr, 32, createHitboxCallback);
 
+    rect_hitbox = createEntity(ARCHETYPE_TEST_RECTANGLE_HITBOX);
+
+    {
+        void* components[1 + NUM_COMPONENTS(ARCHETYPE_TEST_RECTANGLE_HITBOX)];
+        getEntityComponents(rect_hitbox, components);
+
+        Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_TEST_RECTANGLE_HITBOX);
+        Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(components, ARCHETYPE_TEST_RECTANGLE_HITBOX);
+        Model** model = get_component<Bit_Model, Model*>(components, ARCHETYPE_TEST_RECTANGLE_HITBOX);
+
+        pos[0] = 2229.0f + -512.0f;
+        pos[1] = 0.0f;
+        pos[2] = 26620.0f;
+
+        hitbox.mask = player_hitbox_mask;
+        hitbox.radius = 200;
+        hitbox.size_y = 100;
+        hitbox.size_z = 40;
+
+        *model = load_model("models/Weapon");
+    }
+
     return true;
 }
 
@@ -119,6 +139,17 @@ void GameplayScene::update()
     grid_.process_loading_chunks();
     // if ((g_PlayerInput.buttonsHeld & R_TRIG) || (g_PlayerInput.buttonsPressed & L_TRIG))
     {
+        {
+            void* components[1 + NUM_COMPONENTS(ARCHETYPE_TEST_RECTANGLE_HITBOX)];
+            getEntityComponents(rect_hitbox, components);
+            Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_TEST_RECTANGLE_HITBOX);
+            Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_TEST_RECTANGLE_HITBOX);
+
+            rot[1] += 0x800;
+            
+            pos[0] = 1717.0f  + 150 * cossf(rot[1]);
+            pos[2] = 26620.0f - 150 * sinsf(rot[1]);
+        }
         // Increment the physics state
         // debug_printf("before physics tick\n");
         physicsTick(grid_);

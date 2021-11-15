@@ -61,6 +61,15 @@ block_vector<EntityCreationParams> queued_creations;
 void queue_entity_deletion(Entity *e)
 {
     // debug_printf("Entity %08X queued for deletion\n", e);
+    // Check if the entity is already queued and if so do nothing
+    for (auto it = queued_deletions.begin(); it != queued_deletions.end(); ++it)
+    {
+        if (*it == e)
+        {
+            return;
+        }
+    }
+    // Queue the entity for deletion
     queued_deletions.emplace_back(e);
 }
 

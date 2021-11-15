@@ -35,8 +35,9 @@ struct ColliderParams {
 
 struct Hitbox
 {
-    uint16_t radius;
-    uint16_t height;
+    uint16_t size_z; // z length if rectangle hitbox, 0 if cylinder hitbox
+    uint16_t radius; // x length if rectangle hitbox, radius if cylinder hitbox
+    uint16_t size_y;
     uint16_t mask;
 };
 

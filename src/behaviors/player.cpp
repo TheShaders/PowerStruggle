@@ -170,14 +170,13 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
 }
 
 uint32_t last_player_hit_time = 0;
-constexpr uint32_t player_iframes = 0;
+constexpr uint32_t player_iframes = 30;
 
 void take_damage(HealthState* health_state, int damage)
 {
     if (damage >= health_state->health)
     {
-        health_state->health = 0;
-        *(volatile int*)0 = 0;
+        health_state->health = health_state->maxHealth;
     }
     health_state->health -= damage;
 }
@@ -185,15 +184,16 @@ void take_damage(HealthState* health_state, int damage)
 void handle_player_hits(ColliderParams* collider, HealthState* health_state)
 {
     Hit* cur_hit = collider->hits;
-    if (g_gameTimer - last_player_hit_time >= player_iframes)
+    while (cur_hit != nullptr)
     {
-        while (cur_hit != nullptr)
+        if (g_gameTimer - last_player_hit_time < player_iframes)
         {
-            take_damage(health_state, 5);
-            last_player_hit_time = g_gameTimer;
-            queue_entity_deletion(cur_hit->entity);
-            cur_hit = cur_hit->next;
+            break;
         }
+        take_damage(health_state, 10);
+        last_player_hit_time = g_gameTimer;
+        // queue_entity_deletion(cur_hit->entity);
+        cur_hit = cur_hit->next;
     }
 }
 
