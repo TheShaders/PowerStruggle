@@ -504,20 +504,24 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
         auto componentArrays = std::unique_ptr<void*[]>(new void*[numComponents + 1]);
         Entity **cur_entity = entity_pointers.get();
 
-        componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock) + startingElementCount;
-        // Call the callback for the original block, which was modified
-        for (i = 0; i < numComponents; i++)
+        // Skip callbacks for the previous end block if it was already full
+        if (startingElementCount < archetypeList->elementCount)
         {
-            componentArrays[i + 1] = (void*)((uintptr_t)curBlock + componentOffsets[i] + componentSizes[i] * startingElementCount);
-        }
+            componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock) + startingElementCount;
+            // Call the callback for the original block, which was modified
+            for (i = 0; i < numComponents; i++)
+            {
+                componentArrays[i + 1] = (void*)((uintptr_t)curBlock + componentOffsets[i] + componentSizes[i] * startingElementCount);
+            }
 
-        // Copy the entity pointers into the 0th component array
-        std::copy_n(cur_entity, curBlock->numElements - startingElementCount, (Entity**)componentArrays[0]);
-        cur_entity += curBlock->numElements - startingElementCount;
+            // Copy the entity pointers into the 0th component array
+            std::copy_n(cur_entity, curBlock->numElements - startingElementCount, (Entity**)componentArrays[0]);
+            cur_entity += curBlock->numElements - startingElementCount;
 
-        if (callback)
-        {
-            callback(curBlock->numElements - startingElementCount, arg, componentArrays.get());
+            if (callback)
+            {
+                callback(curBlock->numElements - startingElementCount, arg, componentArrays.get());
+            }
         }
         curBlock = curBlock->next;
 
@@ -525,10 +529,9 @@ void createEntitiesCallback(archetype_t archetype, void *arg, int count, EntityA
         while (curBlock)
         {
             componentArrays[0] = multiarraylist_get_block_entity_pointers(curBlock);
-            cur_entity++;
             for (i = 0; i < numComponents; i++)
             {
-                componentArrays[i] = (void*)((uintptr_t)curBlock + componentOffsets[i]);
+                componentArrays[i + 1] = (void*)((uintptr_t)curBlock + componentOffsets[i]);
             }
             
             // Copy the entity pointers into the 0th component array

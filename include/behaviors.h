@@ -20,6 +20,10 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
 
 // The per-subtype parameters for a shooter-type enemy
 struct ShooterParams {
+    // Name of the model used by the shots of this subtype
+    const char* shot_model_name;
+    // Pointer to the model used by the shots of this subtype
+    Model* shot_model;
     // Maximum distance that the player can be seen from
     float sight_radius;
     // Distance that the shooter will try to keep from the player
@@ -28,6 +32,14 @@ struct ShooterParams {
     float move_speed;
     // Speed of the shot (units/frame)
     float shot_speed;
+    // Radius of the shot's hitbox
+    uint16_t shot_radius;
+    // Height of the shot's hitbox
+    uint16_t shot_height;
+    // Y offset of the shot from the shooter's position
+    float shot_y_offset;
+    // Minimum distance at which the shooter will start shooting
+    float fire_radius;
     // Minimum number of frames between shots
     uint8_t shot_rate;
 };

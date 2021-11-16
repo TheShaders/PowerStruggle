@@ -32,6 +32,7 @@ enum ComponentBits
 #define COMPONENT_INDEX(Component, Archetype) (1 + (__builtin_popcount((Archetype) & (Bit_##Component - 1))))
 
 #define ARCHETYPE_MODEL (Bit_Position | Bit_Rotation | Bit_Model)
+#define ARCHETYPE_MODEL_NO_ROTATION (Bit_Position | Bit_Model)
 #define ARCHETYPE_SCALED_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_Scale)
 #define ARCHETYPE_ANIM_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_AnimState)
 #define ARCHETYPE_SCALED_ANIM_MODEL (Bit_Position | Bit_Rotation | Bit_Model | Bit_AnimState | Bit_Scale)

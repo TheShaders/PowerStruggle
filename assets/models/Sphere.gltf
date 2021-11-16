@@ -19,12 +19,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Sphere",
-            "translation" : [
-                0,
-                0.5,
-                0
-            ]
+            "name" : "Sphere"
         }
     ],
     "materials" : [
@@ -32,33 +27,33 @@
             "extensions" : {
                 "N64_materials_gltf64" : {
                     "combiner" : [
+                        "0",
+                        "0",
+                        "0",
                         "ENVIRONMENT",
-                        "0",
-                        "SHADE",
-                        "0",
                         "0",
                         "0",
                         "0",
                         "1",
+                        "0",
+                        "0",
+                        "0",
                         "ENVIRONMENT",
-                        "0",
-                        "SHADE",
-                        "0",
                         "0",
                         "0",
                         "0",
                         "1"
                     ],
                     "envColor" : [
+                        0.16384540498256683,
                         0,
-                        0.08403525501489639,
-                        1,
+                        0.9878652691841125,
                         1
                     ],
                     "drawLayer" : "Opaque"
                 }
             },
-            "name" : "Sphere",
+            "name" : "f3dlite_material",
             "pbrMetallicRoughness" : {
                 "extensions" : {},
                 "metallicFactor" : 0,
@@ -86,63 +81,63 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 60,
+            "count" : 27,
             "max" : [
-                0.44721248745918274,
+                0.21650637686252594,
                 0.5,
-                0.42531999945640564
+                0.2500000298023224
             ],
             "min" : [
-                -0.44721248745918274,
-                -0.5,
-                -0.42531999945640564
+                -0.21650639176368713,
+                0.0732233077287674,
+                -0.25
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 60,
+            "count" : 27,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 60,
+            "count" : 27,
             "type" : "VEC2"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 60,
+            "count" : 90,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 720,
+            "byteLength" : 324,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 720,
-            "byteOffset" : 720
+            "byteLength" : 324,
+            "byteOffset" : 324
         },
         {
             "buffer" : 0,
-            "byteLength" : 480,
-            "byteOffset" : 1440
+            "byteLength" : 216,
+            "byteOffset" : 648
         },
         {
             "buffer" : 0,
-            "byteLength" : 120,
-            "byteOffset" : 1920
+            "byteLength" : 180,
+            "byteOffset" : 864
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 2040,
+            "byteLength" : 1044,
             "uri" : "Sphere.bin"
         }
     ]

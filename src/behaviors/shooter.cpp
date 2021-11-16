@@ -7,6 +7,8 @@
 #include <collision.h>
 #include <interaction.h>
 
+#define ARCHETYPE_SHOOTER_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity)
+
 ShooterDefinition shooter_definitions[] = {
     { // 0
         { // base
@@ -14,18 +16,57 @@ ShooterDefinition shooter_definitions[] = {
             nullptr,      // model
         },
         { // params
-            1536.0f,   // sight_radius
-            512.0f,    // follow_distance
-            5.0f,      // move_speed
-            32.0f,     // shot_speed
-            15,        // shot_rate
+            "models/Sphere",
+            nullptr,
+            1536.0f, // sight_radius
+            512.0f,  // follow_distance
+            5.0f,    // move_speed
+            15.0f,   // shot_speed
+            25,      // shot_radius
+            50,      // shot_height
+            25.0f,   // shot_y_offset
+            800.0f,  // fire_radius
+            30,      // shot_rate
         }
     }
 };
 
+void create_shooter_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
+{
+    // Entity* hitbox_entity = get_entity(componentArrays);
+    Vec3& pos = *get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_SHOOTER_HITBOX);
+    Vec3& vel = *get_component<Bit_Velocity, Vec3>(componentArrays, ARCHETYPE_SHOOTER_HITBOX);
+    Model** model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_SHOOTER_HITBOX);
+    Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_SHOOTER_HITBOX);
+
+    Entity* shooter_entity = (Entity*)arg;
+    void* shooter_components[1 + NUM_COMPONENTS(ARCHETYPE_SHOOTER)];
+    getEntityComponents(shooter_entity, shooter_components);
+    Vec3& shooter_pos = *get_component<Bit_Position, Vec3>(shooter_components, ARCHETYPE_SHOOTER);
+    Vec3s& shooter_rot = *get_component<Bit_Rotation, Vec3s>(shooter_components, ARCHETYPE_SHOOTER);
+    BehaviorState& shooter_bhv = *get_component<Bit_Behavior, BehaviorState>(shooter_components, ARCHETYPE_SHOOTER);
+
+    ShooterState* state = reinterpret_cast<ShooterState*>(shooter_bhv.data.data());
+    ShooterParams* params = state->params;
+
+    *model = params->shot_model;
+
+    hitbox.mask = player_hitbox_mask;
+    hitbox.radius = params->shot_radius;
+    hitbox.size_y = params->shot_height;
+    hitbox.size_z = 0;
+
+    vel[0] = -sinsf(shooter_rot[1]) * params->shot_speed;
+    vel[2] = -cossf(shooter_rot[1]) * params->shot_speed;
+
+    pos[0] = shooter_pos[0] + vel[0];
+    pos[1] = shooter_pos[1] + params->shot_y_offset;
+    pos[2] = shooter_pos[2] + vel[2];
+}
+
 void shooter_callback(void **components, void *data)
 {
-    // Entity* entity = get_entity(components);
+    Entity* shooter = get_entity(components);
     Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SHOOTER);
     Vec3& vel = *get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_SHOOTER);
     Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_SHOOTER);
@@ -39,7 +80,19 @@ void shooter_callback(void **components, void *data)
 
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
 
-    approach_target(params->sight_radius, params->follow_distance, params->move_speed, pos, vel, rot, player_pos);
+    float player_dist = approach_target(params->sight_radius, params->follow_distance, params->move_speed, pos, vel, rot, player_pos);
+
+    // If in cooldown, decrement the cooldown timer
+    if (state->shot_timer > 0)
+    {
+        state->shot_timer--;
+    }
+    // Otherwise if the player is close enough to be shot at, shoot
+    else if (player_dist < params->fire_radius)
+    {
+        queue_entity_creation(ARCHETYPE_SHOOTER_HITBOX, shooter, 1, create_shooter_hitbox_callback);
+        state->shot_timer = params->shot_rate;
+    }
 }
 
 Entity* create_shooter(int subtype, float x, float y, float z)
@@ -89,6 +142,11 @@ Entity* create_shooter(int subtype, float x, float y, float z)
         definition.base.model = load_model(definition.base.model_name);
     }
     *model = definition.base.model;
+    // Load the projectile model if it isn't already loaded
+    if (definition.params.shot_model == nullptr)
+    {
+        definition.params.shot_model = load_model(definition.params.shot_model_name);
+    }
 
     return shooter;
 }

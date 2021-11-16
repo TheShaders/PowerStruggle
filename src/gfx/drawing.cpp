@@ -74,6 +74,24 @@ void drawModels(size_t count, UNUSED void *arg, void **componentArrays)
     }
 }
 
+void drawModelsNoRotation(size_t count, UNUSED void *arg, void **componentArrays)
+{
+    // Components: Position, Rotation, Model
+    Vec3 *curPos = static_cast<Vec3 *>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_MODEL_NO_ROTATION)]);
+    Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_MODEL_NO_ROTATION)]);
+
+    while (count)
+    {
+        gfx::push_mat();
+         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+          drawModel(*curModel, nullptr, 0);
+        gfx::pop_mat();
+        count--;
+        curPos++;
+        curModel++;
+    }
+}
+
 void drawResizableAnimatedModels(size_t count, UNUSED void *arg, void **componentArrays)
 {
     // Components: Position, Rotation, Model, Resizable
@@ -205,6 +223,8 @@ void mtxf_align_camera(MtxF dest, MtxF mtx, Vec3 position, int16_t angle) {
 
 void drawAllEntities()
 {
+    // Draw all non-resizable entities that have a model and no rotation or animation
+    iterateOverEntities(drawModelsNoRotation, nullptr, ARCHETYPE_MODEL_NO_ROTATION, Bit_Rotation | Bit_AnimState | Bit_Scale);
     // Draw all non-resizable entities that have a model and no animation
     iterateOverEntities(drawModels, nullptr, ARCHETYPE_MODEL, Bit_AnimState | Bit_Scale);
     // Draw all non-resizable entities that have a model and an animation
