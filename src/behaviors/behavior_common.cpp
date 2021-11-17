@@ -90,16 +90,18 @@ ControlHandler* control_handlers[] = {
     &slasher_control_handler
 };
 
-void take_damage(Entity* hit_entity, HealthState& health_state, int damage)
+int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 {
     if (damage >= health_state.health)
     {
         queue_entity_deletion(hit_entity);
+        return true;
     }
     health_state.health -= damage;
+    return false;
 }
 
-void handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
+int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
 {
     Hit* cur_hit = collider.hits;
     while (cur_hit != nullptr)
@@ -108,9 +110,11 @@ void handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& hea
         {
             break;
         }
-        take_damage(enemy, health_state, 10);
+        int ret = take_damage(enemy, health_state, 10);
         health_state.last_hit_time = g_gameTimer;
         // queue_entity_deletion(cur_hit->entity);
         cur_hit = cur_hit->next;
+        return ret;
     }
+    return false;
 }

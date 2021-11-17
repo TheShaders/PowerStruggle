@@ -7,6 +7,7 @@
 #include <collision.h>
 #include <interaction.h>
 #include <control.h>
+#include <input.h>
 
 #define ARCHETYPE_SLASHER_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
@@ -56,29 +57,20 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
     slash_rot[1] = slash_world_angle;
 
     // Check if the slash is done and return true if so
-    if (state->cur_slash_angle > params->slash_angle)
+    if (state->cur_slash_angle >= params->slash_angle)
     {
         return true;
     }
     return false;
 }
 
-void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
+void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherState* state, void** hitbox_components, unsigned int hitbox_mask)
 {
-    // Components: Position, Velocity, Rotation, BehaviorState, Model, AnimState, Gravity
-    Entity* hitbox_entity = get_entity(componentArrays);
-    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_SLASHER_HITBOX);
-    Model** model = get_component<Bit_Model, Model*>(componentArrays, ARCHETYPE_SLASHER_HITBOX);
-    Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_SLASHER_HITBOX);
+    Entity* hitbox_entity = get_entity(hitbox_components);
+    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
+    Model** model = get_component<Bit_Model, Model*>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
+    Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
 
-    Entity* slasher_entity = (Entity*)arg;
-    void* slasher_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER)];
-    getEntityComponents(slasher_entity, slasher_components);
-    Vec3& slasher_pos = *get_component<Bit_Position, Vec3>(slasher_components, ARCHETYPE_SLASHER);
-    Vec3s& slasher_rot = *get_component<Bit_Rotation, Vec3s>(slasher_components, ARCHETYPE_SLASHER);
-    BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASHER);
-
-    SlasherState* state = reinterpret_cast<SlasherState*>(slasher_bhv.data.data());
     SlasherDefinition* definition = static_cast<SlasherDefinition*>(state->definition);
     SlasherParams* params = &definition->params;
 
@@ -88,7 +80,7 @@ void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **compo
     }
     *model = slash_weapon_model;
 
-    hitbox.mask = player_hitbox_mask;
+    hitbox.mask = hitbox_mask;
     hitbox.radius = params->slash_length;
     hitbox.size_y = params->slash_height;
     hitbox.size_z = params->slash_width;
@@ -99,6 +91,20 @@ void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **compo
     rot[2] = 0;
 
     update_slash_hitbox(slasher_pos, slasher_rot, params, state, true);
+}
+
+void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
+{
+    Entity* slasher_entity = (Entity*)arg;
+    void* slasher_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER)];
+    getEntityComponents(slasher_entity, slasher_components);
+    Vec3& slasher_pos = *get_component<Bit_Position, Vec3>(slasher_components, ARCHETYPE_SLASHER);
+    Vec3s& slasher_rot = *get_component<Bit_Rotation, Vec3s>(slasher_components, ARCHETYPE_SLASHER);
+    BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASHER);
+
+    SlasherState* state = reinterpret_cast<SlasherState*>(slasher_bhv.data.data());
+
+    setup_slash_hitbox(slasher_pos, slasher_rot, state, componentArrays, player_hitbox_mask);
 }
 
 void slasher_callback(void **components, void *data)
@@ -123,8 +129,18 @@ void slasher_callback(void **components, void *data)
 
     float player_dist = approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
+    // Check if the slasher died
+    if (handle_enemy_hits(slasher, collider, health))
+    {
+        // If it did, delete the hitbox if it exists
+        if (state->slash_hitbox != nullptr)
+        {
+            queue_entity_deletion(state->slash_hitbox);
+            state->slash_hitbox = nullptr;
+        }
+    }
     // If a slash is currently happening, continue it
-    if (state->slash_hitbox != nullptr)
+    else if (state->slash_hitbox != nullptr)
     {
         // If the slash is over, queue the hitbox's deletion
         if (update_slash_hitbox(pos, rot, params, state))
@@ -138,7 +154,6 @@ void slasher_callback(void **components, void *data)
     {
         queue_entity_creation(ARCHETYPE_SLASHER_HITBOX, slasher, 1, create_slasher_hitbox_callback);
     }
-    handle_enemy_hits(slasher, collider, health);
 }
 
 Entity* create_slasher(float x, float y, float z, int subtype)
@@ -185,29 +200,66 @@ Entity* create_slasher(float x, float y, float z, int subtype)
     return slasher;
 }
 
-void on_slasher_enter(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
 {
-    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    Entity* player = (Entity*)arg;
+    void* player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
+    getEntityComponents(player, player_components);
+    Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
+    BehaviorState& player_bhv = *get_component<Bit_Behavior, BehaviorState>(player_components, ARCHETYPE_PLAYER);
+
+    PlayerState* state = reinterpret_cast<PlayerState*>(player_bhv.data.data());
+    SlasherState* slasher_state = static_cast<SlasherState*>(state->controlled_state);
+
+    setup_slash_hitbox(player_pos, player_rot, slasher_state, componentArrays, enemy_hitbox_mask);
+}
+
+void on_slasher_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
+{
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_state->definition);
     SlasherState* state = static_cast<SlasherState*>(base_state);
     (void)definition;
     (void)state;
     (void)input;
     (void)player_components;
+
+    if (slash_weapon_model == nullptr)
+    {
+        slash_weapon_model = load_model("models/Weapon");
+    }
 }
 
-void on_slasher_update(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void on_slasher_update(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
-    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_state->definition);
     SlasherState* state = static_cast<SlasherState*>(base_state);
-    (void)definition;
-    (void)state;
-    (void)input;
-    (void)player_components;
+    SlasherParams* params = &definition->params;
+    Entity* player = get_entity(player_components);
+
+    Vec3& pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
+    
+    // If a slash is currently happening, continue it
+    if (state->slash_hitbox != nullptr)
+    {
+        // If the slash is over, queue the hitbox's deletion
+        if (update_slash_hitbox(pos, rot, params, state))
+        {
+            queue_entity_deletion(state->slash_hitbox);
+            state->slash_hitbox = nullptr;
+        }
+    }
+    // Otherwise if the player is close enough to be hit, start a slash
+    else if (input->buttonsPressed & Z_TRIG)
+    {
+        queue_entity_creation(ARCHETYPE_SLASHER_HITBOX, player, 1, create_player_slash_hitbox_callback);
+    }
 }
 
-void on_slasher_leave(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void on_slasher_leave(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
-    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_state->definition);
     SlasherState* state = static_cast<SlasherState*>(base_state);
     (void)definition;
     (void)state;

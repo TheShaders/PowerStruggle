@@ -157,9 +157,9 @@ Entity* create_shooter(float x, float y, float z, int subtype)
     return shooter;
 }
 
-void on_shooter_enter(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void on_shooter_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
-    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_definition);
+    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_state->definition);
     ShooterState* state = static_cast<ShooterState*>(base_state);
     (void)definition;
     (void)state;
@@ -176,21 +176,21 @@ void on_shooter_enter(BaseEnemyDefinition* base_definition, BaseEnemyState* base
 void create_player_shot_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     Entity* player = (Entity*)arg;
-    void* shooter_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
-    getEntityComponents(player, shooter_components);
-    Vec3& shooter_pos = *get_component<Bit_Position, Vec3>(shooter_components, ARCHETYPE_PLAYER);
-    Vec3s& shooter_rot = *get_component<Bit_Rotation, Vec3s>(shooter_components, ARCHETYPE_PLAYER);
-    BehaviorState& shooter_bhv = *get_component<Bit_Behavior, BehaviorState>(shooter_components, ARCHETYPE_PLAYER);
+    void* player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
+    getEntityComponents(player, player_components);
+    Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
+    BehaviorState& player_bhv = *get_component<Bit_Behavior, BehaviorState>(player_components, ARCHETYPE_PLAYER);
 
-    PlayerState* state = reinterpret_cast<PlayerState*>(shooter_bhv.data.data());
-    ShooterDefinition* definition = static_cast<ShooterDefinition*>(state->controlled_definition);
+    PlayerState* state = reinterpret_cast<PlayerState*>(player_bhv.data.data());
+    ShooterDefinition* definition = static_cast<ShooterDefinition*>(state->controlled_state->definition);
 
-    setup_shot_hitbox(shooter_pos, shooter_rot, definition, componentArrays, enemy_hitbox_mask);
+    setup_shot_hitbox(player_pos, player_rot, definition, componentArrays, enemy_hitbox_mask);
 }
 
-void on_shooter_update(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void on_shooter_update(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
-    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_definition);
+    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_state->definition);
     ShooterState* state = static_cast<ShooterState*>(base_state);
     ShooterParams* params = &definition->params;
     Entity* player = get_entity(player_components);
@@ -208,9 +208,9 @@ void on_shooter_update(BaseEnemyDefinition* base_definition, BaseEnemyState* bas
     }
 }
 
-void on_shooter_leave(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+void on_shooter_leave(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
-    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_definition);
+    ShooterDefinition* definition = static_cast<ShooterDefinition*>(base_state->definition);
     ShooterState* state = static_cast<ShooterState*>(base_state);
     (void)definition;
     (void)state;

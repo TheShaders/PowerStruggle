@@ -7,7 +7,7 @@ struct ControlParams {
     uint8_t placeholder;
 };
 
-using control_func_t = void(BaseEnemyDefinition* definition, BaseEnemyState* state, InputData* input, void** player_components);
+using control_func_t = void(BaseEnemyState* state, InputData* input, void** player_components);
 
 struct ControlHandler {
     control_func_t* on_enter;

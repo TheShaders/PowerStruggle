@@ -8,7 +8,7 @@
 struct PlayerState
 {
     Entity *playerEntity;
-    BaseEnemyDefinition* controlled_definition;
+    BaseEnemyState* controlled_state;
     ControlHandler* controlled_handler;
     uint8_t state;
     uint8_t subState;

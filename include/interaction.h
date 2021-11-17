@@ -15,6 +15,6 @@ constexpr size_t health_per_pixel = 4;
 constexpr size_t health_bar_height = 4;
 
 Entity *findClosestEntity(Vec3 pos, archetype_t archetype, float maxDist, float *foundDist, Vec3 foundPos);
-void take_damage(Entity* entity, HealthState& health_state, int damage);
+int take_damage(Entity* entity, HealthState& health_state, int damage);
 
 #endif

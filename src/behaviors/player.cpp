@@ -110,7 +110,7 @@ void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED
     {
         rot[1] = input->angle + 0x4000;
     }
-    float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed;
+    float targetSpeed = player_speed_buff * state->controlled_state->definition->base.move_speed;
     vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * dir_x * (PLAYER_GROUND_ACCEL_TIME_CONST);
     vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * dir_z * (PLAYER_GROUND_ACCEL_TIME_CONST);
 
@@ -158,7 +158,7 @@ extern Model *get_cube_model();
 Entity* g_PlayerEntity;
 
 // Extra space for storing the state related to the player's current body
-std::array<uint8_t, 16> player_control_state;
+std::array<uint8_t, sizeof(BehaviorState::data)> player_control_state;
 
 void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
@@ -204,17 +204,17 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     
     setAnim(animState, nullptr);
 
-    state->controlled_definition = &shooter_definitions[0];
-    state->controlled_handler = control_handlers[(int)EnemyType::Shooter];
+    state->controlled_state = reinterpret_cast<BaseEnemyState*>(player_control_state.data());
     player_control_state.fill(0);
+    state->controlled_state->definition = &slasher_definitions[0];
+    state->controlled_handler = control_handlers[(int)EnemyType::Slasher];
     state->controlled_handler->on_enter(
-        state->controlled_definition,
-        reinterpret_cast<BaseEnemyState*>(player_control_state.data()),
+        state->controlled_state,
         &g_PlayerInput,
         componentArrays);
 
     // Set the player's body to the default (shooter 0)
-    init_enemy_common(&state->controlled_definition->base, model, health);
+    init_enemy_common(&state->controlled_state->definition->base, model, health);
     health->max_health = static_cast<int>(player_health_buff * health->max_health);
     health->health = health->max_health;
 
@@ -300,8 +300,7 @@ void playerCallback(void **components, void *data)
     if (state->controlled_handler != nullptr)
     {
         state->controlled_handler->on_update(
-            state->controlled_definition,
-            reinterpret_cast<BaseEnemyState*>(player_control_state.data()),
+            state->controlled_state,
             &g_PlayerInput,
             components);
     }

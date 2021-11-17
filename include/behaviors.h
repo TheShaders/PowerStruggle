@@ -35,8 +35,8 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
 Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype);
 // Common initialiation routine for enemies
 void init_enemy_common(BaseEnemyInfo *base_info, Model** model_out, HealthState* health_out);
-// Common hitbox handling routine for enemies
-void handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state);
+// Common hitbox handling routine for enemies, returns true if the entity has run out of health
+int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state);
 
 /////////////
 // Shooter //
