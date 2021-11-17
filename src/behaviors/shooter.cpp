@@ -200,8 +200,8 @@ void on_shooter_update(BaseEnemyDefinition* base_definition, BaseEnemyState* bas
     {
         state->shot_timer--;
     }
-    // Otherwise if the player is close enough to be shot at, shoot
-    else if (input->buttonsPressed & B_BUTTON)
+    // Otherwise if the player is pressing the fire button, fire
+    else if (input->buttonsPressed & Z_TRIG)
     {
         queue_entity_creation(ARCHETYPE_SHOOTER_HITBOX, player, 1, create_player_shot_hitbox_callback);
         state->shot_timer = params->shot_rate;

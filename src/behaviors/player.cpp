@@ -42,10 +42,83 @@ void updateGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED 
 
 void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
 {
-    float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
-    vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
-    vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
-    rot[1] = atan2s(vel[2], vel[0]);
+
+    // Twin stick, c buttons aim
+    // int dir_x = 0;
+    // int dir_z = 0;
+    // if (input->buttonsHeld & U_CBUTTONS)
+    // {
+    //     dir_z -= 1;
+    // }
+    // if (input->buttonsHeld & D_CBUTTONS)
+    // {
+    //     dir_z += 1;
+    // }
+    // if (input->buttonsHeld & R_CBUTTONS)
+    // {
+    //     dir_x += 1;
+    // }
+    // if (input->buttonsHeld & L_CBUTTONS)
+    // {
+    //     dir_x -= 1;
+    // }
+    // if (dir_z != 0 || dir_x != 0)
+    // {
+    //     rot[1] = atan2s(dir_z, dir_x);
+    // }
+    // float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
+    // vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
+    // vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
+    
+    // Twin stick, dpad moves and joystick aims
+    float dir_x = 0;
+    float dir_z = 0;
+    if (input->buttonsHeld & D_JPAD)
+    {
+        dir_z -= 1;
+    }
+    if (input->buttonsHeld & U_JPAD)
+    {
+        dir_z += 1;
+    }
+    if (input->buttonsHeld & R_JPAD)
+    {
+        dir_x += 1;
+    }
+    if (input->buttonsHeld & L_JPAD)
+    {
+        dir_x -= 1;
+    }
+
+    // if (input->buttonsHeld & D_CBUTTONS)
+    // {
+    //     dir_z -= 1;
+    // }
+    // if (input->buttonsHeld & U_CBUTTONS)
+    // {
+    //     dir_z += 1;
+    // }
+    // if (input->buttonsHeld & R_CBUTTONS)
+    // {
+    //     dir_x += 1;
+    // }
+    // if (input->buttonsHeld & L_CBUTTONS)
+    // {
+    //     dir_x -= 1;
+    // }
+    if (input->magnitude > 0.01f)
+    {
+        rot[1] = input->angle + 0x4000;
+    }
+    float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed;
+    vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * dir_x * (PLAYER_GROUND_ACCEL_TIME_CONST);
+    vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * dir_z * (PLAYER_GROUND_ACCEL_TIME_CONST);
+
+    // Single stick
+    // rot[1] = atan2s(vel[2], vel[0]);
+    // float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
+    // vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
+    // vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
 }
 
 void updateAir(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
@@ -201,6 +274,7 @@ void playerCallback(void **components, void *data)
 
     VEC3_COPY(g_Camera.target, *pos);
 
+    // if (g_PlayerInput.buttonsHeld & U_JPAD)
     if (g_PlayerInput.buttonsHeld & U_CBUTTONS)
     {
         g_Camera.distance -= 50.0f;
@@ -210,12 +284,13 @@ void playerCallback(void **components, void *data)
         }
     }
 
+    // if (g_PlayerInput.buttonsHeld & D_JPAD)
     if (g_PlayerInput.buttonsHeld & D_CBUTTONS)
     {
         g_Camera.distance += 50.0f;
     }
 
-    if (g_PlayerInput.buttonsPressed & Z_TRIG)
+    if (g_PlayerInput.buttonsPressed & L_TRIG)
     {
         (*pos)[0] = 2229.0f;
         (*pos)[1] = 512.0f;
