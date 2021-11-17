@@ -904,9 +904,9 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
     gDPSetCombineLERP(g_gui_dlist_head++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1);
     while (count--)
     {
-        if (cur_health_state->maxHealth > 0)
+        if (cur_health_state->max_health > 0)
         {
-            size_t cur_health_bar_size = cur_health_state->maxHealth / health_per_pixel;
+            size_t cur_health_bar_size = cur_health_state->max_health / health_per_pixel;
             size_t filled_size = cur_health_state->health / health_per_pixel;
             Vec3 cur_pos_corrected;
             cur_pos_corrected[0] = (*cur_position)[0] - g_Camera.model_offset[0];

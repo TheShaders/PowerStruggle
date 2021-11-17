@@ -63,13 +63,14 @@ bool GameplayScene::load()
     // Create the player entity
     createPlayer();
 
-    create_shooter(0, 3229.0f, 0.0f, 26620.0f);
-    // create_shooter(0, 2229.0f, 0.0f, 27020.0f);
-    // create_slasher(0, 3229.0f, 0.0f, 26620.0f);
-    // create_slasher(0, 3229.0f, 0.0f, 26120.0f);
-    // create_slasher(0, 3229.0f, 0.0f, 27120.0f);
-    // create_slasher(0, 2729.0f, 0.0f, 26120.0f);
-    // create_slasher(0, 3729.0f, 0.0f, 27120.0f);
+    // create_enemy(3229.0f, 0.0f, 26620.0f, EnemyType::Slasher, 0);
+    // create_shooter(3229.0f, 0.0f, 26620.0f, 0);
+    // create_shooter(2229.0f, 0.0f, 27020.0f, 0);
+    // create_slasher(3229.0f, 0.0f, 26620.0f, 0);
+    // create_slasher(3229.0f, 0.0f, 26120.0f, 0);
+    // create_slasher(3229.0f, 0.0f, 27120.0f, 0);
+    // create_slasher(2729.0f, 0.0f, 26120.0f, 0);
+    create_enemy(3729.0f, 0.0f, 27120.0f, EnemyType::Shooter, 0);
 
     debug_printf("Loading tiles\n");
 

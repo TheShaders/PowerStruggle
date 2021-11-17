@@ -6,13 +6,37 @@
 #define ARCHETYPE_SHOOTER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health)
 #define ARCHETYPE_SLASHER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health)
 
-struct BaseEnemyDefinition {
+// The basic info that every enemy definition has
+struct BaseEnemyInfo {
     const char* model_name;
     Model* model;
+    uint16_t max_health;
+    // Speed the enemy will move at
+    float move_speed;
+};
+
+// The base definition that all enemy definitions inherit from
+struct BaseEnemyDefinition {
+    BaseEnemyInfo base;
+};
+
+struct BaseEnemyState {
+    BaseEnemyDefinition* definition;
+};
+
+enum class EnemyType {
+    Shooter,
+    Slasher
 };
 
 // Check if the target is in the sight radius and if so moves towards being the given distance from it
 float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos);
+// Creates an enemy of the given type and subtype at the given position
+Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype);
+// Common initialiation routine for enemies
+void init_enemy_common(BaseEnemyInfo *base_info, Model** model_out, HealthState* health_out);
+// Common hitbox handling routine for enemies
+void handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state);
 
 /////////////
 // Shooter //
@@ -28,8 +52,6 @@ struct ShooterParams {
     float sight_radius;
     // Distance that the shooter will try to keep from the player
     float follow_distance;
-    // Speed the shooter will move at
-    float move_speed;
     // Speed of the shot (units/frame)
     float shot_speed;
     // Radius of the shot's hitbox
@@ -44,8 +66,7 @@ struct ShooterParams {
     uint8_t shot_rate;
 };
 
-struct ShooterDefinition {
-    BaseEnemyDefinition base;
+struct ShooterDefinition : public BaseEnemyDefinition {
     ShooterParams params;
 };
 
@@ -53,8 +74,7 @@ struct ShooterDefinition {
 extern ShooterDefinition shooter_definitions[];
 
 // The state that a shooter-type enemy maintains
-struct ShooterState {
-    ShooterParams* params;
+struct ShooterState : public BaseEnemyState {
     // Number of frames since last shot
     uint8_t shot_timer;
 };
@@ -63,7 +83,7 @@ struct ShooterState {
 static_assert(sizeof(ShooterState) <= sizeof(BehaviorState::data), "ShooterState does not fit in behavior data!");
 
 // Creates a shooter of the given subtype
-Entity* create_shooter(int subtype, float x, float y, float z);
+Entity* create_shooter(float x, float y, float z, int subtype);
 
 /////////////
 // Slasher //
@@ -75,8 +95,6 @@ struct SlasherParams {
     float sight_radius;
     // Distance that the slasher will try to keep from the player
     float follow_distance;
-    // Speed the slasher will move at
-    float move_speed;
     // Length of the slash hitbox
     uint16_t slash_length;
     // Width of the slash hitbox
@@ -91,8 +109,7 @@ struct SlasherParams {
     uint16_t slash_angular_rate;
 };
 
-struct SlasherDefinition {
-    BaseEnemyDefinition base;
+struct SlasherDefinition : public BaseEnemyDefinition {
     SlasherParams params;
 };
 
@@ -100,8 +117,7 @@ struct SlasherDefinition {
 extern SlasherDefinition slasher_definitions[];
 
 // The state that a slasher-type enemy maintains
-struct SlasherState {
-    SlasherParams* params;
+struct SlasherState : public BaseEnemyState {
     Entity* slash_hitbox;
     uint16_t cur_slash_angle;
 };
@@ -110,6 +126,8 @@ struct SlasherState {
 static_assert(sizeof(SlasherState) <= sizeof(BehaviorState::data), "SlasherState does not fit in behavior data!");
 
 // Creates a slasher of the given slasher
-Entity* create_slasher(int subtype, float x, float y, float z);
+Entity* create_slasher(float x, float y, float z, int subtype);
+// Helper function for a slasher's hitbox
+int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first = false);
 
 #endif

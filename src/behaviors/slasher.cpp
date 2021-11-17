@@ -6,6 +6,7 @@
 #include <physics.h>
 #include <collision.h>
 #include <interaction.h>
+#include <control.h>
 
 #define ARCHETYPE_SLASHER_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
@@ -14,11 +15,12 @@ SlasherDefinition slasher_definitions[] = {
         { // base
             "models/Box", // model_name
             nullptr,      // model
+            100,          // max_health
+            7.0f,         // move_speed
         },
         { // params
             1536.0f, // sight_radius
             150.0f, // follow_distance
-            7.0f, // move_speed
             200, // slash_length
             40, // slash_width
             40, // slash_height
@@ -31,7 +33,7 @@ SlasherDefinition slasher_definitions[] = {
 
 Model* slash_weapon_model = nullptr;
 
-int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first = false)
+int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first)
 {
     Entity* slash_hitbox = state->slash_hitbox;
     void* slash_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER_HITBOX)];
@@ -47,7 +49,7 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
     }
     
     // Translate and rotate the slash hitbox accordingly
-    int slash_world_angle = ((int)state->cur_slash_angle - (int)(params->slash_angle / 2)) + slasher_rot[1] + 0x4000;
+    int slash_world_angle = ((int)state->cur_slash_angle - (int)(params->slash_angle / 2)) + slasher_rot[1] - 0x4000;
     slash_pos[0] = slasher_pos[0] + (float)(int)(params->slash_length / 2) * cossf(slash_world_angle);
     slash_pos[2] = slasher_pos[2] - (float)(int)(params->slash_length / 2) * sinsf(slash_world_angle);
     slash_pos[1] = slasher_pos[1] + params->slash_y_offset;
@@ -77,7 +79,8 @@ void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **compo
     BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASHER);
 
     SlasherState* state = reinterpret_cast<SlasherState*>(slasher_bhv.data.data());
-    SlasherParams* params = state->params;
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(state->definition);
+    SlasherParams* params = &definition->params;
 
     if (slash_weapon_model == nullptr)
     {
@@ -105,9 +108,12 @@ void slasher_callback(void **components, void *data)
     Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SLASHER);
     Vec3& vel = *get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_SLASHER);
     Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_SLASHER);
+    ColliderParams& collider = *get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SLASHER);
+    HealthState& health = *get_component<Bit_Health, HealthState>(components, ARCHETYPE_SLASHER);
 
     SlasherState* state = reinterpret_cast<SlasherState*>(data);
-    SlasherParams* params = state->params;
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(state->definition);
+    SlasherParams* params = &definition->params;
 
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
@@ -115,7 +121,7 @@ void slasher_callback(void **components, void *data)
 
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
 
-    float player_dist = approach_target(params->sight_radius, params->follow_distance, params->move_speed, pos, vel, rot, player_pos);
+    float player_dist = approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
     // If a slash is currently happening, continue it
     if (state->slash_hitbox != nullptr)
@@ -132,9 +138,10 @@ void slasher_callback(void **components, void *data)
     {
         queue_entity_creation(ARCHETYPE_SLASHER_HITBOX, slasher, 1, create_slasher_hitbox_callback);
     }
+    handle_enemy_hits(slasher, collider, health);
 }
 
-Entity* create_slasher(int subtype, float x, float y, float z)
+Entity* create_slasher(float x, float y, float z, int subtype)
 {
     Entity* slasher = createEntity(ARCHETYPE_SLASHER);
     SlasherDefinition& definition = slasher_definitions[subtype];
@@ -163,8 +170,6 @@ Entity* create_slasher(int subtype, float x, float y, float z)
     
     animState->anim = nullptr;
 
-    health->health = health->maxHealth = 200;
-
     // Set the entity's position
     pos[0] = x; pos[1] = y; pos[2] = z;
 
@@ -172,15 +177,46 @@ Entity* create_slasher(int subtype, float x, float y, float z)
     memset(bhv_params->data.data(), 0, sizeof(BehaviorState::data));
     bhv_params->callback = slasher_callback;
     SlasherState* state = reinterpret_cast<SlasherState*>(bhv_params->data.data());
-    state->params = &definition.params;
+    state->definition = &definition;
 
-    // Set up the entity's model
-    // Load the model if it isn't already loaded
-    if (definition.base.model == nullptr)
-    {
-        definition.base.model = load_model(definition.base.model_name);
-    }
-    *model = definition.base.model;
+    init_enemy_common(&definition.base, model, health);
+    health->health = health->max_health;
 
     return slasher;
 }
+
+void on_slasher_enter(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+{
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    SlasherState* state = static_cast<SlasherState*>(base_state);
+    (void)definition;
+    (void)state;
+    (void)input;
+    (void)player_components;
+}
+
+void on_slasher_update(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+{
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    SlasherState* state = static_cast<SlasherState*>(base_state);
+    (void)definition;
+    (void)state;
+    (void)input;
+    (void)player_components;
+}
+
+void on_slasher_leave(BaseEnemyDefinition* base_definition, BaseEnemyState* base_state, InputData* input, void** player_components)
+{
+    SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_definition);
+    SlasherState* state = static_cast<SlasherState*>(base_state);
+    (void)definition;
+    (void)state;
+    (void)input;
+    (void)player_components;
+}
+
+ControlHandler slasher_control_handler {
+    on_slasher_enter,
+    on_slasher_update,
+    on_slasher_leave
+};

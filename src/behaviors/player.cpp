@@ -18,6 +18,8 @@ extern "C" {
 #include <platform.h>
 #include <platform_gfx.h>
 #include <files.h>
+#include <behaviors.h>
+#include <control.h>
 
 #include <memory>
 
@@ -38,11 +40,12 @@ void updateGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED 
     (void)input;
 }
 
-void processGround(UNUSED PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
+void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
 {
-    float targetSpeed = MAX_PLAYER_SPEED * input->magnitude;
+    float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
     vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
     vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
+    rot[1] = atan2s(vel[2], vel[0]);
 }
 
 void updateAir(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED Vec3 vel, UNUSED ColliderParams *collider, UNUSED Vec3s rot, UNUSED GravityParams *gravity, UNUSED AnimState *animState)
@@ -77,17 +80,14 @@ void createPlayer()
 
 extern Model *get_cube_model();
 
-// extern u8 _testmodelSegmentRomStart[];
-// extern u8 _testmodelSegmentSize[];
-
-// Model *testmodel;
-// extern Animation character_anim;
-
 #include <n64_mem.h>
 
 Entity* g_PlayerEntity;
 
-void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays)
+// Extra space for storing the state related to the player's current body
+std::array<uint8_t, 16> player_control_state;
+
+void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
     // debug_printf("Creating player entity\n");
 
@@ -125,60 +125,44 @@ void createPlayerCallback(UNUSED size_t count, void *arg, void **componentArrays
     // Set up collider
     collider->radius = PLAYER_RADIUS;
     collider->height = PLAYER_HEIGHT;
-    // collider->numHeights = PLAYER_WALL_RAYCAST_HEIGHT_COUNT;
-    // collider->startOffset = PLAYER_WALL_RAYCAST_OFFSET;
-    // collider->ySpacing = PLAYER_WALL_RAYCAST_SPACING;
     collider->friction_damping = 1.0f;
-    // collider->floor = nullptr;
     collider->floor_surface_type = surface_none;
     collider->mask = player_hitbox_mask;
     
     setAnim(animState, nullptr);
-    *model = load_model("models/Box");
+
+    state->controlled_definition = &shooter_definitions[0];
+    state->controlled_handler = control_handlers[(int)EnemyType::Shooter];
+    player_control_state.fill(0);
+    state->controlled_handler->on_enter(
+        state->controlled_definition,
+        reinterpret_cast<BaseEnemyState*>(player_control_state.data()),
+        &g_PlayerInput,
+        componentArrays);
+
+    // Set the player's body to the default (shooter 0)
+    init_enemy_common(&state->controlled_definition->base, model, health);
+    health->max_health = static_cast<int>(player_health_buff * health->max_health);
+    health->health = health->max_health;
 
     (*pos)[0] = 2229.0f;
     (*pos)[1] = 512.0f;
     (*pos)[2] = 26620.0f;
-
-    health->health = health->maxHealth = 200;
-    // health->health = 150;
-
-    // debug_printf("Set up player entity: 0x%08X\n", state->playerEntity);
-
-    // // Set up animation
-    // setAnim(animState, &character_anim);
-
-    // // *model = get_cube_model();
-    // testmodel = (Model*)allocRegion((u32)_testmodelSegmentSize, ALLOC_GFX);
-    // {
-    //     OSMesgQueue queue;
-    //     OSMesg msg;
-    //     OSIoMesg io_msg;
-    //     // Set up the intro segment DMA
-    //     io_msg.hdr.pri = OS_MESG_PRI_NORMAL;
-    //     io_msg.hdr.retQueue = &queue;
-    //     io_msg.dramAddr = testmodel;
-    //     io_msg.devAddr = (u32)_testmodelSegmentRomStart;
-    //     io_msg.size = (u32)_testmodelSegmentSize;
-    //     osCreateMesgQueue(&queue, &msg, 1);
-    //     osEPiStartDma(g_romHandle, &io_msg, OS_READ);
-    //     osRecvMesg(&queue, nullptr, OS_MESG_BLOCK);
-    // }
-    // testmodel->adjust_offsets();
-    // testmodel->setup_gfx();
-    // *model = testmodel;
 }
 
 uint32_t last_player_hit_time = 0;
 constexpr uint32_t player_iframes = 30;
 
-void take_damage(HealthState* health_state, int damage)
+void take_player_damage(HealthState* health_state, int damage)
 {
     if (damage >= health_state->health)
     {
-        health_state->health = health_state->maxHealth;
+        health_state->health = health_state->max_health;
     }
-    health_state->health -= damage;
+    else
+    {
+        health_state->health -= damage;
+    }
 }
 
 void handle_player_hits(ColliderParams* collider, HealthState* health_state)
@@ -186,12 +170,12 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state)
     Hit* cur_hit = collider->hits;
     while (cur_hit != nullptr)
     {
-        if (g_gameTimer - last_player_hit_time < player_iframes)
+        if (g_gameTimer - health_state->last_hit_time < player_iframes)
         {
             break;
         }
-        take_damage(health_state, 10);
-        last_player_hit_time = g_gameTimer;
+        take_player_damage(health_state, 10);
+        health_state->last_hit_time = g_gameTimer;
         // queue_entity_deletion(cur_hit->entity);
         cur_hit = cur_hit->next;
     }
@@ -236,6 +220,15 @@ void playerCallback(void **components, void *data)
         (*pos)[0] = 2229.0f;
         (*pos)[1] = 512.0f;
         (*pos)[2] = 26620.0f;
+    }
+
+    if (state->controlled_handler != nullptr)
+    {
+        state->controlled_handler->on_update(
+            state->controlled_definition,
+            reinterpret_cast<BaseEnemyState*>(player_control_state.data()),
+            &g_PlayerInput,
+            components);
     }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);

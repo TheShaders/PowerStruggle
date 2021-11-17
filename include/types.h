@@ -61,6 +61,10 @@ struct PlayerState;
 struct HealthState;
 struct Hitbox;
 struct Hit;
+struct BaseEnemyDefinition;
+struct BaseEnemyState;
+struct ControlParams;
+struct ControlHandler;
 
 // Prototype for the grid
 class Grid;

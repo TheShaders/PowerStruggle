@@ -8,6 +8,8 @@
 struct PlayerState
 {
     Entity *playerEntity;
+    BaseEnemyDefinition* controlled_definition;
+    ControlHandler* controlled_handler;
     uint8_t state;
     uint8_t subState;
     uint16_t stateArg;
@@ -29,6 +31,11 @@ static_assert(sizeof(PlayerState) <= sizeof(BehaviorState::data), "PlayerState d
 #define PLAYER_GRAVITY 1.0f
 #define PLAYER_TERMINAL_VELOCITY 30.0f
 #define PLAYER_SLOW_TERMINAL_VELOCITY 5.0f
+
+// Movement speed multiplier applied to the player's controlled body
+constexpr float player_speed_buff = 1.1f;
+// Maximum health multiplier applied to the player's controlled body
+constexpr float player_health_buff = 1.1f;
 
 void createPlayer();
 void createPlayerCallback(size_t count, void *arg, void **componentArrays);

@@ -1,5 +1,13 @@
+#include <array>
 #include <cmath>
+
+#include <files.h>
 #include <mathutils.h>
+#include <interaction.h>
+#include <behaviors.h>
+#include <control.h>
+#include <collision.h>
+#include <main.h>
 
 float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos)
 {
@@ -40,7 +48,7 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
         vel[0] = approachFloatLinear(vel[0], target_vel_x, 1.0f);
         vel[2] = approachFloatLinear(vel[2], target_vel_z, 1.0f);
 
-        rot[1] = atan2s(dz, dx);
+        rot[1] = atan2s(-dz, -dx);
     }
     else
     {
@@ -48,4 +56,61 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
         vel[2] = approachFloatLinear(vel[2], 0.0f, 1.0f);
     }
     return dist;
+}
+
+std::array create_enemy_funcs {
+    create_shooter,
+    create_slasher
+};
+
+Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype)
+{
+    return create_enemy_funcs[static_cast<int>(type)](x, y, z, subtype);
+}
+
+void init_enemy_common(BaseEnemyInfo* base_info, Model** model_out, HealthState* health_out)
+{
+    // Set up the enemy's model
+    // Load the model if it isn't already loaded
+    if (base_info->model == nullptr)
+    {
+        base_info->model = load_model(base_info->model_name);
+    }
+    *model_out = base_info->model;
+
+    // Set up the enemy's health
+    health_out->max_health = base_info->max_health;
+}
+
+extern ControlHandler shooter_control_handler;
+extern ControlHandler slasher_control_handler;
+
+ControlHandler* control_handlers[] = {
+    &shooter_control_handler,
+    &slasher_control_handler
+};
+
+void take_damage(Entity* hit_entity, HealthState& health_state, int damage)
+{
+    if (damage >= health_state.health)
+    {
+        queue_entity_deletion(hit_entity);
+    }
+    health_state.health -= damage;
+}
+
+void handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
+{
+    Hit* cur_hit = collider.hits;
+    while (cur_hit != nullptr)
+    {
+        if (g_gameTimer - health_state.last_hit_time < 10)
+        {
+            break;
+        }
+        take_damage(enemy, health_state, 10);
+        health_state.last_hit_time = g_gameTimer;
+        // queue_entity_deletion(cur_hit->entity);
+        cur_hit = cur_hit->next;
+    }
 }

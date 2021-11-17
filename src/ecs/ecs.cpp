@@ -9,6 +9,7 @@
 #include <physics.h>
 #include <interaction.h>
 #include <block_vector.h>
+#include <control.h>
 
 #include <memory>
 
