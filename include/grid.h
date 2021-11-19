@@ -81,6 +81,22 @@ struct Chunk {
     }
 };
 
+enum class ObjectClass
+{
+    enemy = 0,
+    interactable = 1,
+};
+
+struct LevelObject {
+    uint16_t x;
+    int16_t  y;
+    uint16_t z;
+    uint16_t object_class;
+    uint16_t object_type;
+    uint16_t object_subtype;
+    uint32_t object_param;
+};
+
 // A grid definition contains information about the grid it refers to. This includes the dimensions of the grid in chunks,
 // as well as the rom offset to the array of chunk rom offsets. (TODO PC) The chunk arrays in rom contain 2 32-bit values each, 
 // the chunk's file offset and the chunk's data length
@@ -89,9 +105,12 @@ struct GridDefinition {
     uint16_t num_chunks_z;
     // Not really necessary in the file, but nice for runtime usage and only costs 4 bytes in rom per grid
     uint32_t chunk_array_rom_offset; // TODO refactor for PC support
+    uint32_t object_array_rom_offset; // TODO refactor for PC support
+    uint32_t num_objects;
     void adjust_offsets(uint32_t base_addr)
     {
         chunk_array_rom_offset += base_addr;
+        object_array_rom_offset += base_addr;
     }
     void get_chunk_offset_size(unsigned int x, unsigned int z, uint32_t *offset, uint32_t *size);
 };
@@ -144,6 +163,7 @@ public:
     void unload_nonvisible_chunks(Camera& camera);
     void load_chunk(chunk_pos pos);
     void process_loading_chunks();
+    void load_objects();
     float get_height(float x, float z, float radius, float min_y, float max_y);
     chunk_pos get_minimum_loaded_chunk();
 

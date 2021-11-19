@@ -61,11 +61,35 @@ struct OutputGridDefinition {
     uint16_t num_chunks_x;
     uint16_t num_chunks_z;
     uint32_t chunk_array_rom_offset;
+    uint32_t object_array_rom_offset;
+    uint32_t num_objects;
     void swap_endianness()
     {
         num_chunks_x = ::swap_endianness(num_chunks_x);
         num_chunks_z = ::swap_endianness(num_chunks_z);
         chunk_array_rom_offset = ::swap_endianness(chunk_array_rom_offset);
+        object_array_rom_offset = ::swap_endianness(object_array_rom_offset);
+        num_objects = ::swap_endianness(num_objects);
+    }
+};
+
+struct OutputObject {
+    uint16_t x;
+    int16_t  y;
+    uint16_t z;
+    uint16_t object_class;
+    uint16_t object_type;
+    uint16_t object_subtype;
+    uint32_t object_param;
+    void swap_endianness()
+    {
+        x = ::swap_endianness(x);
+        y = ::swap_endianness(y);
+        z = ::swap_endianness(z);
+        object_class = ::swap_endianness(object_class);
+        object_type = ::swap_endianness(object_type);
+        object_subtype = ::swap_endianness(object_subtype);
+        object_param = ::swap_endianness(object_param);
     }
 };
 

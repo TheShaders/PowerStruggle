@@ -70,7 +70,7 @@ bool GameplayScene::load()
     // create_slasher(3229.0f, 0.0f, 26120.0f, 0);
     // create_slasher(3229.0f, 0.0f, 27120.0f, 0);
     // create_slasher(2729.0f, 0.0f, 26120.0f, 0);
-    create_enemy(3729.0f, 0.0f, 27120.0f, EnemyType::Slasher, 0);
+    // create_enemy(3729.0f, 0.0f, 27120.0f, EnemyType::Shooter, 0);
 
     debug_printf("Loading tiles\n");
 
@@ -134,6 +134,8 @@ bool GameplayScene::load()
 
         *model = load_model("models/Weapon");
     }
+
+    grid_.load_objects();
 
     return true;
 }

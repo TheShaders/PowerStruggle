@@ -4,6 +4,7 @@
 #include <cstring>
 #include <files.h>
 #include <camera.h>
+#include <behaviors.h>
 
 #include <n64_gfx.h>
 #include <n64_mathutils.h>
@@ -54,8 +55,8 @@ void GridDefinition::get_chunk_offset_size(unsigned int x, unsigned int z, uint3
 
 GridDefinition get_grid_definition(const char *file)
 {
-    // 16 bytes to DMA into as recommended by osEPiStartDma manual entry
-    uint8_t buf[16] __attribute__((aligned(16)));
+    // 16 byte DMA width alignment as recommended by osEPiStartDma manual entry
+    uint8_t buf[16];
     GridDefinition ret;
     auto grid_def_offset = FileRecords::get_offset(file, strlen(file));
     load_data(buf, (u32)(_assetsSegmentStart + grid_def_offset->offset), sizeof(buf));
@@ -590,4 +591,29 @@ chunk_pos Grid::get_minimum_loaded_chunk()
         }
     }
     return ret;
+}
+
+void Grid::load_objects()
+{
+    dynamic_array<LevelObject> level_objs(definition_.num_objects);
+    uint32_t asset_address = (uint32_t)_assetsSegmentStart;
+    load_data(level_objs.data(), asset_address + definition_.object_array_rom_offset, sizeof(LevelObject) * definition_.num_objects);
+
+    for (size_t obj_index = 0; obj_index < definition_.num_objects; obj_index++)
+    {
+        const LevelObject& cur_obj = level_objs[obj_index];
+        switch (static_cast<ObjectClass>(cur_obj.object_class))
+        {
+            case ObjectClass::enemy:
+                create_enemy(
+                    static_cast<float>(static_cast<int>(cur_obj.x * tile_size)),
+                    static_cast<float>(static_cast<int>(cur_obj.y * tile_size)),
+                    static_cast<float>(static_cast<int>(cur_obj.z * tile_size)),
+                    static_cast<EnemyType>(cur_obj.object_type),
+                    cur_obj.object_subtype);
+                break;
+            case ObjectClass::interactable:
+                break;
+        }
+    }
 }

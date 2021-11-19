@@ -22,6 +22,21 @@ constexpr T round_away_divide(T x, T y)
     return (x - 1) / y + 1;
 }
 
+// Rounds the input up to the nearest N, where N is a power of 2
+template <size_t N, typename T>
+constexpr T round_up(T in)
+{
+    static_assert(N && !(N & (N - 1)), "Can only round up to the nearest multiple of a power of 2!");
+    return (in + N - 1) & -N;
+}
+
+template <size_t N>
+constexpr std::streampos round_up(std::streampos in)
+{
+    static_assert(N && !(N & (N - 1)), "Can only round up to the nearest multiple of a power of 2!");
+    return (in + std::streamoff{N - 1}) & -N;
+}
+
 struct Cell
 {
     // int x;
@@ -71,7 +86,7 @@ void write_grid(std::ofstream& output_file, dynamic_array_2d<Chunk>& chunks)
     uint32_t cur_offset = sizeof(OutputGridDefinition) + chunk_offset_array_bytes;
 
     // Write the grid definition
-    OutputGridDefinition grid_def{(uint16_t)num_chunks_x, (uint16_t)num_chunks_z, sizeof(OutputGridDefinition)};
+    OutputGridDefinition grid_def{(uint16_t)num_chunks_x, (uint16_t)num_chunks_z, sizeof(OutputGridDefinition), 0, 0};
     grid_def.swap_endianness();
     output_file.write(reinterpret_cast<char*>(&grid_def), sizeof(OutputGridDefinition));
 
@@ -137,9 +152,13 @@ void write_grid(std::ofstream& output_file, dynamic_array_2d<Chunk>& chunks)
         }
     }
 
+    std::streampos end_pos = output_file.tellp();
+
     // Seek back to the start of the chunk offset array
     output_file.seekp(sizeof(OutputGridDefinition));
     output_file.write(reinterpret_cast<char*>(chunk_offset_array.data()), chunk_offset_array.size() * sizeof(decltype(chunk_offset_array)::value_type));
+
+    output_file.seekp(end_pos);
 }
 
 int main(int argc, char *argv[])
@@ -296,6 +315,50 @@ int main(int argc, char *argv[])
         // fmt::print("Tile count: {}\n", sum);
         // fmt::print("Min: {} {} {} Max: {} {} {}\n", min_x, min_y, min_z, max_x, max_y, max_z);
         // fmt::print("Chunks: {} by {}\n", num_chunks_x, num_chunks_z);
+
+        std::streampos object_array_pos = round_up<alignof(OutputObject)>(output_file.tellp());
+        output_file.seekp(object_array_pos);
+        size_t num_objects = 0;
+        
+        if (input_json.contains("Objects"))
+        {
+            auto& input_objs = input_json["Objects"];
+            num_objects = input_objs.size();
+            dynamic_array<OutputObject> output_objects(num_objects);
+            size_t obj_index = 0;
+            for (auto& obj : input_json["Objects"])
+            {
+                int x = obj["X"];
+                x -= min_x;
+                int y = obj["Y"];
+                int z = obj["Z"];
+                z -= min_z;
+                auto& def = obj["Definition"];
+                int obj_class = def["ObjectClass"];
+                int obj_type = def["ObjectType"];
+                int obj_subtype = def["ObjectSubtype"];
+                int obj_param = obj["ObjectParam"];
+                output_objects[obj_index] = OutputObject {
+                    static_cast<uint16_t>(x),
+                    static_cast<int16_t>(y),
+                    static_cast<uint16_t>(z),
+                    static_cast<uint16_t>(obj_class),
+                    static_cast<uint16_t>(obj_type),
+                    static_cast<uint16_t>(obj_subtype),
+                    static_cast<uint32_t>(obj_param)
+                };
+                output_objects[obj_index].swap_endianness();
+                obj_index++;
+            }
+            output_file.write(reinterpret_cast<const char*>(output_objects.data()), sizeof(OutputObject) * num_objects);
+        }
+        // Write the object array position and number of objects to the file
+        uint32_t object_array_pos_big_endian = ::swap_endianness(static_cast<uint32_t>(object_array_pos));
+        uint32_t num_objects_big_endian = ::swap_endianness(static_cast<uint32_t>(num_objects));
+        output_file.seekp(offsetof(OutputGridDefinition, object_array_rom_offset));
+        output_file.write(reinterpret_cast<const char*>(&object_array_pos_big_endian), sizeof(uint32_t));
+        output_file.seekp(offsetof(OutputGridDefinition, num_objects));
+        output_file.write(reinterpret_cast<const char*>(&num_objects_big_endian), sizeof(uint32_t));
     }
     catch (js::json::exception& err)
     {

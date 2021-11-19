@@ -6,30 +6,30 @@
   "MaxY": 43,
   "MaxZ": 10,
   "TilePaths": [
-    "..\\models\\Floor.gltf",
-    "..\\models\\FloorBlue.gltf",
-    "..\\models\\FloorBrown.gltf",
-    "..\\models\\FloorGray.gltf",
-    "..\\models\\FloorGreen.gltf",
-    "..\\models\\FloorRed.gltf",
-    "..\\models\\FloorWhite.gltf",
-    "..\\models\\FloorYellow.gltf",
-    "..\\models\\Slope.gltf",
-    "..\\models\\SlopeBlue.gltf",
-    "..\\models\\SlopeBrown.gltf",
-    "..\\models\\SlopeGray.gltf",
-    "..\\models\\SlopeGreen.gltf",
-    "..\\models\\SlopeRed.gltf",
-    "..\\models\\SlopeWhite.gltf",
-    "..\\models\\SlopeYellow.gltf",
-    "..\\models\\Wall.gltf",
-    "..\\models\\WallBlue.gltf",
-    "..\\models\\WallBrown.gltf",
-    "..\\models\\WallGray.gltf",
-    "..\\models\\WallGreen.gltf",
-    "..\\models\\WallRed.gltf",
-    "..\\models\\WallWhite.gltf",
-    "..\\models\\WallYellow.gltf"
+    "../models/Floor.gltf",
+    "../models/FloorBlue.gltf",
+    "../models/FloorBrown.gltf",
+    "../models/FloorGray.gltf",
+    "../models/FloorGreen.gltf",
+    "../models/FloorRed.gltf",
+    "../models/FloorWhite.gltf",
+    "../models/FloorYellow.gltf",
+    "../models/Slope.gltf",
+    "../models/SlopeBlue.gltf",
+    "../models/SlopeBrown.gltf",
+    "../models/SlopeGray.gltf",
+    "../models/SlopeGreen.gltf",
+    "../models/SlopeRed.gltf",
+    "../models/SlopeWhite.gltf",
+    "../models/SlopeYellow.gltf",
+    "../models/Wall.gltf",
+    "../models/WallBlue.gltf",
+    "../models/WallBrown.gltf",
+    "../models/WallGray.gltf",
+    "../models/WallGreen.gltf",
+    "../models/WallRed.gltf",
+    "../models/WallWhite.gltf",
+    "../models/WallYellow.gltf"
   ],
   "Cells": [
     {
@@ -390,13 +390,6 @@
       "Rotation": 0
     },
     {
-      "X": 19,
-      "Y": 0,
-      "Z": 1,
-      "TileIndex": 16,
-      "Rotation": 1
-    },
-    {
       "X": -7,
       "Y": 0,
       "Z": 1,
@@ -27989,6 +27982,30 @@
       "Z": -1,
       "TileIndex": 16,
       "Rotation": 1
+    }
+  ],
+  "Objects": [
+    {
+      "X": 3,
+      "Y": 0,
+      "Z": 2,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 3,
+      "Y": 0,
+      "Z": -1,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
     }
   ]
 }
