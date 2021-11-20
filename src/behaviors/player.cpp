@@ -322,14 +322,6 @@ void playerCallback(void **components, void *data)
         (*pos)[2] = 26620.0f;
     }
 
-    if (state->controlled_handler != nullptr)
-    {
-        state->controlled_handler->on_update(
-            state->controlled_state,
-            &g_PlayerInput,
-            components);
-    }
-
     if (to_control != nullptr)
     {
         if (pointer_entity == nullptr)
@@ -387,6 +379,14 @@ void playerCallback(void **components, void *data)
             queue_entity_deletion(pointer_entity);
             pointer_entity = nullptr;
         }
+    }
+
+    if (state->controlled_handler != nullptr)
+    {
+        state->controlled_handler->on_update(
+            state->controlled_state,
+            &g_PlayerInput,
+            components);
     }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
