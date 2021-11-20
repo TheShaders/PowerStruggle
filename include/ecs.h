@@ -41,7 +41,7 @@ enum ComponentBits
 #define ARCHETYPE_CYLINDER_HITBOX (Bit_Position | Bit_Hitbox)
 #define ARCHETYPE_RECTANGLE_HITBOX (Bit_Position | Bit_Hitbox | Bit_Rotation)
 #define ARCHETYPE_COLLIDER (Bit_Position | Bit_Collider)
-#define ARCHETYPE_CONTROLLABLE (Bit_Position | Bit_Health | Bit_Control)
+#define ARCHETYPE_CONTROLLABLE (Bit_Position | Bit_Health | Bit_Control | Bit_Behavior)
 
 typedef struct Entity_t {
     // The archetype of this entity

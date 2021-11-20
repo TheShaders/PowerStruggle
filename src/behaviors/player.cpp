@@ -23,6 +23,8 @@ extern "C" {
 
 #include <memory>
 
+#define POINTER_ARCHETYPE (Bit_Model | Bit_Rotation | Bit_Position)
+
 void setAnim(AnimState *animState, Animation *newAnim)
 {
     newAnim = segmentedToVirtual(newAnim);
@@ -156,6 +158,8 @@ extern Model *get_cube_model();
 #include <n64_mem.h>
 
 Entity* g_PlayerEntity;
+Model* pointer_model = nullptr;
+Entity* pointer_entity = nullptr;
 
 // Extra space for storing the state related to the player's current body
 std::array<uint8_t, sizeof(BehaviorState::data)> player_control_state;
@@ -208,15 +212,27 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     player_control_state.fill(0);
     state->controlled_state->definition = &slasher_definitions[0];
     state->controlled_handler = control_handlers[(int)EnemyType::Slasher];
-    state->controlled_handler->on_enter(
-        state->controlled_state,
-        &g_PlayerInput,
-        componentArrays);
 
     // Set the player's body to the default (shooter 0)
     init_enemy_common(&state->controlled_state->definition->base, model, health);
     health->max_health = static_cast<int>(player_health_buff * health->max_health);
     health->health = health->max_health;
+
+    state->controlled_handler->on_enter(
+        state->controlled_state,
+        &g_PlayerInput,
+        componentArrays);
+
+    if (pointer_model == nullptr)
+    {
+        pointer_model = load_model("models/Pointer");
+    }
+
+    if (pointer_entity != nullptr)
+    {
+        queue_entity_deletion(pointer_entity);
+        pointer_entity = nullptr;
+    }
 
     (*pos)[0] = 2229.0f;
     (*pos)[1] = 512.0f;
@@ -254,6 +270,14 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state)
     }
 }
 
+
+extern Vec3 control_search_pos;
+extern Vec3 control_pos;
+extern float control_dist;
+extern Entity* to_control;
+extern BehaviorState* to_control_behavior;
+extern int control_health;
+
 void playerCallback(void **components, void *data)
 {
     // Components: Position, Velocity, Rotation, BehaviorState, Model, AnimState, Gravity
@@ -263,14 +287,15 @@ void playerCallback(void **components, void *data)
     AnimState *animState = get_component<Bit_AnimState, AnimState>(components, ARCHETYPE_PLAYER);
     ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_PLAYER);
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(components, ARCHETYPE_PLAYER);
-    HealthState *health_state = get_component<Bit_Health, HealthState>(components, ARCHETYPE_PLAYER);
+    HealthState *health = get_component<Bit_Health, HealthState>(components, ARCHETYPE_PLAYER);
+    Model **model = get_component<Bit_Model, Model*>(components, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)data;
     
     // Transition between states if applicable
     stateUpdateCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
     // Process the current state
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
-    handle_player_hits(collider, health_state);
+    handle_player_hits(collider, health);
 
     VEC3_COPY(g_Camera.target, *pos);
 
@@ -290,7 +315,7 @@ void playerCallback(void **components, void *data)
         g_Camera.distance += 50.0f;
     }
 
-    if (g_PlayerInput.buttonsPressed & L_TRIG)
+    if (g_PlayerInput.buttonsPressed & R_TRIG)
     {
         (*pos)[0] = 2229.0f;
         (*pos)[1] = 512.0f;
@@ -303,6 +328,65 @@ void playerCallback(void **components, void *data)
             state->controlled_state,
             &g_PlayerInput,
             components);
+    }
+
+    if (to_control != nullptr)
+    {
+        if (pointer_entity == nullptr)
+        {
+            pointer_entity = createEntity(POINTER_ARCHETYPE);
+        }
+        void* pointer_components[NUM_COMPONENTS(POINTER_ARCHETYPE) + 1];
+        getEntityComponents(pointer_entity, pointer_components);
+        Vec3& pointer_pos = *get_component<Bit_Position, Vec3>(pointer_components, POINTER_ARCHETYPE);
+        Vec3s& pointer_rot = *get_component<Bit_Rotation, Vec3s>(pointer_components, POINTER_ARCHETYPE);
+        Model** pointer_model_out = get_component<Bit_Model, Model*>(pointer_components, POINTER_ARCHETYPE);
+
+        VEC3_COPY(pointer_pos, control_pos);
+        pointer_rot[0] = 0;
+        pointer_rot[1] += 0x100;
+        pointer_rot[2] = 0;
+        *pointer_model_out = pointer_model;
+        if (g_PlayerInput.buttonsPressed & L_TRIG)
+        {
+            BaseEnemyState* new_controlled_state = (BaseEnemyState*)&to_control_behavior->data;
+            
+            state->controlled_handler->on_leave(
+                state->controlled_state,
+                &g_PlayerInput,
+                components);
+
+            player_control_state.fill(0);
+            state->controlled_state->definition = new_controlled_state->definition;
+            state->controlled_handler = control_handlers[(int)new_controlled_state->definition->base.enemy_type];
+
+            // Set the player's body and max health
+            init_enemy_common(&state->controlled_state->definition->base, model, health);
+            health->max_health = static_cast<int>(player_health_buff * health->max_health);
+            health->health += control_health;
+
+            if (health->health > health->max_health)
+            {
+                health->health = health->max_health;
+            }
+            
+            state->controlled_handler->on_enter(
+                state->controlled_state,
+                &g_PlayerInput,
+                components);
+
+            VEC3_COPY(*pos, control_pos);
+
+            queue_entity_deletion(to_control);
+        }
+    }
+    else
+    {
+        if (pointer_entity != nullptr)
+        {
+            queue_entity_deletion(pointer_entity);
+            pointer_entity = nullptr;
+        }
     }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);

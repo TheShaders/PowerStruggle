@@ -4,7 +4,7 @@
 #include <types.h>
 
 struct ControlParams {
-    uint8_t placeholder;
+    uint16_t controllable_health; // Max health at which this entity can be taken control of
 };
 
 using control_func_t = void(BaseEnemyState* state, InputData* input, void** player_components);
@@ -16,5 +16,8 @@ struct ControlHandler {
 };
 
 extern ControlHandler* control_handlers[];
+
+Entity* get_controllable_entity_at_position(Vec3 pos, float radius, Vec3 foundPos, float& found_dist);
+void control_update();
 
 #endif

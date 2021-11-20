@@ -1,0 +1,144 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.16",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "N64_materials_gltf64",
+        "N64_texture_inputs"
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Pointer"
+        }
+    ],
+    "materials" : [
+        {
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "ENVIRONMENT",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "ENVIRONMENT",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "envColor" : [
+                        0.1215687170624733,
+                        0.7223736643791199,
+                        0,
+                        1
+                    ],
+                    "drawLayer" : "Opaque"
+                }
+            },
+            "name" : "PointerMaterial",
+            "pbrMetallicRoughness" : {
+                "extensions" : {},
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Cube.003",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 18,
+            "max" : [
+                0.3499999940395355,
+                2.8499999046325684,
+                0.125
+            ],
+            "min" : [
+                -0.3499999940395355,
+                2.25,
+                -0.125
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 18,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 18,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 24,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 216,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 216,
+            "byteOffset" : 216
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 144,
+            "byteOffset" : 432
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 576
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 624,
+            "uri" : "Pointer.bin"
+        }
+    ]
+}

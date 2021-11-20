@@ -3,16 +3,23 @@
 
 #include <ecs.h>
 
-#define ARCHETYPE_SHOOTER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health)
-#define ARCHETYPE_SLASHER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health)
+enum class EnemyType : uint8_t {
+    Shooter,
+    Slasher
+};
+
+#define ARCHETYPE_SHOOTER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health | Bit_Control)
+#define ARCHETYPE_SLASHER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health | Bit_Control)
 
 // The basic info that every enemy definition has
 struct BaseEnemyInfo {
     const char* model_name;
     Model* model;
     uint16_t max_health;
+    uint16_t controllable_health;
     // Speed the enemy will move at
     float move_speed;
+    EnemyType enemy_type;
 };
 
 // The base definition that all enemy definitions inherit from
@@ -22,11 +29,6 @@ struct BaseEnemyDefinition {
 
 struct BaseEnemyState {
     BaseEnemyDefinition* definition;
-};
-
-enum class EnemyType {
-    Shooter,
-    Slasher
 };
 
 // Check if the target is in the sight radius and if so moves towards being the given distance from it

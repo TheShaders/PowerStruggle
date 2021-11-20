@@ -11,6 +11,7 @@
 #include <input.h>
 #include <collision.h>
 #include <behaviors.h>
+#include <control.h>
 
 extern "C" {
 #include <debug.h>
@@ -162,6 +163,7 @@ void GameplayScene::update()
         // debug_printf("before physics tick\n");
         physicsTick(grid_);
         find_collisions(grid_);
+        control_update();
         // Process all entities that have a behavior
         // debug_printf("before behaviors\n");
         iterateBehaviorEntities();

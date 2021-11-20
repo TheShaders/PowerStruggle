@@ -17,7 +17,9 @@ ShooterDefinition shooter_definitions[] = {
             "models/Box", // model_name
             nullptr,      // model
             100,          // max_health
+            25,           // controllable_health
             5.0f,         // move_speed
+            EnemyType::Shooter, // enemy_type
         },
         { // params
             "models/Sphere", // shot_model_name
@@ -122,6 +124,7 @@ Entity* create_shooter(float x, float y, float z, int subtype)
     GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(components, ARCHETYPE_SHOOTER);
     AnimState *animState = get_component<Bit_AnimState, AnimState>(components, ARCHETYPE_SHOOTER);
     HealthState *health = get_component<Bit_Health, HealthState>(components, ARCHETYPE_SHOOTER);
+    ControlParams *control_params = get_component<Bit_Control, ControlParams>(components, ARCHETYPE_SHOOTER);
 
     // Set up gravity
     gravity->accel = -PLAYER_GRAVITY;
@@ -133,6 +136,8 @@ Entity* create_shooter(float x, float y, float z, int subtype)
     collider->friction_damping = 1.0f;
     collider->floor_surface_type = surface_none;
     collider->mask = enemy_hitbox_mask;
+
+    control_params->controllable_health = definition.base.controllable_health;
     
     animState->anim = nullptr;
 
