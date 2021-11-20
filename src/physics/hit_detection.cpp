@@ -194,7 +194,7 @@ int circle_rectangle_intersection(Vec3 rect_pos, float rect_size_x, float rect_s
     return (delta_x * delta_x + delta_z * delta_z) < (circle_radius * circle_radius);
 }
 
-FORCEINLINE void test_collider(
+void test_collider(
     UNUSED Entity* entity, ColliderParams* collider, Vec3 pos,
     int min_array_x, int min_array_z, int max_array_x, int max_array_z,
     skipfield<Entity*, max_hitbox_entities_checked>& checked_entities)

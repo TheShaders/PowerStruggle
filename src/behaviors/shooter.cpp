@@ -12,7 +12,7 @@
 #define ARCHETYPE_SHOOTER_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity)
 
 ShooterDefinition shooter_definitions[] = {
-    { // 0
+    { // Grease-E
         { // base
             "models/Box", // model_name
             nullptr,      // model
@@ -20,8 +20,8 @@ ShooterDefinition shooter_definitions[] = {
             5.0f,         // move_speed
         },
         { // params
-            "models/Sphere",
-            nullptr,
+            "models/Sphere", // shot_model_name
+            nullptr, // shot_model
             1536.0f, // sight_radius
             512.0f,  // follow_distance
             15.0f,   // shot_speed

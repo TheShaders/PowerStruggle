@@ -1,5 +1,7 @@
 #include <ultra64.h>
 
+#include <cmath>
+
 #include <grid.h>
 #include <cstring>
 #include <files.h>
@@ -574,6 +576,141 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
 
     // debug_printf("-> found_y: %d\n", found_y);
     return found_y;
+}
+
+int Grid::get_wall_collisions(Vec3 hits[4], float dists[4], float x, float z, float radius, float min_y, float max_y)
+{
+    int num_hits = 0;
+    float rad_sq = radius * radius;
+
+    // debug_printf("get_height([%5.2f, %5.2f], %5.2f, [%5.2f, %5.2f])\n", x, z, radius, min_y, max_y);
+    // debug_printf("-> pos (%d, %d)\n", x_int, z_int);
+
+    // This would be 1 more, but we need to find slopes too which can take up the entire tile they're in
+    int min_pos_y = round_down_divide<tile_size>(lfloor(min_y));
+    int max_pos_y = round_down_divide<tile_size>(lceil(max_y));
+
+    // debug_printf("  y tile bounds: [%d, %d]\n", min_pos_y, max_pos_y);
+
+    if (min_pos_y > max_pos_y) return 0; // If no tile boundaries are crossed, there's nothing that can be found
+
+    // Get the positional bounds of the query
+    int min_x = lfloor(x - radius);
+    int max_x = lceil(x + radius);
+    int min_z = lfloor(z - radius);
+    int max_z = lceil(z + radius);
+
+    // Get the tile bounds of the query
+    int min_pos_x = round_down_divide<tile_size>(min_x);
+    int max_pos_x = round_down_divide<tile_size>(max_x);
+    int min_pos_z = round_down_divide<tile_size>(min_z);
+    int max_pos_z = round_down_divide<tile_size>(max_z);
+
+    // Get the chunk bounds of the query
+    int min_chunk_x = round_down_divide<chunk_size>(min_pos_x);
+    int max_chunk_x = round_down_divide<chunk_size>(max_pos_x);
+    int min_chunk_z = round_down_divide<chunk_size>(min_pos_z);
+    int max_chunk_z = round_down_divide<chunk_size>(max_pos_z);
+
+    // Convert the tile bounds to exclusive upper bounds
+    max_pos_x += 1;
+    max_pos_y += 1;
+    max_pos_z += 1;
+
+    // debug_printf("  Looking for tiles in region [%d, %d], (%d, %d)\n", min_pos_x, min_pos_z, max_pos_x, max_pos_z);
+    
+    // Iterate over every loaded chunk to see which ones exist that contain tiles in the query
+    for (const auto& chunk_entry : loaded_chunks_)
+    {
+        // Get the position of this chunk
+        int chunk_x = chunk_entry.pos.first;
+        int chunk_z = chunk_entry.pos.second;
+        // Check if the current chunk is within the calculated chunk bounds
+        if (between_inclusive(min_chunk_x, max_chunk_x, chunk_x) && between_inclusive(min_chunk_z, max_chunk_z, chunk_z))
+        {
+            // debug_printf("    Chunk %d, %d intersects with the region\n", chunk_x, chunk_z);
+            // Get the tile bounds of this chunk
+            int cur_chunk_min_x = chunk_x * chunk_size;
+            int cur_chunk_max_x = cur_chunk_min_x + chunk_size;
+            int cur_chunk_min_z = chunk_z * chunk_size;
+            int cur_chunk_max_z = cur_chunk_min_z + chunk_size;
+
+            // Get the tile bounds of the intersection of the chunk and the query
+            int cur_check_min_x = std::max(cur_chunk_min_x, min_pos_x);
+            int cur_check_max_x = std::min(cur_chunk_max_x, max_pos_x);
+            int cur_check_min_z = std::max(cur_chunk_min_z, min_pos_z);
+            int cur_check_max_z = std::min(cur_chunk_max_z, max_pos_z);
+
+            // Convert the bounds to local coordinates in the chunk
+            int cur_local_min_x = cur_check_min_x - cur_chunk_min_x;
+            int cur_local_max_x = cur_check_max_x - cur_chunk_min_x;
+            int cur_local_min_z = cur_check_min_z - cur_chunk_min_z;
+            int cur_local_max_z = cur_check_max_z - cur_chunk_min_z;
+
+            // debug_printf("    Checking local tile region [%d, %d], (%d %d)\n", cur_local_min_x, cur_local_min_z, cur_local_max_x, cur_local_max_z);
+
+            const auto& chunk_columns = chunk_entry.chunk->columns;
+
+            // Check the columns in the current chunk to see if they contain any floors in the given bounds
+            for (int local_tile_x = cur_local_min_x; local_tile_x < cur_local_max_x; local_tile_x++)
+            {
+                for (int local_tile_z = cur_local_min_z; local_tile_z < cur_local_max_z; local_tile_z++)
+                {
+                    const auto& cur_column = chunk_columns[local_tile_x][local_tile_z];
+
+                    // Get the start and end tiles to search through in this column
+                    int min_tile_index = std::max(0, min_pos_y - cur_column.base_height);
+                    int num_tiles = std::min(cur_column.num_tiles - min_tile_index, max_pos_y + 1 - cur_column.base_height);
+
+                    int tile_x = (local_tile_x + cur_chunk_min_x) * static_cast<int>(tile_size);
+                    int tile_z = (local_tile_z + cur_chunk_min_z) * static_cast<int>(tile_size);
+
+                    // debug_printf("      Checking tiles %d through %d in column [%d, %d]\n", min_tile_index, num_tiles, local_tile_x, local_tile_z);
+                    // debug_printf("      -> local (%d, %d)\n", local_x, local_z);
+
+                    for (int tile_index = min_tile_index + num_tiles - 1; tile_index >= min_tile_index; tile_index--)
+                    {
+                        int tile_id = cur_column.tiles[tile_index].id;
+                        if (tile_id != -1)
+                        {
+                            TileCollision tile_collision = tile_types_[tile_id].flags;
+                            if (tile_collision == TileCollision::wall)
+                            {
+                                int tile_y = tile_index + cur_column.base_height;
+                                float tile_y_world = tile_y * static_cast<int>(tile_size);
+                                if (tile_y_world >= min_y && tile_y_world < max_y)
+                                {
+                                    float closest_x = std::max(static_cast<float>(tile_x), std::min(x, static_cast<float>(tile_x + static_cast<int>(tile_size))));
+                                    float closest_z = std::max(static_cast<float>(tile_z), std::min(z, static_cast<float>(tile_z + static_cast<int>(tile_size))));
+                                    float dx = closest_x - x;
+                                    float dz = closest_z - z;
+                                    float dist_sq = dx * dx + dz * dz;
+                                    if (dist_sq < rad_sq)
+                                    {
+                                        dists[num_hits] = sqrtf(dist_sq);
+                                        hits[num_hits][0] = closest_x;
+                                        hits[num_hits][1] = tile_y_world;
+                                        hits[num_hits][2] = closest_z;
+                                        num_hits++;
+                                        if (num_hits >= 4)
+                                        {
+                                            return num_hits;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // debug_printf("    Chunk %d, %d does not intersect with the region\n", chunk_x, chunk_z);
+        }
+    }
+
+    return num_hits;
 }
 
 chunk_pos Grid::get_minimum_loaded_chunk()

@@ -165,6 +165,7 @@ public:
     void process_loading_chunks();
     void load_objects();
     float get_height(float x, float z, float radius, float min_y, float max_y);
+    int get_wall_collisions(Vec3 hits[4], float dists[4], float x, float z, float radius, float y_min, float y_max);
     chunk_pos get_minimum_loaded_chunk();
 
     void draw(Camera *camera);

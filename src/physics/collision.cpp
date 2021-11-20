@@ -127,10 +127,36 @@ float rayVsAABB(Vec3 rayStart, Vec3 rayDirInv, AABB *box, float tmin, float tmax
 
 void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 {
-    if (std::abs(vel[0]) >= VEL_THRESHOLD || std::abs(vel[2]) >= VEL_THRESHOLD || collider->floor_surface_type == surface_none)
+    // if (std::abs(vel[0]) >= VEL_THRESHOLD || std::abs(vel[2]) >= VEL_THRESHOLD || collider->floor_surface_type == surface_none)
     {
         float radius = collider->radius;
-        // TODO search the grid for wall cells
+        Vec3 wall_hits[4];
+        float wall_dists[4];
+        int num_hits = grid->get_wall_collisions(wall_hits, wall_dists, pos[0], pos[2], radius, pos[1], pos[1] + collider->height);
+
+        for (int i = 0; i < num_hits; i++)
+        {
+            float dx = wall_hits[i][0] - pos[0];
+            float dz = wall_hits[i][2] - pos[2];
+            if (wall_dists[i] > EPSILON)
+            {
+                float nx = dx * (1.0f / wall_dists[i]);
+                float nz = dz * (1.0f / wall_dists[i]);
+
+                float vel_dot_norm = nx * vel[0] + nz * vel[2];
+                vel[0] -= vel_dot_norm * nx;
+                vel[2] -= vel_dot_norm * nz;
+
+                float push_dist = radius - wall_dists[i];
+                pos[0] -= push_dist * nx;
+                pos[2] -= push_dist * nz;
+            }
+            else
+            {
+                vel[0] = 0;
+                vel[2] = 0;
+            }
+        }
     }
 }
 
