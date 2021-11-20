@@ -9,7 +9,7 @@
 #include <control.h>
 #include <input.h>
 
-#define ARCHETYPE_SLASHER_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
+#define ARCHETYPE_SLASH_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
 SlasherDefinition slasher_definitions[] = {
     { // 0
@@ -19,7 +19,7 @@ SlasherDefinition slasher_definitions[] = {
             100,          // max_health
             25,           // controllable_health
             7.0f,         // move_speed
-            EnemyType::Slasher, // enemy_type
+            EnemyType::Slash, // enemy_type
         },
         { // params
             1536.0f, // sight_radius
@@ -39,11 +39,11 @@ Model* slash_weapon_model = nullptr;
 int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first)
 {
     Entity* slash_hitbox = state->slash_hitbox;
-    void* slash_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER_HITBOX)];
+    void* slash_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH_HITBOX)];
     getEntityComponents(slash_hitbox, slash_components);
 
-    Vec3& slash_pos = *get_component<Bit_Position, Vec3>(slash_components, ARCHETYPE_SLASHER_HITBOX);
-    Vec3s& slash_rot = *get_component<Bit_Rotation, Vec3s>(slash_components, ARCHETYPE_SLASHER_HITBOX);
+    Vec3& slash_pos = *get_component<Bit_Position, Vec3>(slash_components, ARCHETYPE_SLASH_HITBOX);
+    Vec3s& slash_rot = *get_component<Bit_Rotation, Vec3s>(slash_components, ARCHETYPE_SLASH_HITBOX);
 
     // If this is not the first frame of the slash, advance its angle by the amount in the params
     if (!first)
@@ -69,9 +69,9 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
 void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherState* state, void** hitbox_components, unsigned int hitbox_mask)
 {
     Entity* hitbox_entity = get_entity(hitbox_components);
-    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
-    Model** model = get_component<Bit_Model, Model*>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
-    Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(hitbox_components, ARCHETYPE_SLASHER_HITBOX);
+    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(hitbox_components, ARCHETYPE_SLASH_HITBOX);
+    Model** model = get_component<Bit_Model, Model*>(hitbox_components, ARCHETYPE_SLASH_HITBOX);
+    Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(hitbox_components, ARCHETYPE_SLASH_HITBOX);
 
     SlasherDefinition* definition = static_cast<SlasherDefinition*>(state->definition);
     SlasherParams* params = &definition->params;
@@ -98,11 +98,11 @@ void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
 void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     Entity* slasher_entity = (Entity*)arg;
-    void* slasher_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER)];
+    void* slasher_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH)];
     getEntityComponents(slasher_entity, slasher_components);
-    Vec3& slasher_pos = *get_component<Bit_Position, Vec3>(slasher_components, ARCHETYPE_SLASHER);
-    Vec3s& slasher_rot = *get_component<Bit_Rotation, Vec3s>(slasher_components, ARCHETYPE_SLASHER);
-    BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASHER);
+    Vec3& slasher_pos = *get_component<Bit_Position, Vec3>(slasher_components, ARCHETYPE_SLASH);
+    Vec3s& slasher_rot = *get_component<Bit_Rotation, Vec3s>(slasher_components, ARCHETYPE_SLASH);
+    BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASH);
 
     SlasherState* state = reinterpret_cast<SlasherState*>(slasher_bhv.data.data());
 
@@ -113,11 +113,11 @@ void slasher_callback(void **components, void *data)
 {
     // Entity* entity = get_entity(components);
     Entity* slasher = get_entity(components);
-    Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SLASHER);
-    Vec3& vel = *get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_SLASHER);
-    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_SLASHER);
-    ColliderParams& collider = *get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SLASHER);
-    HealthState& health = *get_component<Bit_Health, HealthState>(components, ARCHETYPE_SLASHER);
+    Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SLASH);
+    Vec3& vel = *get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_SLASH);
+    Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(components, ARCHETYPE_SLASH);
+    ColliderParams& collider = *get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SLASH);
+    HealthState& health = *get_component<Bit_Health, HealthState>(components, ARCHETYPE_SLASH);
 
     SlasherState* state = reinterpret_cast<SlasherState*>(data);
     SlasherDefinition* definition = static_cast<SlasherDefinition*>(state->definition);
@@ -154,26 +154,26 @@ void slasher_callback(void **components, void *data)
     // Otherwise if the player is close enough to be hit, start a slash
     else if (player_dist < (float)(int)params->slash_length + PLAYER_RADIUS)
     {
-        queue_entity_creation(ARCHETYPE_SLASHER_HITBOX, slasher, 1, create_slasher_hitbox_callback);
+        queue_entity_creation(ARCHETYPE_SLASH_HITBOX, slasher, 1, create_slasher_hitbox_callback);
     }
 }
 
 Entity* create_slasher(float x, float y, float z, int subtype)
 {
-    Entity* slasher = createEntity(ARCHETYPE_SLASHER);
+    Entity* slasher = createEntity(ARCHETYPE_SLASH);
     SlasherDefinition& definition = slasher_definitions[subtype];
 
-    void* components[1 + NUM_COMPONENTS(ARCHETYPE_SLASHER)];
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH)];
     getEntityComponents(slasher, components);
 
-    Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SLASHER);
-    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_SLASHER);
-    Model** model = get_component<Bit_Model, Model*>(components, ARCHETYPE_SLASHER);
-    ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SLASHER);
-    GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(components, ARCHETYPE_SLASHER);
-    AnimState *animState = get_component<Bit_AnimState, AnimState>(components, ARCHETYPE_SLASHER);
-    HealthState *health = get_component<Bit_Health, HealthState>(components, ARCHETYPE_SLASHER);
-    ControlParams *control_params = get_component<Bit_Control, ControlParams>(components, ARCHETYPE_SLASHER);
+    Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_SLASH);
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_SLASH);
+    Model** model = get_component<Bit_Model, Model*>(components, ARCHETYPE_SLASH);
+    ColliderParams *collider = get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SLASH);
+    GravityParams *gravity = get_component<Bit_Gravity, GravityParams>(components, ARCHETYPE_SLASH);
+    AnimState *animState = get_component<Bit_AnimState, AnimState>(components, ARCHETYPE_SLASH);
+    HealthState *health = get_component<Bit_Health, HealthState>(components, ARCHETYPE_SLASH);
+    ControlParams *control_params = get_component<Bit_Control, ControlParams>(components, ARCHETYPE_SLASH);
 
     // Set up gravity
     gravity->accel = -PLAYER_GRAVITY;
@@ -258,7 +258,7 @@ void on_slasher_update(BaseEnemyState* base_state, InputData* input, void** play
     // Otherwise if the player is close enough to be hit, start a slash
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_SLASHER_HITBOX, player, 1, create_player_slash_hitbox_callback);
+        queue_entity_creation(ARCHETYPE_SLASH_HITBOX, player, 1, create_player_slash_hitbox_callback);
     }
 }
 
@@ -272,7 +272,7 @@ void on_slasher_leave(BaseEnemyState* base_state, InputData* input, void** playe
     (void)player_components;
 }
 
-ControlHandler slasher_control_handler {
+ControlHandler slash_control_handler {
     on_slasher_enter,
     on_slasher_update,
     on_slasher_leave

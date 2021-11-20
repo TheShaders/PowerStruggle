@@ -211,7 +211,7 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     state->controlled_state = reinterpret_cast<BaseEnemyState*>(player_control_state.data());
     player_control_state.fill(0);
     state->controlled_state->definition = &slasher_definitions[0];
-    state->controlled_handler = control_handlers[(int)EnemyType::Slasher];
+    state->controlled_handler = control_handlers[(int)EnemyType::Slash];
 
     // Set the player's body to the default (shooter 0)
     init_enemy_common(&state->controlled_state->definition->base, model, health);

@@ -27991,7 +27991,7 @@
       "Z": 2,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 0,
+        "ObjectType": 2,
         "ObjectSubtype": 0
       },
       "ObjectParam": 0
@@ -28002,7 +28002,7 @@
       "Z": -1,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 0,
+        "ObjectType": 2,
         "ObjectSubtype": 0
       },
       "ObjectParam": 0

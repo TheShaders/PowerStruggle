@@ -59,8 +59,9 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
 }
 
 std::array create_enemy_funcs {
-    create_shooter,
-    create_slasher
+    create_shoot,
+    create_slasher,
+    create_spinner,
 };
 
 Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype)
@@ -82,12 +83,14 @@ void init_enemy_common(BaseEnemyInfo* base_info, Model** model_out, HealthState*
     health_out->max_health = base_info->max_health;
 }
 
-extern ControlHandler shooter_control_handler;
-extern ControlHandler slasher_control_handler;
+extern ControlHandler shoot_control_handler;
+extern ControlHandler slash_control_handler;
+extern ControlHandler spinner_control_handler;
 
 ControlHandler* control_handlers[] = {
-    &shooter_control_handler,
-    &slasher_control_handler
+    &shoot_control_handler,
+    &slash_control_handler,
+    &spinner_control_handler
 };
 
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
