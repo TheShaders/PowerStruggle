@@ -44,6 +44,6 @@ struct ShootState : public BaseEnemyState {
 static_assert(sizeof(ShootState) <= sizeof(BehaviorState::data), "ShootState does not fit in behavior data!");
 
 // Creates a shooter of the given subtype
-Entity* create_shoot(float x, float y, float z, int subtype);
+Entity* create_shoot_enemy(float x, float y, float z, int subtype);
 
 #endif

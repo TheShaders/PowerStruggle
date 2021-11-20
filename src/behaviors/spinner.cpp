@@ -12,7 +12,7 @@
 #define ARCHETYPE_SPINNER_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
 SpinnerDefinition spinner_definitions[] = {
-    { // 0
+    { // Harv-E
         { // base
             "models/Box", // model_name
             nullptr,      // model
@@ -132,7 +132,7 @@ void spinner_callback(void **components, void *data)
     }
 }
 
-Entity* create_spinner(float x, float y, float z, int subtype)
+Entity* create_spinner_enemy(float x, float y, float z, int subtype)
 {
     Entity* spinner = createEntity(ARCHETYPE_SPINNER);
     SpinnerDefinition& definition = spinner_definitions[subtype];

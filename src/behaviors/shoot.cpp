@@ -109,7 +109,7 @@ void shooter_callback(void **components, void *data)
     handle_enemy_hits(shooter, collider, health);
 }
 
-Entity* create_shoot(float x, float y, float z, int subtype)
+Entity* create_shoot_enemy(float x, float y, float z, int subtype)
 {
     Entity* shooter = createEntity(ARCHETYPE_SHOOT);
     ShootDefinition& definition = shooter_definitions[subtype];

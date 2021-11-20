@@ -41,6 +41,6 @@ struct SpinnerState : public BaseEnemyState {
 static_assert(sizeof(SpinnerState) <= sizeof(BehaviorState::data), "SpinnerState does not fit in behavior data!");
 
 // Creates a spinner of the given subtype
-Entity* create_spinner(float x, float y, float z, int subtype);
+Entity* create_spinner_enemy(float x, float y, float z, int subtype);
 
 #endif

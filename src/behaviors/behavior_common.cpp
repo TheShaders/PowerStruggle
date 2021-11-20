@@ -58,10 +58,20 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
     return dist;
 }
 
+Entity* placeholder_create(float, float, float, int)
+{
+    *(volatile int*)0 = 0;
+    while (1);
+}
+
 std::array create_enemy_funcs {
-    create_shoot,
-    create_slasher,
-    create_spinner,
+    create_shoot_enemy,
+    create_slash_enemy,
+    create_spinner_enemy,
+    placeholder_create, // ram
+    placeholder_create, // bomb
+    placeholder_create, // beam
+    create_multishot_enemy,
 };
 
 Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype)
@@ -86,11 +96,19 @@ void init_enemy_common(BaseEnemyInfo* base_info, Model** model_out, HealthState*
 extern ControlHandler shoot_control_handler;
 extern ControlHandler slash_control_handler;
 extern ControlHandler spinner_control_handler;
+// ram
+// bomb
+// beam
+extern ControlHandler multishot_control_handler;
 
 ControlHandler* control_handlers[] = {
     &shoot_control_handler,
     &slash_control_handler,
-    &spinner_control_handler
+    &spinner_control_handler,
+    nullptr,
+    nullptr,
+    nullptr,
+    &multishot_control_handler,
 };
 
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)

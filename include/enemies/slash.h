@@ -40,7 +40,7 @@ struct SlasherState : public BaseEnemyState {
 static_assert(sizeof(SlasherState) <= sizeof(BehaviorState::data), "SlasherState does not fit in behavior data!");
 
 // Creates a slasher of the given slasher
-Entity* create_slasher(float x, float y, float z, int subtype);
+Entity* create_slash_enemy(float x, float y, float z, int subtype);
 // Helper function for a slasher's hitbox
 int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first = false);
 

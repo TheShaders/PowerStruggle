@@ -158,7 +158,7 @@ void slasher_callback(void **components, void *data)
     }
 }
 
-Entity* create_slasher(float x, float y, float z, int subtype)
+Entity* create_slash_enemy(float x, float y, float z, int subtype)
 {
     Entity* slasher = createEntity(ARCHETYPE_SLASH);
     SlasherDefinition& definition = slasher_definitions[subtype];
@@ -267,9 +267,15 @@ void on_slasher_leave(BaseEnemyState* base_state, InputData* input, void** playe
     SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_state->definition);
     SlasherState* state = static_cast<SlasherState*>(base_state);
     (void)definition;
-    (void)state;
     (void)input;
     (void)player_components;
+
+    // If a slash is currently happening, end it
+    if (state->slash_hitbox != nullptr)
+    {
+        queue_entity_deletion(state->slash_hitbox);
+        state->slash_hitbox = nullptr;
+    }
 }
 
 ControlHandler slash_control_handler {
