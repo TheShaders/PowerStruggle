@@ -256,7 +256,7 @@ void take_player_damage(HealthState* health_state, int damage)
 
 void handle_player_hits(ColliderParams* collider, HealthState* health_state)
 {
-    Hit* cur_hit = collider->hits;
+    ColliderHit* cur_hit = collider->hits;
     while (cur_hit != nullptr)
     {
         if (g_gameTimer - health_state->last_hit_time < player_iframes)

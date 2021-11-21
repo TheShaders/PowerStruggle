@@ -60,7 +60,7 @@ struct PlayerState;
 // Prototypes for various gameplay strucs
 struct HealthState;
 struct Hitbox;
-struct Hit;
+struct ColliderHit;
 struct BaseEnemyDefinition;
 struct BaseEnemyState;
 struct ControlParams;

@@ -57,8 +57,10 @@ struct HitboxNode
 std::array<std::array<HitboxNode*, max_tiles_x>, max_tiles_z> tile_hitboxes alignas(8);
 // Pool for hitbox nodes, used to group hitbox entities into lists by tile
 block_vector<HitboxNode> node_pool;
-// Pool for hits, used to create lists for every entity containing the hitboxes they intersect with
-block_vector<Hit> hit_pool;
+// Pool for collider hits, used to create lists containing every hitbox entity a given collider hit
+block_vector<ColliderHit> collider_hit_pool;
+// Pool for hitbox hits, used to create lists containing every collider entity a given hitbox hit
+block_vector<HitboxHit> hitbox_hit_pool;
 
 struct GatherHitboxesParams
 {
@@ -129,6 +131,8 @@ void gather_cylinder_hitboxes(size_t count, void *arg, void **componentArrays)
         int max_x = lceil((*cur_pos)[0] + cur_hitbox->radius);
         int max_z = lceil((*cur_pos)[2] + cur_hitbox->radius);
 
+        cur_hitbox->hits = nullptr;
+
         insert_hitbox_nodes(min_x, min_z, max_x, max_z, start_tile_x, start_tile_z, cur_hitbox, *cur_entity, cur_pos, nullptr);
 
         count--;
@@ -161,6 +165,8 @@ void gather_rectangle_hitboxes(size_t count, void *arg, void **componentArrays)
         int min_z = lfloor((*cur_pos)[2] - radius);
         int max_x = lceil((*cur_pos)[0] + radius);
         int max_z = lceil((*cur_pos)[2] + radius);
+
+        cur_hitbox->hits = nullptr;
 
         insert_hitbox_nodes(min_x, min_z, max_x, max_z, start_tile_x, start_tile_z, cur_hitbox, *cur_entity, cur_pos, cur_rot);
 
@@ -195,11 +201,11 @@ int circle_rectangle_intersection(Vec3 rect_pos, float rect_size_x, float rect_s
 }
 
 void test_collider(
-    UNUSED Entity* entity, ColliderParams* collider, Vec3 pos,
+    Entity* entity, ColliderParams* collider, Vec3 pos,
     int min_array_x, int min_array_z, int max_array_x, int max_array_z,
     skipfield<Entity*, max_hitbox_entities_checked>& checked_entities)
 {
-    Hit* cur_hit = nullptr;
+    ColliderHit* cur_hit = nullptr;
     // debug_printf("Testing collider entity %08X at {%4.0f %4.0f %4.0f}\n", pos[0], pos[1], pos[2]);
     // Iterate over the tile extents and insert a new node into each tile pointing to the current hitbox
     for (int x = min_array_x; x <= max_array_x; x++)
@@ -243,7 +249,8 @@ void test_collider(
                                 {
                                     // The collider intersects with the hitbox
                                     // Allocate a new hit node and swap the current one with it
-                                    cur_hit = &(*hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hitbox->hits = &(*hitbox_hit_pool.emplace_back(cur_hitbox->hits, entity));
                                     // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
                                 }
                             }
@@ -256,7 +263,8 @@ void test_collider(
                                 {
                                     // The collider intersects with the hitbox
                                     // Allocate a new hit node and swap the current one with it
-                                    cur_hit = &(*hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hitbox->hits = &(*hitbox_hit_pool.emplace_back(cur_hitbox->hits, entity));
                                     // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
                                 }
                             }
@@ -347,7 +355,8 @@ void find_collisions(Grid& grid)
     // Initialize the node and hit pools
     // This will free the previous frame's pools' memory via move assignment
     node_pool = {};
-    hit_pool = {};
+    collider_hit_pool = {};
+    hitbox_hit_pool = {};
     GatherHitboxesParams params {
         start_tile_x,
         start_tile_z

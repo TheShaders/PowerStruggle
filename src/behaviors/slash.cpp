@@ -36,14 +36,56 @@ SlasherDefinition slasher_definitions[] = {
 
 Model* slash_weapon_model = nullptr;
 
-int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first)
+void apply_recoil(const Vec3& slasher_pos, Vec3& slasher_vel, Entity* slash_hit)
 {
-    Entity* slash_hitbox = state->slash_hitbox;
+    archetype_t hit_archetype = slash_hit->archetype;
+    // Get the hit entity's components
+    dynamic_array<void*> hit_components(NUM_COMPONENTS(hit_archetype) + 1);
+    getEntityComponents(slash_hit, hit_components.data());
+    Vec3& hit_pos = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
+
+    // Get the normal vector between the slasher and the hit
+    float dx = hit_pos[0] - slasher_pos[0];
+    float dz = hit_pos[2] - slasher_pos[2];
+    float magnitude = sqrtf(dx * dx + dz * dz);
+    float nx = dx * (1.0f / magnitude);
+    float nz = dz * (1.0f / magnitude);
+
+    slasher_vel[0] -= 16.0f * nx;
+    slasher_vel[2] -= 16.0f * nz;
+
+    // If the hit entity has a velocity, apply recoil to it too
+    if (slash_hit->archetype & Bit_Velocity)
+    {
+        Vec3& hit_vel = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
+
+        hit_vel[0] += 16.0f * nx;
+        hit_vel[2] += 16.0f * nz;
+    }
+}
+
+int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3& slasher_vel, SlasherParams* params, SlasherState* state, int first = false)
+{
+    Entity* slash_entity = state->slash_hitbox;
     void* slash_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH_HITBOX)];
-    getEntityComponents(slash_hitbox, slash_components);
+    getEntityComponents(slash_entity, slash_components);
 
     Vec3& slash_pos = *get_component<Bit_Position, Vec3>(slash_components, ARCHETYPE_SLASH_HITBOX);
     Vec3s& slash_rot = *get_component<Bit_Rotation, Vec3s>(slash_components, ARCHETYPE_SLASH_HITBOX);
+    Hitbox& slash_hitbox = *get_component<Bit_Hitbox, Hitbox>(slash_components, ARCHETYPE_SLASH_HITBOX);
+
+    if (state->recoil_timer == 0)
+    {
+        if (slash_hitbox.hits != nullptr)
+        {
+            apply_recoil(slasher_pos, slasher_vel, slash_hitbox.hits->hit);
+            state->recoil_timer = 15;
+        }
+    }
+    else
+    {
+        state->recoil_timer--;
+    }
 
     // If this is not the first frame of the slash, advance its angle by the amount in the params
     if (!first)
@@ -66,7 +108,7 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
     return false;
 }
 
-void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherState* state, void** hitbox_components, unsigned int hitbox_mask)
+void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3& slasher_vel, SlasherState* state, void** hitbox_components, unsigned int hitbox_mask)
 {
     Entity* hitbox_entity = get_entity(hitbox_components);
     Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(hitbox_components, ARCHETYPE_SLASH_HITBOX);
@@ -92,7 +134,7 @@ void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Slash
     rot[0] = 0;
     rot[2] = 0;
 
-    update_slash_hitbox(slasher_pos, slasher_rot, params, state, true);
+    update_slash_hitbox(slasher_pos, slasher_rot, slasher_vel, params, state, true);
 }
 
 void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
@@ -101,12 +143,13 @@ void create_slasher_hitbox_callback(UNUSED size_t count, void *arg, void **compo
     void* slasher_components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH)];
     getEntityComponents(slasher_entity, slasher_components);
     Vec3& slasher_pos = *get_component<Bit_Position, Vec3>(slasher_components, ARCHETYPE_SLASH);
+    Vec3& slasher_vel = *get_component<Bit_Velocity, Vec3>(slasher_components, ARCHETYPE_SLASH);
     Vec3s& slasher_rot = *get_component<Bit_Rotation, Vec3s>(slasher_components, ARCHETYPE_SLASH);
     BehaviorState& slasher_bhv = *get_component<Bit_Behavior, BehaviorState>(slasher_components, ARCHETYPE_SLASH);
 
     SlasherState* state = reinterpret_cast<SlasherState*>(slasher_bhv.data.data());
 
-    setup_slash_hitbox(slasher_pos, slasher_rot, state, componentArrays, player_hitbox_mask);
+    setup_slash_hitbox(slasher_pos, slasher_rot, slasher_vel, state, componentArrays, player_hitbox_mask);
 }
 
 void slasher_callback(void **components, void *data)
@@ -145,7 +188,7 @@ void slasher_callback(void **components, void *data)
     else if (state->slash_hitbox != nullptr)
     {
         // If the slash is over, queue the hitbox's deletion
-        if (update_slash_hitbox(pos, rot, params, state))
+        if (update_slash_hitbox(pos, rot, vel, params, state))
         {
             queue_entity_deletion(state->slash_hitbox);
             state->slash_hitbox = nullptr;
@@ -207,7 +250,7 @@ Entity* create_slash_enemy(float x, float y, float z, int subtype)
 
 void delete_slash_enemy(Entity *slash_enemy)
 {
-    
+
 }
 
 void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
@@ -216,13 +259,14 @@ void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **
     void* player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3& player_vel = *get_component<Bit_Velocity, Vec3>(player_components, ARCHETYPE_PLAYER);
     Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
     BehaviorState& player_bhv = *get_component<Bit_Behavior, BehaviorState>(player_components, ARCHETYPE_PLAYER);
 
     PlayerState* state = reinterpret_cast<PlayerState*>(player_bhv.data.data());
     SlasherState* slasher_state = static_cast<SlasherState*>(state->controlled_state);
 
-    setup_slash_hitbox(player_pos, player_rot, slasher_state, componentArrays, enemy_hitbox_mask);
+    setup_slash_hitbox(player_pos, player_rot, player_vel, slasher_state, componentArrays, enemy_hitbox_mask);
 }
 
 void on_slasher_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
@@ -248,13 +292,14 @@ void on_slasher_update(BaseEnemyState* base_state, InputData* input, void** play
     Entity* player = get_entity(player_components);
 
     Vec3& pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3& vel = *get_component<Bit_Velocity, Vec3>(player_components, ARCHETYPE_PLAYER);
     Vec3s& rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
     
     // If a slash is currently happening, continue it
     if (state->slash_hitbox != nullptr)
     {
         // If the slash is over, queue the hitbox's deletion
-        if (update_slash_hitbox(pos, rot, params, state))
+        if (update_slash_hitbox(pos, rot, vel, params, state))
         {
             queue_entity_deletion(state->slash_hitbox);
             state->slash_hitbox = nullptr;

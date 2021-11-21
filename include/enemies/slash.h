@@ -34,6 +34,7 @@ extern SlasherDefinition slasher_definitions[];
 struct SlasherState : public BaseEnemyState {
     Entity* slash_hitbox;
     uint16_t cur_slash_angle;
+    uint16_t recoil_timer;
 };
 
 // Ensure that the slasher state first in behavior data
@@ -42,7 +43,6 @@ static_assert(sizeof(SlasherState) <= sizeof(BehaviorState::data), "SlasherState
 // Creates a slasher of the given slasher
 Entity* create_slash_enemy(float x, float y, float z, int subtype);
 // Helper function for a slasher's hitbox
-int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first = false);
 
 void delete_slash_enemy(Entity *slash_enemy);
 

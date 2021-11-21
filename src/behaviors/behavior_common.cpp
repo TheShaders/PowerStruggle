@@ -136,7 +136,7 @@ int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 
 int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
 {
-    Hit* cur_hit = collider.hits;
+    ColliderHit* cur_hit = collider.hits;
     while (cur_hit != nullptr)
     {
         if (g_gameTimer - health_state.last_hit_time < 10)

@@ -164,6 +164,8 @@ void addMtxToDrawLayer(DrawLayer drawLayer, Mtx* mtx)
     removeDrawLayerSlot(drawLayer);
 }
 
+Gfx* cur_layer_materials[gfx::draw_layers];
+
 void resetGfxFrame(void)
 {
     // Set up the master displaylist head
@@ -181,6 +183,9 @@ void resetGfxFrame(void)
 
     // Clear the modelview matrix
     gfx::load_identity();
+
+    // Reset the current materials for each layer
+    std::fill_n(cur_layer_materials, gfx::draw_layers, nullptr);
 }
 
 void sendGfxTask(void)
@@ -349,7 +354,6 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
     // Gfx *callbackReturn;
     std::unique_ptr<MtxF[]> jointMatrices;
     u32 numFrames = 0;
-    int cur_material = -1;
 
     if (toDraw == nullptr) return;
 
@@ -502,11 +506,12 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             for (size_t draw_idx = 0; draw_idx < curJointLayer->num_draws; draw_idx++)
             {
                 auto& cur_draw = curJointLayer->draws[draw_idx];
+                Gfx* cur_material_dl = toDraw->materials[cur_draw.material_index]->gfx;
                 // Check if we've changed materials; if so load the new material
-                if (cur_draw.material_index != cur_material)
+                if (cur_material_dl != cur_layer_materials[cur_layer])
                 {
-                    cur_material = cur_draw.material_index;
-                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), toDraw->materials[cur_material]->gfx);
+                    cur_layer_materials[cur_layer] = cur_material_dl;
+                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_material_dl);
                 }
                 // Check if this draw has any groups and skip it if it doesn't
                 if (cur_draw.num_groups != 0)
