@@ -205,6 +205,11 @@ Entity* create_slash_enemy(float x, float y, float z, int subtype)
     return slasher;
 }
 
+void delete_slash_enemy(Entity *slash_enemy)
+{
+    
+}
+
 void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     Entity* player = (Entity*)arg;

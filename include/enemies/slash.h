@@ -44,4 +44,6 @@ Entity* create_slash_enemy(float x, float y, float z, int subtype);
 // Helper function for a slasher's hitbox
 int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, SlasherParams* params, SlasherState* state, int first = false);
 
+void delete_slash_enemy(Entity *slash_enemy);
+
 #endif

@@ -74,6 +74,18 @@ std::array create_enemy_funcs {
     create_multishot_enemy,
 };
 
+using delete_enemy_func_t = void(Entity*);
+
+std::array<delete_enemy_func_t*, create_enemy_funcs.size()> delete_enemy_funcs {
+    nullptr, // shoot
+    delete_slash_enemy,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr
+};
+
 Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype)
 {
     return create_enemy_funcs[static_cast<int>(type)](x, y, z, subtype);

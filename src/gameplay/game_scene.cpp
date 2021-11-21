@@ -186,6 +186,7 @@ void GameplayScene::draw()
 
         drawAllEntities();
         drawAllEntitiesHealth();
+        drawAllHitboxes();
     }
 }
 

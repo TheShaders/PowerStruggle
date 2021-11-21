@@ -964,3 +964,103 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
         cur_position++;
     }
 }
+
+Model* cylinder_hitbox_model;
+Model* rectangle_hitbox_model;
+
+Gfx set_blue_env[] = {
+    gsDPSetEnvColor(0x00, 0x00, 0xFF, 0x7F),
+    gsSPEndDisplayList(),
+};
+
+Gfx set_red_env[] = {
+    gsDPSetEnvColor(0xFF, 0x00, 0x00, 0x7F),
+    gsSPEndDisplayList(),
+};
+
+Gfx set_purple_env[] = {
+    gsDPSetEnvColor(0xFF, 0x00, 0xFF, 0x7F),
+    gsSPEndDisplayList(),
+};
+
+void draw_cylinder_hitboxes_callback(size_t count, UNUSED void *arg, void **componentArrays)
+{
+    Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CYLINDER_HITBOX);
+    Hitbox* cur_hitbox = get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_CYLINDER_HITBOX);
+    for (size_t i = 0; i < count; i++)
+    {
+        gfx::push_mat();
+        gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1], (*cur_pos)[2]);
+        gfx::apply_scale_affine(cur_hitbox->radius * 0.011f, cur_hitbox->size_y * 0.011f, cur_hitbox->radius * 0.011f);
+
+        if (cur_hitbox->mask & enemy_hitbox_mask)
+        {
+            if (cur_hitbox->mask & player_hitbox_mask)
+            {
+                addGfxToDrawLayer(DrawLayer::xlu_surf, set_purple_env);
+            }
+            else
+            {
+                addGfxToDrawLayer(DrawLayer::xlu_surf, set_blue_env);
+            }
+        }
+        else if (cur_hitbox->mask & player_hitbox_mask)
+        {
+            addGfxToDrawLayer(DrawLayer::xlu_surf, set_red_env);
+        }
+
+        drawModel(cylinder_hitbox_model, nullptr, 0);
+
+        cur_pos++;
+        cur_hitbox++;
+        gfx::pop_mat();
+    }
+}
+
+void draw_rectangle_hitboxes_callback(size_t count, UNUSED void *arg, void **componentArrays)
+{
+    Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_RECTANGLE_HITBOX);
+    Vec3s* cur_rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_RECTANGLE_HITBOX);
+    Hitbox* cur_hitbox = get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_RECTANGLE_HITBOX);
+    for (size_t i = 0; i < count; i++)
+    {
+        gfx::push_mat();
+        gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1], (*cur_pos)[2]);
+        gfx::rotate_euler_xyz(0, (*cur_rot)[1], 0);
+        gfx::apply_scale_affine(cur_hitbox->radius * 0.011f, cur_hitbox->size_y * 0.011f, cur_hitbox->size_z * 0.011f);
+
+        if (cur_hitbox->mask & enemy_hitbox_mask)
+        {
+            if (cur_hitbox->mask & player_hitbox_mask)
+            {
+                addGfxToDrawLayer(DrawLayer::xlu_surf, set_purple_env);
+            }
+            else
+            {
+                addGfxToDrawLayer(DrawLayer::xlu_surf, set_blue_env);
+            }
+        }
+        else if (cur_hitbox->mask & player_hitbox_mask)
+        {
+            addGfxToDrawLayer(DrawLayer::xlu_surf, set_red_env);
+        }
+
+        drawModel(rectangle_hitbox_model, nullptr, 0);
+
+        cur_pos++;
+        cur_rot++;
+        cur_hitbox++;
+        gfx::pop_mat();
+    }
+}
+
+void drawAllHitboxes(void)
+{
+    if (cylinder_hitbox_model == nullptr)
+    {
+        cylinder_hitbox_model = load_model("models/HitboxCylinder");
+        rectangle_hitbox_model = load_model("models/HitboxCube");
+    }
+    iterateOverEntities(draw_cylinder_hitboxes_callback, nullptr, ARCHETYPE_CYLINDER_HITBOX, Bit_Rotation);
+    iterateOverEntities(draw_rectangle_hitboxes_callback, nullptr, ARCHETYPE_RECTANGLE_HITBOX, 0);
+}

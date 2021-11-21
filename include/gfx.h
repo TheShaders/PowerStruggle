@@ -45,6 +45,8 @@ void drawLine(DrawLayer layer, Vec3 start, Vec3 end, uint32_t color);
 void drawAllEntities(void);
 void drawAllEntitiesHealth(void);
 
+void drawAllHitboxes(void);
+
 void drawHealthBars(size_t count, void *, void **componentArrays);
 
 void scrollTextures();
