@@ -26,11 +26,11 @@ constexpr unsigned int gfx_pool_size64 = gfx_pool_size / 8;
 constexpr unsigned int num_frame_buffers = 2;
 
 #ifdef HIGH_RES
-constexpr unsigned int screen_width = 640;
-constexpr unsigned int screen_height = 480;
+constexpr int screen_width = 640;
+constexpr int screen_height = 480;
 #else
-constexpr unsigned int screen_width = 320;
-constexpr unsigned int screen_height = 240;
+constexpr int screen_width = 320;
+constexpr int screen_height = 240;
 #endif
 
 #define BUFFER_SEGMENT 0x01

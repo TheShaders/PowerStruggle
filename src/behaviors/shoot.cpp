@@ -9,7 +9,7 @@
 #include <control.h>
 #include <input.h>
 
-#define ARCHETYPE_SHOOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity)
+#define ARCHETYPE_SHOOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity | Bit_Deactivatable)
 
 ShootDefinition shooter_definitions[] = {
     { // Grease-E
@@ -45,6 +45,7 @@ void setup_shot_hitbox(const Vec3& shooter_pos, const Vec3s& shooter_rot, ShootD
     Vec3& vel = *get_component<Bit_Velocity, Vec3>(shot_components, ARCHETYPE_SHOOT_HITBOX);
     Model** model = get_component<Bit_Model, Model*>(shot_components, ARCHETYPE_SHOOT_HITBOX);
     Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(shot_components, ARCHETYPE_SHOOT_HITBOX);
+    ActiveState& active_state = *get_component<Bit_Deactivatable, ActiveState>(shot_components, ARCHETYPE_SHOOT_HITBOX);
 
     *model = params->shot_model;
 
@@ -59,6 +60,8 @@ void setup_shot_hitbox(const Vec3& shooter_pos, const Vec3s& shooter_rot, ShootD
     pos[0] = shooter_pos[0] + vel[0];
     pos[1] = shooter_pos[1] + params->shot_y_offset;
     pos[2] = shooter_pos[2] + vel[2];
+
+    active_state.delete_on_deactivate = 1;
 }
 
 void create_shoot_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)

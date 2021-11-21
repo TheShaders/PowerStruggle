@@ -68,6 +68,11 @@ struct BehaviorState
     std::array<uint8_t, 16> data;
 };
 
+struct ActiveState {
+    uint8_t delete_on_deactivate : 1;
+    uint8_t deactivated : 1;
+};
+
 #include <bit>
 #include <memory>
 

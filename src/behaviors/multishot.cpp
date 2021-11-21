@@ -9,7 +9,7 @@
 #include <control.h>
 #include <input.h>
 
-#define ARCHETYPE_MULTISHOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity)
+#define ARCHETYPE_MULTISHOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity | Bit_Deactivatable)
 
 MultishotDefinition multishoter_definitions[] = {
     { // Gas-E
@@ -45,6 +45,7 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
     Vec3* vel = get_component<Bit_Velocity, Vec3>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
     Model** model = get_component<Bit_Model, Model*>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
     Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
+    ActiveState* active_state = get_component<Bit_Deactivatable, ActiveState>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
 
     for (int i = 0; i < 4; i++)
     {
@@ -84,10 +85,13 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
         (*pos)[1] = multishoter_pos[1] + params->shot_y_offset;
         (*pos)[2] = multishoter_pos[2] + (*vel)[2];
 
+        active_state->delete_on_deactivate = 1;
+
         pos++;
         vel++;
         model++;
         hitbox++;
+        active_state++;
     }
 }
 

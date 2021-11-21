@@ -28006,6 +28006,50 @@
         "ObjectSubtype": 0
       },
       "ObjectParam": 0
+    },
+    {
+      "X": 3,
+      "Y": 2,
+      "Z": -44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": -2,
+      "Y": 2,
+      "Z": -44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": -2,
+      "Y": 2,
+      "Z": -41,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 3,
+      "Y": 2,
+      "Z": -41,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
     }
   ]
 }

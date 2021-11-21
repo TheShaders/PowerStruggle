@@ -139,7 +139,7 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
     ColliderHit* cur_hit = collider.hits;
     while (cur_hit != nullptr)
     {
-        if (g_gameTimer - health_state.last_hit_time < 10)
+        if (g_gameTimer - health_state.last_hit_time < 15)
         {
             break;
         }

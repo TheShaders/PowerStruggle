@@ -67,6 +67,18 @@ GridDefinition get_grid_definition(const char *file)
     return ret;
 }
 
+bool Grid::is_loaded(chunk_pos pos)
+{
+    for (auto& entry : loaded_chunks_)
+    {
+        if (entry.pos == pos)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Grid::is_loaded_or_loading(chunk_pos pos)
 {
     for (auto& entry : loading_chunks_)

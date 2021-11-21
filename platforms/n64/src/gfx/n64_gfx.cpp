@@ -911,16 +911,16 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
     {
         if (cur_health_state->max_health > 0)
         {
-            size_t cur_health_bar_size = cur_health_state->max_health / health_per_pixel;
-            size_t filled_size = cur_health_state->health / health_per_pixel;
+            int cur_health_bar_size = cur_health_state->max_health / health_per_pixel;
+            int filled_size = cur_health_state->health / health_per_pixel;
             Vec3 cur_pos_corrected;
             cur_pos_corrected[0] = (*cur_position)[0] - g_Camera.model_offset[0];
             cur_pos_corrected[1] = (*cur_position)[1] - g_Camera.model_offset[1] + 256.0f;
             cur_pos_corrected[2] = (*cur_position)[2] - g_Camera.model_offset[2];
             glm::vec2 entity_ndc = calculate_normalized_device_coords(cur_pos_corrected, &g_gfxContexts[g_curGfxContext].viewProjMtxF);
 
-            unsigned int screen_space_x = lround(entity_ndc[0] *  ((int)screen_width  / 2)) + screen_width  / 2;
-            unsigned int screen_space_y = lround(entity_ndc[1] * -((int)screen_height / 2)) + screen_height / 2;
+            int screen_space_x = lround(entity_ndc[0] *  (screen_width  / 2)) + screen_width  / 2;
+            int screen_space_y = lround(entity_ndc[1] * -(screen_height / 2)) + screen_height / 2;
             
             int cur_health_bar_pos_x = (screen_space_x - cur_health_bar_size / 2);
             int cur_health_bar_pos_y = (screen_space_y - health_bar_height / 2);
@@ -934,11 +934,11 @@ void drawHealthBars(size_t count, void *, void **componentArrays)
             //     cur_health_bar_pos_x = screen_width - 16 - 16;
             // }
             
-            if (cur_health_bar_pos_y > (int)screen_height)
+            if (cur_health_bar_pos_y > screen_height)
             {
                 continue;
             }
-            if (cur_health_bar_pos_y + (int)health_bar_height < 0)
+            if (cur_health_bar_pos_y < -(int)health_bar_height)
             {
                 continue;
             }

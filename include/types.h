@@ -1,8 +1,8 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint>
+#include <cstddef>
 
 #ifdef __GNUC__
 #define UNUSED __attribute__((unused))
@@ -65,6 +65,7 @@ struct BaseEnemyDefinition;
 struct BaseEnemyState;
 struct ControlParams;
 struct ControlHandler;
+struct ActiveState;
 
 // Prototype for the grid
 class Grid;

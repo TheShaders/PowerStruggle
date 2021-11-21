@@ -632,11 +632,19 @@ void processBehaviorEntities(size_t count, UNUSED void *arg, int numComponents, 
     int i = 0;
     // Get the index of the BehaviorState component in the component array and iterate over it
     BehaviorState *cur_bhv = static_cast<BehaviorState*>(componentArrays[COMPONENT_INDEX(Behavior, archetype)]);
+    ActiveState *cur_active_state = nullptr;
+    if (archetype & Bit_Deactivatable)
+    {
+        cur_active_state = get_component<Bit_Deactivatable, ActiveState>(componentArrays, archetype);
+    }
     // Iterate over every entity in the given array
     while (count)
     {
-        // Call the entity's callback with the component pointers and it's data pointer
-        cur_bhv->callback(componentArrays, cur_bhv->data.data());
+        if (cur_active_state == nullptr || !cur_active_state->deactivated)
+        {
+            // Call the entity's callback with the component pointers and it's data pointer
+            cur_bhv->callback(componentArrays, cur_bhv->data.data());
+        }
 
         componentArrays[0] = static_cast<uint8_t*>(componentArrays[0]) + sizeof(Entity*);
 
@@ -644,6 +652,10 @@ void processBehaviorEntities(size_t count, UNUSED void *arg, int numComponents, 
         for (i = 0; i < numComponents; i++)
         {
             componentArrays[i + 1] = static_cast<uint8_t*>(componentArrays[i + 1]) + componentSizes[i];
+        }
+        if (cur_active_state)
+        {
+            cur_active_state++;
         }
         // Increment to the next entity's behavior params
         cur_bhv++;

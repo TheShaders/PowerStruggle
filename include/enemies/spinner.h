@@ -1,7 +1,7 @@
 #ifndef __ENEMY_SPINNER_H__
 #define __ENEMY_SPINNER_H__
 
-#define ARCHETYPE_SPINNER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health | Bit_Control)
+#define ARCHETYPE_SPINNER (Bit_Position | Bit_Velocity | Bit_Collider | Bit_Rotation | Bit_Behavior | Bit_Model | Bit_AnimState | Bit_Gravity | Bit_Health | Bit_Control | Bit_Deactivatable)
 
 // The per-subtype parameters for a spinner-type enemy
 struct SpinnerParams {
