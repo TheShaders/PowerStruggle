@@ -36,34 +36,6 @@ SlasherDefinition slasher_definitions[] = {
 
 Model* slash_weapon_model = nullptr;
 
-void apply_recoil(const Vec3& slasher_pos, Vec3& slasher_vel, Entity* slash_hit)
-{
-    archetype_t hit_archetype = slash_hit->archetype;
-    // Get the hit entity's components
-    dynamic_array<void*> hit_components(NUM_COMPONENTS(hit_archetype) + 1);
-    getEntityComponents(slash_hit, hit_components.data());
-    Vec3& hit_pos = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
-
-    // Get the normal vector between the slasher and the hit
-    float dx = hit_pos[0] - slasher_pos[0];
-    float dz = hit_pos[2] - slasher_pos[2];
-    float magnitude = sqrtf(dx * dx + dz * dz);
-    float nx = dx * (1.0f / magnitude);
-    float nz = dz * (1.0f / magnitude);
-
-    slasher_vel[0] -= 16.0f * nx;
-    slasher_vel[2] -= 16.0f * nz;
-
-    // If the hit entity has a velocity, apply recoil to it too
-    if (slash_hit->archetype & Bit_Velocity)
-    {
-        Vec3& hit_vel = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
-
-        hit_vel[0] += 16.0f * nx;
-        hit_vel[2] += 16.0f * nz;
-    }
-}
-
 int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3& slasher_vel, SlasherParams* params, SlasherState* state, int first = false)
 {
     Entity* slash_entity = state->slash_hitbox;
@@ -78,7 +50,7 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3&
     {
         if (slash_hitbox.hits != nullptr)
         {
-            apply_recoil(slasher_pos, slasher_vel, slash_hitbox.hits->hit);
+            apply_recoil(slasher_pos, slasher_vel, slash_hitbox.hits->hit, 16.0f);
             state->recoil_timer = 15;
         }
     }
@@ -128,6 +100,7 @@ void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3&
     hitbox.radius = params->slash_length;
     hitbox.size_y = params->slash_height;
     hitbox.size_z = params->slash_width;
+    hitbox.hits = nullptr;
 
     state->cur_slash_angle = 0;
     state->slash_hitbox = hitbox_entity;

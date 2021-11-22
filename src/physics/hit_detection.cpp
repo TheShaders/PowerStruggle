@@ -76,6 +76,8 @@ void insert_hitbox_nodes(int min_x, int min_z, int max_x, int max_z, int start_t
     int min_array_z = round_down_divide<tile_size>(min_z) - start_tile_z;
     int max_array_x = round_up_divide<tile_size>(max_x)   - start_tile_x;
     int max_array_z = round_up_divide<tile_size>(max_z)   - start_tile_z;
+    
+    cur_hitbox->hits = nullptr;
 
     // debug_printf("min_arr_x %d min_arr_z %d max_arr_x %d max_arr_z %d\n", min_array_x, min_array_z, max_array_x, max_array_z);
     // Check if the entity is within the bounds of the currently loaded chunks
@@ -131,8 +133,6 @@ void gather_cylinder_hitboxes(size_t count, void *arg, void **componentArrays)
         int max_x = lceil((*cur_pos)[0] + cur_hitbox->radius);
         int max_z = lceil((*cur_pos)[2] + cur_hitbox->radius);
 
-        cur_hitbox->hits = nullptr;
-
         insert_hitbox_nodes(min_x, min_z, max_x, max_z, start_tile_x, start_tile_z, cur_hitbox, *cur_entity, cur_pos, nullptr);
 
         count--;
@@ -165,8 +165,6 @@ void gather_rectangle_hitboxes(size_t count, void *arg, void **componentArrays)
         int min_z = lfloor((*cur_pos)[2] - radius);
         int max_x = lceil((*cur_pos)[0] + radius);
         int max_z = lceil((*cur_pos)[2] + radius);
-
-        cur_hitbox->hits = nullptr;
 
         insert_hitbox_nodes(min_x, min_z, max_x, max_z, start_tile_x, start_tile_z, cur_hitbox, *cur_entity, cur_pos, cur_rot);
 

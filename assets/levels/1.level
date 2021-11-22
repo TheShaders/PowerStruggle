@@ -27991,18 +27991,7 @@
       "Z": 2,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 6,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
-      "X": 3,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 6,
+        "ObjectType": 3,
         "ObjectSubtype": 0
       },
       "ObjectParam": 0

@@ -127,6 +127,7 @@ float rayVsAABB(Vec3 rayStart, Vec3 rayDirInv, AABB *box, float tmin, float tmax
 
 void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 {
+    collider->hit_wall = false;
     // if (std::abs(vel[0]) >= VEL_THRESHOLD || std::abs(vel[2]) >= VEL_THRESHOLD || collider->floor_surface_type == surface_none)
     {
         float radius = collider->radius;
@@ -156,6 +157,7 @@ void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
                 vel[0] = 0;
                 vel[2] = 0;
             }
+            collider->hit_wall = true;
         }
     }
 }

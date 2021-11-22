@@ -30,7 +30,7 @@ struct SpinnerDefinition : public BaseEnemyDefinition {
 };
 
 // The list of spinner params for each spinner subtypes
-extern SpinnerDefinition spinnerer_definitions[];
+extern SpinnerDefinition spinner_definitions[];
 
 // The state that a spinner-type enemy maintains
 struct SpinnerState : public BaseEnemyState {

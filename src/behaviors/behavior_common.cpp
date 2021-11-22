@@ -18,7 +18,7 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
     if (dist_sq < EPSILON) return 0.0f;
     float dist = sqrtf(dist_sq);
     // Check if the player can be seen
-    if (dist < sight_radius)
+    if (dist < sight_radius && dist > EPSILON)
     {
         // If so, determine where to move towards
 
@@ -36,14 +36,24 @@ float approach_target(float sight_radius, float follow_distance, float move_spee
         float target_dist_sq = target_dx * target_dx + target_dz * target_dz;
         float target_dist = sqrtf(target_dist_sq);
 
-        // Calculate the normal vector from the enemy to the target position
-        float target_dx_norm = target_dx * (1.0f / target_dist);
-        float target_dz_norm = target_dz * (1.0f / target_dist);
+        float target_vel_x;
+        float target_vel_z;
+        if (target_dist > EPSILON)
+        {
+            // Calculate the normal vector from the enemy to the target position
+            float target_dx_norm = target_dx * (1.0f / target_dist);
+            float target_dz_norm = target_dz * (1.0f / target_dist);
 
-        // Calculate the target speed
-        float target_speed = std::min(move_speed, target_dist * 0.25f);
-        float target_vel_x = target_speed * target_dx_norm;
-        float target_vel_z = target_speed * target_dz_norm;
+            // Calculate the target speed
+            float target_speed = std::min(move_speed, target_dist * 0.25f);
+            target_vel_x = target_speed * target_dx_norm;
+            target_vel_z = target_speed * target_dz_norm;
+        }
+        else
+        {
+            target_vel_x = 0.0f;
+            target_vel_z = 0.0f;
+        }
 
         vel[0] = approachFloatLinear(vel[0], target_vel_x, 1.0f);
         vel[2] = approachFloatLinear(vel[2], target_vel_z, 1.0f);
@@ -68,7 +78,7 @@ std::array create_enemy_funcs {
     create_shoot_enemy,
     create_slash_enemy,
     create_spinner_enemy,
-    placeholder_create, // ram
+    create_ram_enemy, // ram
     placeholder_create, // bomb
     placeholder_create, // beam
     create_multishot_enemy,
@@ -108,7 +118,7 @@ void init_enemy_common(BaseEnemyInfo* base_info, Model** model_out, HealthState*
 extern ControlHandler shoot_control_handler;
 extern ControlHandler slash_control_handler;
 extern ControlHandler spinner_control_handler;
-// ram
+extern ControlHandler ram_control_handler;
 // bomb
 // beam
 extern ControlHandler multishot_control_handler;
@@ -117,7 +127,7 @@ ControlHandler* control_handlers[] = {
     &shoot_control_handler,
     &slash_control_handler,
     &spinner_control_handler,
-    nullptr,
+    &ram_control_handler,
     nullptr,
     nullptr,
     &multishot_control_handler,
@@ -150,4 +160,38 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
         return ret;
     }
     return false;
+}
+
+void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength)
+{
+    archetype_t hit_archetype = hit->archetype;
+    // Get the hit entity's components
+    dynamic_array<void*> hit_components(NUM_COMPONENTS(hit_archetype) + 1);
+    getEntityComponents(hit, hit_components.data());
+    Vec3& hit_pos = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
+
+    // Get the normal vector between the ram and the hit
+    float dx = hit_pos[0] - pos[0];
+    float dz = hit_pos[2] - pos[2];
+    float magnitude = sqrtf(dx * dx + dz * dz);
+    if (magnitude < EPSILON)
+    {
+        dx = 1.0f;
+        dz = 0.0f;
+        magnitude = 1.0f;
+    }
+    float nx = dx * (1.0f / magnitude);
+    float nz = dz * (1.0f / magnitude);
+
+    vel[0] -= recoil_strength * nx;
+    vel[2] -= recoil_strength * nz;
+
+    // If the hit entity has a velocity, apply recoil to it too
+    if (hit->archetype & Bit_Velocity)
+    {
+        Vec3& hit_vel = *get_component<Bit_Position, Vec3>(hit_components.data(), hit_archetype);
+
+        hit_vel[0] += recoil_strength * nx;
+        hit_vel[2] += recoil_strength * nz;
+    }
 }

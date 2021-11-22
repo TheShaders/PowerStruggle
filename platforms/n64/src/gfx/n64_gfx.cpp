@@ -901,8 +901,8 @@ glm::vec2 calculate_normalized_device_coords(const Vec3& pos, const MtxF* mat)
 
 void drawHealthBars(size_t count, void *, void **componentArrays)
 {
-    HealthState *cur_health_state = static_cast<HealthState*>(componentArrays[COMPONENT_INDEX(Health, ARCHETYPE_HEALTHBAR)]);
-    Vec3 *cur_position = static_cast<Vec3*>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_HEALTHBAR)]);
+    HealthState *cur_health_state = get_component<Bit_Health, HealthState>(componentArrays, ARCHETYPE_HEALTHBAR);
+    Vec3 *cur_position = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_HEALTHBAR);
     gDPPipeSync(g_gui_dlist_head++);
     gDPSetCycleType(g_gui_dlist_head++, G_CYC_1CYCLE);
     gDPSetTexturePersp(g_gui_dlist_head++, G_TP_NONE);

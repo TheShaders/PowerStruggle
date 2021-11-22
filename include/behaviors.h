@@ -22,7 +22,7 @@ enum class EnemyType : uint8_t {
 #include <enemies/shoot.h>
 #include <enemies/slash.h>
 #include <enemies/spinner.h>
-
+#include <enemies/ram.h>
 
 #include <enemies/multishot.h>
 
@@ -34,5 +34,8 @@ Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype);
 void init_enemy_common(BaseEnemyInfo *base_info, Model** model_out, HealthState* health_out);
 // Common hitbox handling routine for enemies, returns true if the entity has run out of health
 int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state);
+// Applies recoil to the given position and velocity based on the hit entity's position
+// Also applies recoil to the hit entity if it has a velocity component
+void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength);
 
 #endif
