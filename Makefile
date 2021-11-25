@@ -232,7 +232,7 @@ WARNFLAGS  := -Wall -Wextra -Wpedantic -Wdouble-promotion -Wfloat-conversion
 ASFLAGS    := -mtune=vr4300 -march=vr4300 -mabi=32 -mips3
 LDFLAGS    := -T $(LD_CPP) -Wl,--accept-unknown-input-arch -Wl,--no-check-sections -Wl,-Map $(BUILD_ROOT)/$(TARGET).map \
 			  $(ULTRA_LINKER) -L lib $(GCC_LINKER) -nostartfiles -Wl,-gc-sections
-SEG_LDFLAGS:= $(ULTRA_LINKER) -L lib -lstdc++ -lnustd -l$(LIBULTRA) -e init -Wl,-gc-sections -u numberOfSetBits
+SEG_LDFLAGS:= $(ULTRA_LINKER) -L lib -lstdc++ -lnustd -ln_mus -ln_audio_sc -l$(LIBULTRA) -e init -Wl,-gc-sections -u numberOfSetBits
 LDCPPFLAGS := -P -Wno-trigraphs -DBUILD_ROOT=$(BUILD_ROOT) -Umips
 OCOPYFLAGS := --pad-to=0x400000 --gap-fill=0xFF
 

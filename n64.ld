@@ -52,16 +52,24 @@ SECTIONS
         PR/gspF3DEX2.fifo.o(.text*);
         PR/gspL3DEX2.fifo.o(.text*);
         PR/gspS2DEX2.fifo.o(.text*);
+        PR/n_aspMain.o(.text*);
 
         . = ALIGN(64);
         BUILD_ROOT/codesegment.o(.data*);
         BUILD_ROOT/codesegment.o(COMMON*);
         BUILD_ROOT/codesegment.o(.scommon*);
+        . = ALIGN(16);
+        _ptrBankStart = .;
+        KEEP(BUILD_ROOT/sounds.ptr.o(.data*));
+        . = ALIGN(16);
+        _fxBankStart = .;
+        KEEP(BUILD_ROOT/fxbank.bin.o(.data*));
 
         PR/rspboot.o(.*data*);
         PR/gspF3DEX2.fifo.o(.*data*);
         PR/gspL3DEX2.fifo.o(.*data*);
         PR/gspS2DEX2.fifo.o(.*data*);
+        PR/n_aspMain.o(.*data*);
         BUILD_ROOT/codesegment.o(.rodata*);
         . = ALIGN(16);
     }
@@ -82,8 +90,15 @@ SECTIONS
     START_SEGMENT(assets, romPos)
     {
         KEEP(BUILD_ROOT/assets.o(.*data*));
+        . = ALIGN(16);
     }
     END_SEGMENT(assets);
+    START_SEGMENT(wavetable, romPos)
+    {
+        KEEP(BUILD_ROOT/sounds.wbk.o(.data*));
+        . = ALIGN(16);
+    }
+    END_SEGMENT(wavetable);
 
     /DISCARD/ :
     {

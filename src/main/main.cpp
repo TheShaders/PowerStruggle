@@ -41,6 +41,8 @@ void update()
     }
 }
 
+void audioInit();
+
 int main(UNUSED int argc, UNUSED char **arg)
 {
     int frame = 0;
@@ -51,6 +53,7 @@ int main(UNUSED int argc, UNUSED char **arg)
 
     initInput();
     initGfx();
+    audioInit();
 
     cur_scene = std::make_unique<GameplayScene>();
     cur_scene->load();

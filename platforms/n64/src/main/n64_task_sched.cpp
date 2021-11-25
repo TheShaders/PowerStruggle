@@ -9,7 +9,7 @@ extern "C" {
 #include <n64_init.h>
 #include <n64_task_sched.h>
 
-static OSSched scheduler;
+OSSched scheduler;
 static OSScClient gfxClient;
 static OSMesgQueue schedQueue;
 static OSMesg schedMesg;
