@@ -1,8 +1,12 @@
 {
     "sfx":[
         {
-            "name": "test",
-            "sample": "horn_honk.wav"
+            "name": "metal_hit",
+            "sample": "metal_hit.wav"
+        },
+        {
+            "name": "electricity",
+            "sample": "electricity.wav"
         }
     ]
 }

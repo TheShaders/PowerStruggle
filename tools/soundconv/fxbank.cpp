@@ -105,8 +105,8 @@ void FxBank::write(const fs::path& output_path, const std::vector<fs::path>& sam
         seq_data.push_back(0x6F); seq_data.push_back(0x7C);
         // Fpan(0x7F)
         seq_data.push_back(0x9C); seq_data.push_back(0x7F);
-        // Fvolume(0x5A)
-        seq_data.push_back(0xA6); seq_data.push_back(0x5A);
+        // Fvolume(180)
+        seq_data.push_back(0xA6); seq_data.push_back(180);
         // Note(0x30, 0x7FFF)
         seq_data.push_back(0x30); seq_data.push_back(0xFF);
         seq_data.push_back(0xFF);

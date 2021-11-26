@@ -8,6 +8,7 @@
 #include <control.h>
 #include <collision.h>
 #include <main.h>
+#include <audio.h>
 
 float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos)
 {
@@ -137,6 +138,7 @@ int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 {
     if (damage >= health_state.health)
     {
+        // playSound(1);
         queue_entity_deletion(hit_entity);
         return true;
     }

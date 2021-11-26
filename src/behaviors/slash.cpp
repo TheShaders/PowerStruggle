@@ -8,6 +8,7 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
 
 #define ARCHETYPE_SLASH_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
@@ -50,6 +51,7 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3&
     {
         if (slash_hitbox.hits != nullptr)
         {
+            playSound(Sfx::zap);
             apply_recoil(slasher_pos, slasher_vel, slash_hitbox.hits->hit, 16.0f);
             state->recoil_timer = 15;
         }
@@ -226,8 +228,6 @@ void delete_slash_enemy(Entity *slash_enemy)
 
 }
 
-void playSound(uint32_t);
-
 void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
 {
     Entity* player = (Entity*)arg;
@@ -243,7 +243,7 @@ void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **
 
     setup_slash_hitbox(player_pos, player_rot, player_vel, slasher_state, componentArrays, enemy_hitbox_mask);
 
-    playSound(0);
+    // playSound(0);
 }
 
 void on_slasher_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
