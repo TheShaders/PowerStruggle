@@ -60,7 +60,7 @@ void audioInit(void)
 
 void playSound(uint32_t soundIndex)
 {
-    MusStartEffect2(soundIndex, 0x80, 0x80, 0, -1);
+    MusStartEffect2(soundIndex, 0xFF, 0x80, 0, -1);
 }
 
 // void audioThreadFunc(UNUSED void *arg)

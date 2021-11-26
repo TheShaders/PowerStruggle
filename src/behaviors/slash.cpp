@@ -243,7 +243,7 @@ void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **
 
     setup_slash_hitbox(player_pos, player_rot, player_vel, slasher_state, componentArrays, enemy_hitbox_mask);
 
-    playSound(12);
+    playSound(0);
 }
 
 void on_slasher_enter(BaseEnemyState* base_state, InputData* input, void** player_components)

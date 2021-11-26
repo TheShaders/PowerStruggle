@@ -1,0 +1,8 @@
+{
+    "sfx":[
+        {
+            "name": "test",
+            "sample": "horn_honk.wav"
+        }
+    ]
+}
