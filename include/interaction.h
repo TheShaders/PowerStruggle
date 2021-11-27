@@ -16,5 +16,6 @@ constexpr int health_bar_height = 4;
 
 Entity *findClosestEntity(Vec3 pos, archetype_t archetype, float maxDist, float *foundDist, Vec3 foundPos);
 int take_damage(Entity* entity, HealthState& health_state, int damage);
+void create_explosion(Vec3 pos, int radius, int time, int mask);
 
 #endif

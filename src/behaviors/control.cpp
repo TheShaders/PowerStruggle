@@ -110,7 +110,7 @@ void control_update()
     getEntityComponents(player, player_components);
 
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
-    Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
+    // Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
 
     control_search_pos[0] = g_PlayerInput.x * 150.0f + player_pos[0];
     control_search_pos[1] = player_pos[1];

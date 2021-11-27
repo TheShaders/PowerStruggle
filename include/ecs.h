@@ -124,6 +124,8 @@ Entity *findEntity(archetype_t archetype, size_t archetypeArrayIndex);
 void deleteAllEntities(void);
 // Iterates over every behavior entity and processes their behavior
 void iterateBehaviorEntities(void);
+// Iterates over every entity with a destroy timer, ticks it, and deletes the entity if the timer reached zero
+void tickDestroyTimers(void);
 
 extern const size_t g_componentSizes[];
 

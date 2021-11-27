@@ -79,8 +79,8 @@ std::array create_enemy_funcs {
     create_shoot_enemy,
     create_slash_enemy,
     create_spinner_enemy,
-    create_ram_enemy, // ram
-    placeholder_create, // bomb
+    create_ram_enemy,
+    create_bomb_enemy,
     placeholder_create, // beam
     create_multishot_enemy,
 };
@@ -120,7 +120,7 @@ extern ControlHandler shoot_control_handler;
 extern ControlHandler slash_control_handler;
 extern ControlHandler spinner_control_handler;
 extern ControlHandler ram_control_handler;
-// bomb
+extern ControlHandler bomb_control_handler;
 // beam
 extern ControlHandler multishot_control_handler;
 
@@ -129,7 +129,7 @@ ControlHandler* control_handlers[] = {
     &slash_control_handler,
     &spinner_control_handler,
     &ram_control_handler,
-    nullptr,
+    &bomb_control_handler,
     nullptr,
     &multishot_control_handler,
 };
@@ -138,6 +138,7 @@ int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 {
     if (damage >= health_state.health)
     {
+        health_state.health = 0;
         // playSound(1);
         queue_entity_deletion(hit_entity);
         return true;
@@ -196,4 +197,41 @@ void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength
         hit_vel[0] += recoil_strength * nx;
         hit_vel[2] += recoil_strength * nz;
     }
+}
+
+Model* explosion_model = nullptr;
+const char explosion_model_name[] = "models/Explosion";
+
+void create_explosion(Vec3 pos, int radius, int time, int mask)
+{
+    Entity* explosion = createEntity(ARCHETYPE_EXPLOSION);
+    void* explosion_components[NUM_COMPONENTS(ARCHETYPE_EXPLOSION) + 1];
+    getEntityComponents(explosion, explosion_components);
+
+    if (explosion_model == nullptr)
+    {
+        explosion_model = load_model(explosion_model_name);
+    }
+
+    Model** model_out = get_component<Bit_Model, Model*>(explosion_components, ARCHETYPE_EXPLOSION);
+    Vec3& explosion_pos = *get_component<Bit_Position, Vec3>(explosion_components, ARCHETYPE_EXPLOSION);
+    Vec3& explosion_scale = *get_component<Bit_Scale, Vec3>(explosion_components, ARCHETYPE_EXPLOSION);
+    Vec3s& explosion_rot = *get_component<Bit_Rotation, Vec3s>(explosion_components, ARCHETYPE_EXPLOSION);
+    uint16_t& explosion_timer = *get_component<Bit_DestroyTimer, uint16_t>(explosion_components, ARCHETYPE_EXPLOSION);
+    Hitbox& explosion_hitbox = *get_component<Bit_Hitbox, Hitbox>(explosion_components, ARCHETYPE_EXPLOSION);
+
+    *model_out = explosion_model;
+    VEC3_COPY(explosion_pos, pos);
+    explosion_rot[0] = 0;
+    explosion_rot[1] = 0;
+    explosion_rot[2] = 0;
+
+    explosion_scale[0] = explosion_scale[1] = explosion_scale[2] = radius / 100.0f;
+
+    explosion_timer = time;
+    explosion_hitbox.radius = radius;
+    explosion_hitbox.size_y = radius;
+    explosion_hitbox.size_z = 0;
+    explosion_hitbox.mask = mask;
+    explosion_hitbox.hits = nullptr;
 }

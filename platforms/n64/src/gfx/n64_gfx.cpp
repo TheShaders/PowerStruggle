@@ -996,7 +996,7 @@ void draw_cylinder_hitboxes_callback(size_t count, UNUSED void *arg, void **comp
     {
         gfx::push_mat();
         gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1], (*cur_pos)[2]);
-        gfx::apply_scale_affine(cur_hitbox->radius * 0.011f, cur_hitbox->size_y * 0.011f, cur_hitbox->radius * 0.011f);
+        gfx::apply_scale_affine(cur_hitbox->radius * 0.01f + 0.05f, cur_hitbox->size_y * 0.01f + 0.05f, cur_hitbox->radius * 0.01f + 0.05f);
 
         if (cur_hitbox->mask & enemy_hitbox_mask)
         {
@@ -1032,7 +1032,14 @@ void draw_rectangle_hitboxes_callback(size_t count, UNUSED void *arg, void **com
         gfx::push_mat();
         gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1], (*cur_pos)[2]);
         gfx::rotate_euler_xyz(0, (*cur_rot)[1], 0);
-        gfx::apply_scale_affine(cur_hitbox->radius * 0.011f, cur_hitbox->size_y * 0.011f, cur_hitbox->size_z * 0.011f);
+        if (cur_hitbox->size_z == 0)
+        {
+            gfx::apply_scale_affine(cur_hitbox->radius * 0.01f + 0.05f, cur_hitbox->size_y * 0.01f + 0.05f, cur_hitbox->radius * 0.01f + 0.05f);
+        }
+        else
+        {
+            gfx::apply_scale_affine(cur_hitbox->radius * 0.01f + 0.05f, cur_hitbox->size_y * 0.01f + 0.05f, cur_hitbox->size_z * 0.01f + 0.05f);
+        }
 
         if (cur_hitbox->mask & enemy_hitbox_mask)
         {
@@ -1050,7 +1057,14 @@ void draw_rectangle_hitboxes_callback(size_t count, UNUSED void *arg, void **com
             addGfxToDrawLayer(DrawLayer::xlu_surf, set_red_env);
         }
 
-        drawModel(rectangle_hitbox_model, nullptr, 0);
+        if (cur_hitbox->size_z == 0)
+        {
+            drawModel(cylinder_hitbox_model, nullptr, 0);
+        }
+        else
+        {
+            drawModel(rectangle_hitbox_model, nullptr, 0);
+        }
 
         cur_pos++;
         cur_rot++;

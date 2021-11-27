@@ -18,11 +18,14 @@ enum class EnemyType : uint8_t {
     Flame, // e.g. Heat-O
 };
 
+#define ARCHETYPE_EXPLOSION (ARCHETYPE_SCALED_MODEL | Bit_Hitbox | Bit_DestroyTimer)
+
 #include <enemies/base.h>
 #include <enemies/shoot.h>
 #include <enemies/slash.h>
 #include <enemies/spinner.h>
 #include <enemies/ram.h>
+#include <enemies/bomb.h>
 
 #include <enemies/multishot.h>
 

@@ -167,6 +167,7 @@ void GameplayScene::update()
         // Process all entities that have a behavior
         // debug_printf("before behaviors\n");
         iterateBehaviorEntities();
+        tickDestroyTimers();
     }
 }
 
@@ -186,7 +187,7 @@ void GameplayScene::draw()
 
         drawAllEntities();
         drawAllEntitiesHealth();
-        drawAllHitboxes();
+        // drawAllHitboxes();
     }
 }
 

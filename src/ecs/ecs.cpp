@@ -668,3 +668,26 @@ void iterateBehaviorEntities()
 {
     iterateOverEntitiesAllComponents(processBehaviorEntities, nullptr, Bit_Behavior, 0);
 }
+
+void tickDestroyTimersCallback(size_t count, UNUSED void *arg, void **componentArrays)
+{
+    Entity** cur_entity = reinterpret_cast<Entity**>(componentArrays[0]);
+    uint16_t* cur_timer = get_component<Bit_DestroyTimer, uint16_t>(componentArrays, Bit_DestroyTimer);
+    while (count)
+    {
+        (*cur_timer)--;
+        if (*cur_timer == 0)
+        {
+            queue_entity_deletion(*cur_entity);
+        }
+
+        cur_timer++;
+        cur_entity++;
+        count--;
+    }
+}
+
+void tickDestroyTimers()
+{
+    iterateOverEntities(tickDestroyTimersCallback, nullptr, Bit_DestroyTimer, 0);
+}
