@@ -11,6 +11,7 @@ struct BaseEnemyInfo {
     // Speed the enemy will move at
     float move_speed;
     EnemyType enemy_type;
+    uint16_t head_y_offset;
 };
 
 // The base definition that all enemy definitions inherit from

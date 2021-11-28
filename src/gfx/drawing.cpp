@@ -5,6 +5,8 @@
 #include <mem.h>
 #include <ecs.h>
 #include <model.h>
+#include <files.h>
+#include <behaviors.h>
 
 #include <cmath>
 
@@ -236,6 +238,48 @@ void drawAllEntities()
 
     animateTextures();
     scrollTextures();
+}
+
+Model* head_model = nullptr;
+
+void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
+{
+    Vec3* player_pos = reinterpret_cast<Vec3*>(arg);
+    Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CONTROLLABLE);
+    BehaviorState* cur_bhv = get_component<Bit_Behavior, BehaviorState>(componentArrays, ARCHETYPE_CONTROLLABLE);
+
+    while (count)
+    {
+        BaseEnemyState* enemy_state = reinterpret_cast<BaseEnemyState*>(cur_bhv->data.data());
+
+        int rot = atan2s((*player_pos)[2] - (*cur_pos)[2], (*player_pos)[0] - (*cur_pos)[0]);
+
+        gfx::push_mat();
+         gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, (*cur_pos)[2]);
+         gfx::rotate_euler_xyz(0, rot, 0);
+         drawModel(head_model, nullptr, 0);
+
+        gfx::pop_mat();
+
+        cur_pos++;
+        cur_bhv++;
+        count--;
+    }
+}
+
+extern Entity* g_PlayerEntity;
+
+void draw_enemy_heads()
+{
+    if (head_model == nullptr)
+    {
+        head_model = load_model("models/Head_Enemy");
+    }
+    void* player_components[NUM_COMPONENTS(ARCHETYPE_PLAYER) + 1];
+    getEntityComponents(g_PlayerEntity, player_components);
+    Vec3* player_pos = get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    // Draw all non-resizable entities that have a model and no rotation or animation
+    iterateOverEntities(draw_enemy_heads_callback, player_pos, ARCHETYPE_CONTROLLABLE, 0);
 }
 
 void drawAllEntitiesHealth()

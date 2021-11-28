@@ -21,6 +21,7 @@ SpinnerDefinition spinner_definitions[] = {
             25,           // controllable_health
             7.0f,         // move_speed
             EnemyType::Spinner, // enemy_type
+            120, // head_y_offset
         },
         { // params
             "models/blade_Harv-E", // blade_model_name

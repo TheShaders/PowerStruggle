@@ -21,6 +21,7 @@ MultishotDefinition multishoter_definitions[] = {
             25,           // controllable_health
             5.0f,         // move_speed
             EnemyType::Multishot, // enemy_type
+            142 // head_y_offset
         },
         { // params
             "models/Sphere", // shot_model_name

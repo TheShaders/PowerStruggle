@@ -187,6 +187,7 @@ void GameplayScene::draw()
         // debug_printf("before drawing\n");
         grid_.draw(&g_Camera);
 
+        draw_enemy_heads();
         drawAllEntities();
         drawAllEntitiesHealth();
         set_text_color(0, 128, 0, 255);
