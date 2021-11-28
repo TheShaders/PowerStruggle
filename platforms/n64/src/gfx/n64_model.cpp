@@ -125,52 +125,79 @@ Gfx *process_texture_params(TextureParams* params, Gfx *cur_gfx, char const* con
     uint32_t cwm_t = cwm >> 4;
     uint32_t mask_shift_s = params->mask_shift_s;
     uint32_t mask_shift_t = params->mask_shift_t;
+    uint32_t mask_s = (mask_shift_s >> 4) & 0xF;
+    uint32_t mask_t = (mask_shift_t >> 4) & 0xF;
+    uint32_t shift_s = (mask_shift_s >> 0) & 0xF;
+    uint32_t shift_t = (mask_shift_t >> 0) & 0xF;
     uint32_t settile_bits =
         (cwm_t        << 18) |
         (mask_shift_t << 10) |
         (cwm_s        <<  8) |
         (mask_shift_s <<  0);
     uint32_t tmem_size = width * height;
-    uint32_t dxt = 0;
-    uint32_t row_bytes = 0;
+
+    void* image_data = get_or_load_image(image);
+
+    // TODO clean this up
     switch (format_size)
     {
         case G_IM_SIZ_32b:
-            tmem_size *= 4;
-            row_bytes = width * 4;
-            dxt = CALC_DXT(width, G_IM_SIZ_32b_BYTES);
-            while (1);
+            gDPLoadMultiBlock(cur_gfx++, image_data, tmem_word_addr, tex_index, format_type, G_IM_SIZ_32b, width, height, 0, cwm_s, cwm_t, mask_s, mask_t, shift_s, shift_t);
             break;
         case G_IM_SIZ_16b:
-            tmem_size *= 2;
-            row_bytes = width * 2;
-            dxt = CALC_DXT(width, G_IM_SIZ_16b_BYTES);
-            break;
+            gDPLoadMultiBlock(cur_gfx++, image_data, tmem_word_addr, tex_index, format_type, G_IM_SIZ_16b, width, height, 0, cwm_s, cwm_t, mask_s, mask_t, shift_s, shift_t);
+                break;
         case G_IM_SIZ_8b:
-            tmem_size *= 1;
-            row_bytes = width;
-            dxt = CALC_DXT(width, G_IM_SIZ_8b_BYTES);
-            break;
+            gDPLoadMultiBlock(cur_gfx++, image_data, tmem_word_addr, tex_index, format_type, G_IM_SIZ_8b, width, height, 0, cwm_s, cwm_t, mask_s, mask_t, shift_s, shift_t);
+            break;    
         case G_IM_SIZ_4b:
-            tmem_size = round_up_divide<2>(tmem_size);
-            row_bytes = round_up_divide<2>(width);
-            dxt = CALC_DXT_4b(width);
+            gDPLoadMultiBlock_4b(cur_gfx++, image_data, tmem_word_addr, tex_index, format_type, width, height, 0, cwm_s, cwm_t, mask_s, mask_t, shift_s, shift_t);
             break;
     }
-    uint32_t lines = round_up_divide<sizeof(uint64_t)>(row_bytes);
+    // Override the pipesync with enabling textures
+    gSPTexture(cur_gfx - 3, 0xFFFF, 0xFFFF, 0, tex_index, G_ON);
 
-    gDPSetTextureImage(cur_gfx++, format_type, G_IM_SIZ_16b, 1, get_or_load_image(image));
-    gDPSetTile(cur_gfx, format_type, G_IM_SIZ_16b, 0, tmem_word_addr, G_TX_LOADTILE - tex_index, 0,    0, 5, 0, 0, 5, 0);
-    cur_gfx->words.w1 |= settile_bits;
-    cur_gfx++;
-    gDPLoadSync(cur_gfx++);
-    gDPLoadBlock(cur_gfx++, G_TX_LOADTILE - tex_index, 0, 0, round_up_divide<2>(tmem_size) - 1, dxt);
-    // gDPPipeSync(cur_gfx++);
-    gSPTexture(cur_gfx++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE + tex_index, G_ON);
-    gDPSetTile(cur_gfx, format_type, format_size, lines, tmem_word_addr, G_TX_RENDERTILE + tex_index, 0,    0, 5, 0, 0, 5, 0);
-    cur_gfx->words.w1 |= settile_bits;
-    cur_gfx++;
-    gDPSetTileSize(cur_gfx++, G_TX_RENDERTILE + tex_index, 0, 0, (width - 1) << G_TEXTURE_IMAGE_FRAC, (height - 1) << G_TEXTURE_IMAGE_FRAC);
+    // uint32_t dxt = 0;
+    // uint32_t row_bytes = 0;
+    // switch (format_size)
+    // {
+    //     case G_IM_SIZ_32b:
+    //         tmem_size *= 4;
+    //         row_bytes = width * 4;
+    //         dxt = CALC_DXT(width, G_IM_SIZ_32b_BYTES);
+    //         while (1);
+    //         break;
+    //     case G_IM_SIZ_16b:
+    //         tmem_size *= 2;
+    //         row_bytes = width * 2;
+    //         dxt = CALC_DXT(width, G_IM_SIZ_16b_BYTES);
+    //         break;
+    //     case G_IM_SIZ_8b:
+    //         tmem_size *= 1;
+    //         row_bytes = width;
+    //         dxt = CALC_DXT(width, G_IM_SIZ_8b_BYTES);
+    //         break;
+    //     case G_IM_SIZ_4b:
+    //         tmem_size = round_up_divide<2>(tmem_size);
+    //         row_bytes = round_up_divide<2>(width);
+    //         dxt = CALC_DXT_4b(width);
+    //         break;
+    // }
+    
+    // uint32_t lines = round_up_divide<sizeof(uint64_t)>(row_bytes);
+
+    // gDPSetTextureImage(cur_gfx++, format_type, G_IM_SIZ_16b, 1, get_or_load_image(image));
+    // gDPSetTile(cur_gfx, format_type, G_IM_SIZ_16b, 0, tmem_word_addr, G_TX_LOADTILE - tex_index, 0,    0, 5, 0, 0, 5, 0);
+    // cur_gfx->words.w1 |= settile_bits;
+    // cur_gfx++;
+    // gDPLoadSync(cur_gfx++);
+    // gDPLoadBlock(cur_gfx++, G_TX_LOADTILE - tex_index, 0, 0, round_up_divide<2>(tmem_size) - 1, dxt);
+    // // gDPPipeSync(cur_gfx++);
+    // gSPTexture(cur_gfx++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE + tex_index, G_ON);
+    // gDPSetTile(cur_gfx, format_type, format_size, lines, tmem_word_addr, G_TX_RENDERTILE + tex_index, 0,    0, 5, 0, 0, 5, 0);
+    // cur_gfx->words.w1 |= settile_bits;
+    // cur_gfx++;
+    // gDPSetTileSize(cur_gfx++, G_TX_RENDERTILE + tex_index, 0, 0, (width - 1) << G_TEXTURE_IMAGE_FRAC, (height - 1) << G_TEXTURE_IMAGE_FRAC);
 
     return cur_gfx;
 }

@@ -843,6 +843,12 @@ void endFrame()
         // Link this layer's displaylist to the main displaylist
         gSPDisplayList(g_dlist_head++, drawLayerStarts[i]);
 
+        if (cur_layer_materials[i])
+        {
+            // Reset the state from this layer's last material so that the previous layer is in a valid initial state
+            resetMaterial(cur_layer_materials[i], static_cast<DrawLayer>(i));
+        }
+
         // Terminate this draw layer's displaylist
         gSPEndDisplayList(drawLayerHeads[i]);
     }

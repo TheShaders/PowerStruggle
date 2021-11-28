@@ -14,7 +14,7 @@
 ShootDefinition shooter_definitions[] = {
     { // Grease-E
         { // base
-            "models/Box", // model_name
+            "models/shot_Grease-E", // model_name
             nullptr,      // model
             100,          // max_health
             25,           // controllable_health
@@ -31,7 +31,7 @@ ShootDefinition shooter_definitions[] = {
             50,      // shot_height
             25.0f,   // shot_y_offset
             800.0f,  // fire_radius
-            30,      // shot_rate
+            60,      // shot_rate
         }
     }
 };
