@@ -14,7 +14,7 @@
 SpinnerDefinition spinner_definitions[] = {
     { // Harv-E
         { // base
-            "models/Box", // model_name
+            "models/spinner_Harv-E", // model_name
             nullptr,      // model
             100,          // max_health
             25,           // controllable_health
@@ -22,7 +22,7 @@ SpinnerDefinition spinner_definitions[] = {
             EnemyType::Spinner, // enemy_type
         },
         { // params
-            "models/Weapon", // blade_model_name
+            "models/blade_Harv-E", // blade_model_name
             nullptr, // blade_model
             1536.0f, // sight_radius
             150.0f, // follow_distance
