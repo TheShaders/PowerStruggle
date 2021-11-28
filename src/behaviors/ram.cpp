@@ -19,6 +19,7 @@ RamDefinition ram_definitions[] = {
         { // base
             "models/Box", // model_name
             nullptr,      // model
+            "Till-R",     // enemy_name
             100,          // max_health
             25,           // controllable_health
             7.0f,         // move_speed

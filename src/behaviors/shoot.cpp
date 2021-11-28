@@ -16,6 +16,7 @@ ShootDefinition shooter_definitions[] = {
         { // base
             "models/shot_Grease-E", // model_name
             nullptr,      // model
+            "Grease-E",   // enemy_name
             100,          // max_health
             25,           // controllable_health
             5.0f,         // move_speed

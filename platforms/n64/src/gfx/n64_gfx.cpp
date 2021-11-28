@@ -247,7 +247,7 @@ const Gfx rdpInitDL[] = {
             G_TC_FILT | G_CK_NONE | G_CD_DISABLE | G_AD_DISABLE,
         G_AC_NONE | G_ZS_PIXEL | G_RM_OPA_SURF | G_RM_OPA_SURF2),
 #ifndef INTERLACED
-    gsDPSetScissor(G_SC_NON_INTERLACE, 0, 0, screen_width, screen_height),
+    gsDPSetScissor(G_SC_NON_INTERLACE, 0, border_height, screen_width, screen_height - border_height),
 #endif
     gsDPSetCombineLERP(ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1, ENVIRONMENT, 0, SHADE, 0, 0, 0, 0, 1),
     gsDPSetEnvColor(0xFF, 0xFF, 0xFF, 0xFF),

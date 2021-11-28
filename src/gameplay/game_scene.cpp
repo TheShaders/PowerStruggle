@@ -12,6 +12,7 @@
 #include <collision.h>
 #include <behaviors.h>
 #include <control.h>
+#include <text.h>
 
 extern "C" {
 #include <debug.h>
@@ -179,6 +180,7 @@ void GameplayScene::draw()
     setupCameraMatrices(&g_Camera);
     // debug_printf("before light dir\n");
     setLightDirection(lightDir);
+    set_text_color(255, 255, 255, 255);
 
     if (g_gameTimer > 30)
     {
@@ -187,6 +189,9 @@ void GameplayScene::draw()
 
         drawAllEntities();
         drawAllEntitiesHealth();
+        set_text_color(0, 128, 0, 255);
+        print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
+        draw_all_text();
         // drawAllHitboxes();
     }
 }

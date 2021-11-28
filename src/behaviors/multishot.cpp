@@ -16,6 +16,7 @@ MultishotDefinition multishoter_definitions[] = {
         { // base
             "models/multishot_Fume-R", // model_name
             nullptr,      // model
+            "Gas-E",      // enemy_name
             100,          // max_health
             25,           // controllable_health
             5.0f,         // move_speed

@@ -15,4 +15,6 @@ public:
     virtual void unloading_update() = 0;
 };
 
+void start_scene_load(std::unique_ptr<Scene>&& new_scene);
+
 #endif

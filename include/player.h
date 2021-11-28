@@ -56,4 +56,6 @@ void playerCallback(void **components, void *data);
 
 extern Entity* g_PlayerEntity;
 
+BaseEnemyDefinition* get_player_controlled_definition();
+
 #endif

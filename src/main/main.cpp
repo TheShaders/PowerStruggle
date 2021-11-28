@@ -13,6 +13,7 @@ extern "C" {
 #include <gameplay.h>
 #include <files.h>
 #include <mem.h>
+#include <text.h>
 
 #include <platform_gfx.h>
 
@@ -21,6 +22,11 @@ uint32_t g_graphicsTimer = 0;
 
 std::unique_ptr<Scene> cur_scene;
 std::unique_ptr<Scene> loading_scene;
+
+void start_scene_load(std::unique_ptr<Scene>&& new_scene)
+{
+    loading_scene = std::move(new_scene);
+}
 
 void update()
 {
@@ -54,6 +60,7 @@ int main(UNUSED int argc, UNUSED char **arg)
     initInput();
     initGfx();
     audioInit();
+    text_init();
 
     cur_scene = std::make_unique<GameplayScene>();
     cur_scene->load();

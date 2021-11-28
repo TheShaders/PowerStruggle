@@ -20,6 +20,7 @@ extern "C" {
 #include <files.h>
 #include <behaviors.h>
 #include <control.h>
+#include <text.h>
 
 #include <memory>
 
@@ -390,4 +391,10 @@ void playerCallback(void **components, void *data)
     }
 
     // debug_printf("Player position: %5.2f %5.2f %5.2f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
+}
+
+BaseEnemyDefinition* get_player_controlled_definition()
+{
+    BaseEnemyState* state = reinterpret_cast<BaseEnemyState*>(player_control_state.data());
+    return state->definition;
 }

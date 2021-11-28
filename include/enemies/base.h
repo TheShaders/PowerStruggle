@@ -5,6 +5,7 @@
 struct BaseEnemyInfo {
     const char* model_name;
     Model* model;
+    const char* enemy_name;
     uint16_t max_health;
     uint16_t controllable_health;
     // Speed the enemy will move at

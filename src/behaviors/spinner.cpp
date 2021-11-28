@@ -16,6 +16,7 @@ SpinnerDefinition spinner_definitions[] = {
         { // base
             "models/spinner_Harv-E", // model_name
             nullptr,      // model
+            "Harv-E",     // enemy_name
             100,          // max_health
             25,           // controllable_health
             7.0f,         // move_speed

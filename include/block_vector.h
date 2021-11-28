@@ -23,7 +23,22 @@ public:
     struct Block {
         Block *next;
         size_type count;
-        std::array<T, block_size> contents;
+        // std::array<T, block_size> contents;
+        std::aligned_storage<sizeof(T), alignof(T)>::type contents[block_size];
+
+
+        // Block() = default;
+        // Block(const Block&) = delete;
+        // Block(Block&&) = delete;
+        // Block& operator=(const Block&) = delete;
+        // Block& operator=(Block&&) = delete;
+        // ~Block()
+        // {
+        //     for (size_type i = 0; i < count; i++)
+        //     {
+        //         reinterpret_cast<T*>(&contents[i])->~T();
+        //     }
+        // }
     };
     struct Iterator {
         using iterator_category = std::forward_iterator_tag;
@@ -32,9 +47,10 @@ public:
         using pointer           = T*;
         using reference         = T&;
 
+        constexpr Iterator() : block_(nullptr), index_(0) {}
         constexpr Iterator(Block* block, size_type index) : block_(block), index_(index) {}
-        constexpr reference operator*() const { return block_->contents[index_]; }
-        constexpr pointer operator->() { return &block_->contents[index_]; }
+        constexpr reference operator*() const { return reinterpret_cast<reference>(block_->contents[index_]); }
+        constexpr pointer operator->() { return reinterpret_cast<pointer>(&block_->contents[index_]); }
         constexpr Iterator& operator++()
         {
             ++index_;
@@ -138,7 +154,18 @@ public:
     template <typename... Args>
     constexpr iterator emplace_back(Args&&... args) noexcept
     {
-        new (&last_->contents[last_->count]) T(args...);
+        new (&last_->contents[last_->count]) T(std::forward<Args>(args)...);
+        iterator ret{last_, last_->count++};
+        if (last_->count == block_size)
+        {
+            add_block();
+        }
+        return ret;
+    }
+
+    constexpr iterator push_back(const T& val) noexcept
+    {
+        new (&last_->contents[last_->count]) T(val);
         iterator ret{last_, last_->count++};
         if (last_->count == block_size)
         {

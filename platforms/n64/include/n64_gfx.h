@@ -31,6 +31,7 @@ constexpr int screen_height = 480;
 #else
 constexpr int screen_width = 320;
 constexpr int screen_height = 240;
+constexpr int border_height = 8;
 #endif
 
 #define BUFFER_SEGMENT 0x01
