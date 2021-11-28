@@ -27991,7 +27991,7 @@
       "Z": 2,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 4,
+        "ObjectType": 6,
         "ObjectSubtype": 0
       },
       "ObjectParam": 0

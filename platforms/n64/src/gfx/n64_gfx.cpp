@@ -164,7 +164,34 @@ void addMtxToDrawLayer(DrawLayer drawLayer, Mtx* mtx)
     removeDrawLayerSlot(drawLayer);
 }
 
-Gfx* cur_layer_materials[gfx::draw_layers];
+constexpr s32 default_geometry_mode = G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING;
+
+void resetMaterial(MaterialHeader* material, DrawLayer drawLayer)
+{
+    gDPPipeSync(drawLayerHeads[static_cast<int>(drawLayer)]++);
+    removeDrawLayerSlot(drawLayer);
+    if ((material->flags & MaterialFlags::set_rendermode) != MaterialFlags::none)
+    {
+        addGfxToDrawLayer(drawLayer, drawLayerRenderModes1Cycle[static_cast<int>(drawLayer)].data());
+    }
+    if ((material->flags & MaterialFlags::set_geometry_mode) != MaterialFlags::none)
+    {
+        gSPLoadGeometryMode(drawLayerHeads[static_cast<int>(drawLayer)]++, default_geometry_mode);
+        removeDrawLayerSlot(drawLayer);
+    }
+    if ((material->flags & MaterialFlags::two_cycle) != MaterialFlags::none)
+    {
+        gDPSetCycleType(drawLayerHeads[static_cast<int>(drawLayer)]++, G_CYC_1CYCLE);
+        removeDrawLayerSlot(drawLayer);
+    }
+    if ((material->flags & MaterialFlags::point_filter) != MaterialFlags::none)
+    {
+        gDPSetTextureFilter(drawLayerHeads[static_cast<int>(drawLayer)]++, G_TF_BILERP);
+        removeDrawLayerSlot(drawLayer);
+    }
+}
+
+MaterialHeader* cur_layer_materials[gfx::draw_layers];
 
 void resetGfxFrame(void)
 {
@@ -251,7 +278,7 @@ const Gfx clearDepthBuffer[] = {
 
 void rspUcodeLoadInit(void)
 {
-    gSPLoadGeometryMode(g_dlist_head++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
+    gSPLoadGeometryMode(g_dlist_head++, default_geometry_mode);
     gSPTexture(g_dlist_head++, 0, 0, 0, 0, G_OFF);
     
     gSPSetLights1(g_dlist_head++, (*light));
@@ -506,12 +533,16 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
             for (size_t draw_idx = 0; draw_idx < curJointLayer->num_draws; draw_idx++)
             {
                 auto& cur_draw = curJointLayer->draws[draw_idx];
-                Gfx* cur_material_dl = toDraw->materials[cur_draw.material_index]->gfx;
+                MaterialHeader* cur_material = toDraw->materials[cur_draw.material_index];
                 // Check if we've changed materials; if so load the new material
-                if (cur_material_dl != cur_layer_materials[cur_layer])
+                if (cur_material != cur_layer_materials[cur_layer])
                 {
-                    cur_layer_materials[cur_layer] = cur_material_dl;
-                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_material_dl);
+                    if (cur_layer_materials[cur_layer] != nullptr)
+                    {
+                        resetMaterial(cur_layer_materials[cur_layer], static_cast<DrawLayer>(cur_layer));
+                    }
+                    cur_layer_materials[cur_layer] = cur_material;
+                    addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_material->gfx);
                 }
                 // Check if this draw has any groups and skip it if it doesn't
                 if (cur_draw.num_groups != 0)
@@ -742,7 +773,8 @@ void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near,
     // g_perspNorm = 0xFFFF;
 
     // Set up view matrix
-    guLookAtF(g_gfxContexts[g_curGfxContext].viewMtxF,
+    guLookAtReflectF(g_gfxContexts[g_curGfxContext].viewMtxF, lookAt, 
+    // guLookAtF(g_gfxContexts[g_curGfxContext].viewMtxF,
         eye_pos[0] - camera->model_offset[0],
         eye_pos[1] - camera->model_offset[1],
         eye_pos[2] - camera->model_offset[2], // Eye pos

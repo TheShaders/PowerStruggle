@@ -205,15 +205,46 @@ Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos, char const* const* images)
         gDPSetColor(gfx_pos++, G_SETPRIMCOLOR, prim);
         material_data += sizeof(uint32_t);
     }
+    int tex_0_width = 0, tex_0_height = 0;
+    int tex_1_width = 0, tex_1_height = 0;
     if ((flags & MaterialFlags::tex0) != MaterialFlags::none)
     {
         gfx_pos = process_texture_params((TextureParams*)material_data, gfx_pos, images, 0);
+        tex_0_width = ((TextureParams*)material_data)->image_width;
+        tex_0_height = ((TextureParams*)material_data)->image_width;
         material_data += sizeof(TextureParams);
     }
     if ((flags & MaterialFlags::tex1) != MaterialFlags::none)
     {
         gfx_pos = process_texture_params((TextureParams*)material_data, gfx_pos, images, 1);
+        tex_1_width = ((TextureParams*)material_data)->image_width;
+        tex_1_height = ((TextureParams*)material_data)->image_width;
         material_data += sizeof(TextureParams);
+    }
+    if ((flags & MaterialFlags::set_geometry_mode) != MaterialFlags::none)
+    {
+        uint32_t geometry_mode = *(uint32_t*)material_data;
+        gSPLoadGeometryMode(gfx_pos++, geometry_mode);
+        if (geometry_mode & (G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR))
+        {
+            if ((flags & MaterialFlags::tex0) != MaterialFlags::none)
+            {
+                gSPTexture(gfx_pos++, tex_0_width << 6, tex_0_height << 6, 0, G_TX_RENDERTILE + 0, G_ON);
+            }
+            if ((flags & MaterialFlags::tex1) != MaterialFlags::none)
+            {
+                gSPTexture(gfx_pos++, tex_1_width << 6, tex_1_height << 6, 0, G_TX_RENDERTILE + 1, G_ON);
+            }
+        }
+        material_data += sizeof(uint32_t);
+    }
+    if ((flags & MaterialFlags::two_cycle) != MaterialFlags::none)
+    {
+        gDPSetCycleType(gfx_pos++, G_CYC_2CYCLE);
+    }
+    if ((flags & MaterialFlags::point_filter) != MaterialFlags::none)
+    {
+        gDPSetTextureFilter(gfx_pos++, G_TF_POINT);
     }
     gSPEndDisplayList(gfx_pos++);
     return gfx_pos;

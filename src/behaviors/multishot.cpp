@@ -14,7 +14,7 @@
 MultishotDefinition multishoter_definitions[] = {
     { // Gas-E
         { // base
-            "models/Box", // model_name
+            "models/multishot_Fume-R", // model_name
             nullptr,      // model
             100,          // max_health
             25,           // controllable_health
@@ -29,7 +29,7 @@ MultishotDefinition multishoter_definitions[] = {
             8.0f,   // shot_speed
             25,      // shot_radius
             50,      // shot_height
-            25.0f,   // shot_y_offset
+            60.0f,   // shot_y_offset
             800.0f,  // fire_radius
             120,      // shot_rate
         }
@@ -81,9 +81,9 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
             (*vel)[0] = 0;
         }
 
-        (*pos)[0] = multishoter_pos[0] + (*vel)[0];
+        (*pos)[0] = multishoter_pos[0] + 8 * (*vel)[0];
         (*pos)[1] = multishoter_pos[1] + params->shot_y_offset;
-        (*pos)[2] = multishoter_pos[2] + (*vel)[2];
+        (*pos)[2] = multishoter_pos[2] + 8 * (*vel)[2];
 
         active_state->delete_on_deactivate = 1;
 

@@ -132,6 +132,11 @@ ControlHandler* control_handlers[] = {
     &bomb_control_handler,
     nullptr,
     &multishot_control_handler,
+    nullptr, // jet
+    // stab
+    // slam
+    // mortar
+    // flamethrower
 };
 
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
