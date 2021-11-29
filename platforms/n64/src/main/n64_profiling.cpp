@@ -1,9 +1,12 @@
 #include <ultra64.h>
 #include <profiling.h>
+#include <cinttypes>
 
 extern "C" {
 #include <debug.h>
 }
+
+#include <text.h>
 
 static struct {
     u32 cpuTime;
@@ -33,11 +36,15 @@ void profileEndMainLoop()
     ProfilerData.rdpPipeTime = IO_READ(DPC_PIPEBUSY_REG);
     ProfilerData.rdpTmemTime = IO_READ(DPC_TMEM_REG);
 
-    debug_printf(
-        // "CPU:  %8u RSP:  %8u CLK:  %8u\n"
-        // "CMD:  %8u PIPE: %8u TMEM: %8u\n"
-        "  CPU us: %u\n",
-        // ProfilerData.cpuTime, ProfilerData.rspTime, ProfilerData.rdpClockTime, ProfilerData.rdpCmdTime,
-        // ProfilerData.rdpPipeTime, ProfilerData.rdpTmemTime,
-        (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
+    // debug_printf(
+    //     // "CPU:  %8u RSP:  %8u CLK:  %8u\n"
+    //     // "CMD:  %8u PIPE: %8u TMEM: %8u\n"
+    //     "  CPU us: %u\n",
+    //     // ProfilerData.cpuTime, ProfilerData.rspTime, ProfilerData.rdpClockTime, ProfilerData.rdpCmdTime,
+    //     // ProfilerData.rdpPipeTime, ProfilerData.rdpTmemTime,
+    //     (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
+
+    char text_buf[32];
+    sprintf(text_buf, "CPU us: %" PRIu32 "\n", (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
+    print_text(10, 10, text_buf);
 }

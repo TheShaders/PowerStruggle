@@ -1,22 +1,23 @@
-#ifndef __SCENE_H__
-#define __SCENE_H__
+#ifndef __TITLE_H__
+#define __TITLE_H__
 
-#include <memory>
+#include <scene.h>
 
-class Scene {
+class TitleScene : public Scene {
 public:
+    TitleScene();
     // Called every frame after the scene is constructed, stops being called once it returns true
-    virtual bool load() = 0;
+    bool load() override final;
     // Called every frame while the scene is active at a fixed 60Hz rate for logic handling
-    virtual void update() = 0;
+    void update() override final;
     // Called every frame while the scene is active every frame for drawing the scene contents
-    virtual void draw() = 0;
+    void draw() override final;
     // Called every frame while the scene is active after graphics processing is complete
-    virtual void after_gfx() = 0;
+    void after_gfx() override final;
     // Called every frame while the scene is being unloaded
-    virtual void unloading_update() = 0;
+    void unloading_update() override final;
+private:
+    int title_timer_;
 };
-
-void start_scene_load(std::unique_ptr<Scene>&& new_scene);
 
 #endif

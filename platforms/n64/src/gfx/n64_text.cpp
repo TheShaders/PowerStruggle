@@ -52,6 +52,12 @@ void print_text(int x, int y, char const* text, int length)
     std::copy(text, text + length, std::back_inserter(text_storage));
 }
 
+void print_text_centered(int x, int y, char const* text, int length)
+{
+    int width = length * 6;
+    print_text(x - width / 2, y, text, length);
+}
+
 extern Gfx* g_gui_dlist_head;
 
 void draw_all_text()
@@ -77,7 +83,7 @@ void draw_all_text()
             gSPTextureRectangle(g_gui_dlist_head++, (x) << 2, (y) << 2, (x + 6) << 2, (y + 8) << 2, 0,
                 ((character - font_char_offset) * 6) << 5, 0 << 5,
                 1 << 10, 1 << 10);
-            it++;
+            ++it;
             x += 6;
         }
     }

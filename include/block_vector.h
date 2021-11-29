@@ -180,6 +180,9 @@ public:
     const_iterator end() const noexcept { return {last_, last_->count}; }
     iterator       end()       noexcept { return {last_, last_->count}; }
 
+    const_iterator back() const noexcept { return {last_, last_->count - 1}; }
+    iterator       back()       noexcept { return {last_, last_->count - 1}; }
+
     struct BlockIterator
     {
         constexpr BlockIterator(Block* block) : block_(block) {}

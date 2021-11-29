@@ -19,7 +19,7 @@
 constexpr unsigned int output_buff_len = 1024;
 
 constexpr unsigned int display_list_len = 1024;
-constexpr unsigned int gui_display_list_len = 1024;
+constexpr unsigned int gui_display_list_len = 4096;
 constexpr unsigned int gfx_pool_size = 65536 * 8;
 constexpr unsigned int gfx_pool_size64 = gfx_pool_size / 8;
 

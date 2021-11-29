@@ -1159,7 +1159,7 @@
             },
             "mimeType" : "image/png",
             "name" : "metal_shiny.RGBA16",
-            "uri" : "../images/metal_shiny_RGBA16.png"
+            "uri" : "../textures/metal_shiny_RGBA16.png"
         },
         {
             "extensions" : {
@@ -1169,7 +1169,7 @@
             },
             "mimeType" : "image/png",
             "name" : "treads_IA4",
-            "uri" : "../images/treads_IA4.png"
+            "uri" : "../textures/treads_IA4.png"
         },
         {
             "extensions" : {
@@ -1179,7 +1179,7 @@
             },
             "mimeType" : "image/png",
             "name" : "wheel_IA4",
-            "uri" : "../images/wheel_IA4.png"
+            "uri" : "../textures/wheel_IA4.png"
         },
         {
             "extensions" : {
@@ -1189,7 +1189,7 @@
             },
             "mimeType" : "image/png",
             "name" : "gascan.RGBA16",
-            "uri" : "../images/gascan_RGBA16.png"
+            "uri" : "../textures/gascan_RGBA16.png"
         },
         {
             "extensions" : {
@@ -1199,7 +1199,7 @@
             },
             "mimeType" : "image/png",
             "name" : "0001",
-            "uri" : "../images/0001.png"
+            "uri" : "../textures/0001.png"
         }
     ],
     "skins" : [

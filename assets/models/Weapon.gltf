@@ -142,7 +142,7 @@
             },
             "mimeType" : "image/png",
             "name" : "Wrench",
-            "uri" : "../images/Wrench.png"
+            "uri" : "../textures/Wrench.png"
         }
     ],
     "accessors" : [

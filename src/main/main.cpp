@@ -5,6 +5,7 @@ extern "C" {
 #include <debug.h>
 }
 #include <main.h>
+#include <title.h>
 #include <gfx.h>
 #include <input.h>
 #include <profiling.h>
@@ -47,6 +48,10 @@ void update()
     }
 }
 
+// #ifdef DEBUG_MODE
+#define PROFILING
+// #endif
+
 void audioInit();
 
 int main(UNUSED int argc, UNUSED char **arg)
@@ -62,7 +67,7 @@ int main(UNUSED int argc, UNUSED char **arg)
     audioInit();
     text_init();
 
-    cur_scene = std::make_unique<GameplayScene>();
+    cur_scene = std::make_unique<TitleScene>();//std::make_unique<GameplayScene>();
     cur_scene->load();
 
     while (1)
@@ -75,7 +80,7 @@ int main(UNUSED int argc, UNUSED char **arg)
         // debug_printf("before read input\n");
         readInput();
         
-#ifdef DEBUG_MODE
+#ifdef PROFILING
         profileStartMainLoop();
 #endif
 
@@ -96,13 +101,13 @@ int main(UNUSED int argc, UNUSED char **arg)
             memset(&g_PlayerInput, 0, sizeof(g_PlayerInput));
         }
         // Update the scene
-        cur_scene->update();
+        update();
         g_gameTimer++;
 #endif
         // Draw the current scene
         cur_scene->draw();
 
-#ifdef DEBUG_MODE
+#ifdef PROFILING
         profileBeforeGfxMainLoop();
 #endif
         g_graphicsTimer++;
@@ -111,7 +116,7 @@ int main(UNUSED int argc, UNUSED char **arg)
 
         cur_scene->after_gfx();
 
-#ifdef DEBUG_MODE
+#ifdef PROFILING
         profileEndMainLoop();
 #endif
 

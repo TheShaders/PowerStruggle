@@ -873,7 +873,7 @@
             },
             "mimeType" : "image/png",
             "name" : "metalshine_I4",
-            "uri" : "../images/metalshine_I4.png"
+            "uri" : "../textures/metalshine_I4.png"
         },
         {
             "extensions" : {
@@ -883,7 +883,7 @@
             },
             "mimeType" : "image/png",
             "name" : "scythe_IA4",
-            "uri" : "../images/scythe_IA4.png"
+            "uri" : "../textures/scythe_IA4.png"
         }
     ],
     "skins" : [

@@ -178,8 +178,8 @@ void gather_rectangle_hitboxes(size_t count, void *arg, void **componentArrays)
 
 int circle_rectangle_intersection(Vec3 rect_pos, float rect_size_x, float rect_size_z, int rect_rot, Vec3 circle_pos, float circle_radius)
 {
-    debug_printf("Checking circle/rectangle collision\n");
-    debug_printf("  Rect rot: %d Radius: %5.2f\n", rect_rot, circle_radius);
+    // debug_printf("Checking circle/rectangle collision\n");
+    // debug_printf("  Rect rot: %d Radius: %5.2f\n", rect_rot, circle_radius);
     float rel_x = circle_pos[0] - rect_pos[0];
     float rel_z = circle_pos[2] - rect_pos[2];
     int angle = rect_rot;
@@ -189,12 +189,12 @@ int circle_rectangle_intersection(Vec3 rect_pos, float rect_size_x, float rect_s
     // Calculate the position of the circle in the rectangle's coordinate frame
     float local_x = cos_rot * rel_x - sin_rot * rel_z;
     float local_z = sin_rot * rel_x + cos_rot * rel_z;
-    debug_printf("  Local pos %5.2f %5.2f\n", local_x, local_z);
+    // debug_printf("  Local pos %5.2f %5.2f\n", local_x, local_z);
 
     // Get the closest point on the rectangle to the circle in the rectangle's coordinate frame
     float delta_x = local_x - std::max(-rect_size_x * 0.5f, std::min(local_x, rect_size_x * 0.5f));
     float delta_z = local_z - std::max(-rect_size_z * 0.5f, std::min(local_z, rect_size_z * 0.5f));
-    debug_printf("  Delta %5.2f %5.2f\n", delta_x, delta_z);
+    // debug_printf("  Delta %5.2f %5.2f\n", delta_x, delta_z);
     return (delta_x * delta_x + delta_z * delta_z) < (circle_radius * circle_radius);
 }
 

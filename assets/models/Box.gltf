@@ -142,7 +142,7 @@
             },
             "mimeType" : "image/png",
             "name" : "Test",
-            "uri" : "../images/Test.png"
+            "uri" : "../textures/Test.png"
         }
     ],
     "accessors" : [
