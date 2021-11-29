@@ -21,6 +21,8 @@ ShootDefinition shooter_definitions[] = {
             25,           // controllable_health
             5.0f,         // move_speed
             EnemyType::Shoot, // enemy_type
+            45, // head_y_offset
+            -25, // head_z_offset
         },
         { // params
             "models/Sphere", // shot_model_name
@@ -65,19 +67,6 @@ void setup_shot_hitbox(const Vec3& shooter_pos, const Vec3s& shooter_rot, ShootD
     active_state.delete_on_deactivate = 1;
 }
 
-void create_shoot_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
-{
-    Entity* shooter_entity = (Entity*)arg;
-    void* shooter_components[1 + NUM_COMPONENTS(ARCHETYPE_SHOOT)];
-    getEntityComponents(shooter_entity, shooter_components);
-    Vec3& shooter_pos = *get_component<Bit_Position, Vec3>(shooter_components, ARCHETYPE_SHOOT);
-    Vec3s& shooter_rot = *get_component<Bit_Rotation, Vec3s>(shooter_components, ARCHETYPE_SHOOT);
-    BehaviorState& shooter_bhv = *get_component<Bit_Behavior, BehaviorState>(shooter_components, ARCHETYPE_SHOOT);
-    ShootState* state = reinterpret_cast<ShootState*>(shooter_bhv.data.data());
-    ShootDefinition* definition = static_cast<ShootDefinition*>(state->definition);
-    setup_shot_hitbox(shooter_pos, shooter_rot, definition, componentArrays, player_hitbox_mask);
-}
-
 void shooter_callback(void **components, void *data)
 {
     Entity* shooter = get_entity(components);
@@ -107,7 +96,11 @@ void shooter_callback(void **components, void *data)
     // Otherwise if the player is close enough to be shot at, shoot
     else if (player_dist < params->fire_radius)
     {
-        queue_entity_creation(ARCHETYPE_SHOOT_HITBOX, shooter, 1, create_shoot_hitbox_callback);
+        Entity* shot_hitbox = createEntity(ARCHETYPE_SHOOT_HITBOX);
+        void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_SHOOT_HITBOX) + 1];
+        getEntityComponents(shot_hitbox, hitbox_components);
+        
+        setup_shot_hitbox(pos, rot, definition, hitbox_components, player_hitbox_mask);
         state->shot_timer = params->shot_rate;
     }
     handle_enemy_hits(shooter, collider, health);
@@ -182,27 +175,14 @@ void on_shooter_enter(BaseEnemyState* base_state, InputData* input, void** playe
     }
 }
 
-void create_player_shot_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)
-{
-    Entity* player = (Entity*)arg;
-    void* player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
-    getEntityComponents(player, player_components);
-    Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
-    Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
-    BehaviorState& player_bhv = *get_component<Bit_Behavior, BehaviorState>(player_components, ARCHETYPE_PLAYER);
-
-    PlayerState* state = reinterpret_cast<PlayerState*>(player_bhv.data.data());
-    ShootDefinition* definition = static_cast<ShootDefinition*>(state->controlled_state->definition);
-
-    setup_shot_hitbox(player_pos, player_rot, definition, componentArrays, enemy_hitbox_mask);
-}
-
 void on_shooter_update(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
     ShootDefinition* definition = static_cast<ShootDefinition*>(base_state->definition);
     ShootState* state = static_cast<ShootState*>(base_state);
     ShootParams* params = &definition->params;
-    Entity* player = get_entity(player_components);
+    // Entity* player = get_entity(player_components);
+    Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
 
     // If in cooldown, decrement the cooldown timer
     if (state->shot_timer > 0)
@@ -212,7 +192,11 @@ void on_shooter_update(BaseEnemyState* base_state, InputData* input, void** play
     // Otherwise if the player is pressing the fire button, fire
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_SHOOT_HITBOX, player, 1, create_player_shot_hitbox_callback);
+        Entity* shot_hitbox = createEntity(ARCHETYPE_SHOOT_HITBOX);
+        void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_SHOOT_HITBOX) + 1];
+        getEntityComponents(shot_hitbox, hitbox_components);
+        
+        setup_shot_hitbox(player_pos, player_rot, definition, hitbox_components, enemy_hitbox_mask);
         state->shot_timer = params->shot_rate;
     }
 }

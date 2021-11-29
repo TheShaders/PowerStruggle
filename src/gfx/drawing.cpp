@@ -246,22 +246,34 @@ void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
 {
     Vec3* player_pos = reinterpret_cast<Vec3*>(arg);
     Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CONTROLLABLE);
+    Vec3s* cur_rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_CONTROLLABLE);
     BehaviorState* cur_bhv = get_component<Bit_Behavior, BehaviorState>(componentArrays, ARCHETYPE_CONTROLLABLE);
 
     while (count)
     {
         BaseEnemyState* enemy_state = reinterpret_cast<BaseEnemyState*>(cur_bhv->data.data());
 
-        int rot = atan2s((*player_pos)[2] - (*cur_pos)[2], (*player_pos)[0] - (*cur_pos)[0]);
+        int head_rot = atan2s((*player_pos)[2] - (*cur_pos)[2], (*player_pos)[0] - (*cur_pos)[0]);
+        float x = (*cur_pos)[0];
+        float z = (*cur_pos)[2];
+
+        int z_offset = enemy_state->definition->base.head_z_offset;
+
+        if (z_offset != 0)
+        {
+            x -= static_cast<float>(z_offset) * sinsf((*cur_rot)[1]);
+            z -= static_cast<float>(z_offset) * cossf((*cur_rot)[1]);
+        }
 
         gfx::push_mat();
-         gfx::apply_translation_affine((*cur_pos)[0], (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, (*cur_pos)[2]);
-         gfx::rotate_euler_xyz(0, rot, 0);
+         gfx::apply_translation_affine(x, (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, z);
+         gfx::rotate_euler_xyz(0, head_rot, 0);
          drawModel(head_model, nullptr, 0);
 
         gfx::pop_mat();
 
         cur_pos++;
+        cur_rot++;
         cur_bhv++;
         count--;
     }

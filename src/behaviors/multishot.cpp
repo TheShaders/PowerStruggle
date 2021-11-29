@@ -21,7 +21,7 @@ MultishotDefinition multishoter_definitions[] = {
             25,           // controllable_health
             5.0f,         // move_speed
             EnemyType::Multishot, // enemy_type
-            142 // head_y_offset
+            110 // head_y_offset
         },
         { // params
             "models/Sphere", // shot_model_name
@@ -139,7 +139,7 @@ void multishoter_callback(void **components, void *data)
     // Otherwise if the player is close enough to be shot at, shoot
     else if (player_dist < params->fire_radius)
     {
-        queue_entity_creation(ARCHETYPE_MULTISHOT_HITBOX, enemy, 4, create_multishot_hitbox_callback);
+        createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, enemy, 4, create_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }
     handle_enemy_hits(enemy, collider, health);
@@ -245,7 +245,7 @@ void on_multishoter_update(BaseEnemyState* base_state, InputData* input, void** 
     // Otherwise if the player is pressing the fire button, fire
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_MULTISHOT_HITBOX, player, 4, create_player_multishot_hitbox_callback);
+        createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, player, 4, create_player_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }
 }
