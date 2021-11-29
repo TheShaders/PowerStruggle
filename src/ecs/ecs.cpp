@@ -565,10 +565,10 @@ void getEntityComponents(Entity *entity, void **componentArrayOut)
         arrayIndex -= blockElementCount;
     }
 
-    componentArrayOut[0] = entity;
-
     // Keep track of the position of the current component's array in the block
     uintptr_t block_offset = sizeof(Entity*) * blockElementCount + sizeof(MultiArrayListBlock);
+
+    componentArrayOut[0] = reinterpret_cast<Entity**>((uintptr_t)curBlock + sizeof(Entity*) * arrayIndex + sizeof(MultiArrayListBlock));
 
     while (archetype)
     {

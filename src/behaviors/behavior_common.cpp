@@ -83,6 +83,8 @@ std::array create_enemy_funcs {
     create_bomb_enemy,
     placeholder_create, // beam
     create_multishot_enemy,
+    placeholder_create, // jet
+    create_stab_enemy,
 };
 
 using delete_enemy_func_t = void(Entity*);
@@ -123,6 +125,8 @@ extern ControlHandler ram_control_handler;
 extern ControlHandler bomb_control_handler;
 // beam
 extern ControlHandler multishot_control_handler;
+// jet
+extern ControlHandler stab_control_handler;
 
 ControlHandler* control_handlers[] = {
     &shoot_control_handler,
@@ -133,7 +137,7 @@ ControlHandler* control_handlers[] = {
     nullptr,
     &multishot_control_handler,
     nullptr, // jet
-    // stab
+    &stab_control_handler, // stab
     // slam
     // mortar
     // flamethrower

@@ -173,7 +173,11 @@ void slasher_callback(void **components, void *data)
     // Otherwise if the player is close enough to be hit, start a slash
     else if (player_dist < (float)(int)params->slash_length + PLAYER_RADIUS)
     {
-        queue_entity_creation(ARCHETYPE_SLASH_HITBOX, slasher, 1, create_slasher_hitbox_callback);
+        Entity* stab_hitbox = createEntity(ARCHETYPE_SLASH_HITBOX);
+        void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_SLASH_HITBOX) + 1];
+        getEntityComponents(stab_hitbox, hitbox_components);
+
+        setup_slash_hitbox(pos, rot, vel, state, hitbox_components, player_hitbox_mask);
     }
 }
 
@@ -267,7 +271,7 @@ void on_slasher_update(BaseEnemyState* base_state, InputData* input, void** play
     SlasherDefinition* definition = static_cast<SlasherDefinition*>(base_state->definition);
     SlasherState* state = static_cast<SlasherState*>(base_state);
     SlasherParams* params = &definition->params;
-    Entity* player = get_entity(player_components);
+    // Entity* player = get_entity(player_components);
 
     Vec3& pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
     Vec3& vel = *get_component<Bit_Velocity, Vec3>(player_components, ARCHETYPE_PLAYER);
@@ -286,7 +290,11 @@ void on_slasher_update(BaseEnemyState* base_state, InputData* input, void** play
     // Otherwise if the player is close enough to be hit, start a slash
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_SLASH_HITBOX, player, 1, create_player_slash_hitbox_callback);
+        Entity* slash_hitbox = createEntity(ARCHETYPE_SLASH_HITBOX);
+        void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_SLASH_HITBOX) + 1];
+        getEntityComponents(slash_hitbox, hitbox_components);
+
+        setup_slash_hitbox(pos, rot, vel, state, hitbox_components, enemy_hitbox_mask);
     }
 }
 

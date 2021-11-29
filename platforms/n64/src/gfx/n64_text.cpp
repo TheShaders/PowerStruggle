@@ -1,6 +1,7 @@
 #include <text.h>
 #include <gfx.h>
 #include <block_vector.h>
+#include <main.h>
 
 #include <ultra64.h>
 #include <n64_gfx.h>

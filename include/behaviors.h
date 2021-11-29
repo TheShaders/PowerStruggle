@@ -26,8 +26,12 @@ enum class EnemyType : uint8_t {
 #include <enemies/spinner.h>
 #include <enemies/ram.h>
 #include <enemies/bomb.h>
-
+// beam
 #include <enemies/multishot.h>
+// jet
+#include <enemies/stab.h>
+// mortar
+// flame
 
 // Check if the target is in the sight radius and if so moves towards being the given distance from it
 float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos);
