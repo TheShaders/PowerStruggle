@@ -7,6 +7,10 @@
         {
             "name": "electricity",
             "sample": "electricity.wav"
+        },
+        {
+            "name": "bootup",
+            "sample": "bootup.wav"
         }
     ]
 }

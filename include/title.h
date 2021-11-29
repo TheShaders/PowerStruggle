@@ -3,6 +3,11 @@
 
 #include <scene.h>
 
+enum class TitleState {
+    Startup,
+    DisplayTitle
+};
+
 class TitleScene : public Scene {
 public:
     TitleScene();
@@ -18,6 +23,7 @@ public:
     void unloading_update() override final;
 private:
     int title_timer_;
+    TitleState title_state_;
 };
 
 #endif

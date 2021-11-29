@@ -731,9 +731,9 @@ u8* allocGfx(s32 size)
 
 void setLightDirection(Vec3 lightDir)
 {
-    light->a.l.col[0] = light->a.l.colc[0] = 0x3F;
-    light->a.l.col[1] = light->a.l.colc[1] = 0x3F;
-    light->a.l.col[2] = light->a.l.colc[2] = 0x3F;
+    light->a.l.col[0] = light->a.l.colc[0] = 0x7F;
+    light->a.l.col[1] = light->a.l.colc[1] = 0x7F;
+    light->a.l.col[2] = light->a.l.colc[2] = 0x7F;
 
     light->l->l.col[0] = light->l->l.colc[0] = 0x7F;
     light->l->l.col[1] = light->l->l.colc[1] = 0x7F;
@@ -743,13 +743,13 @@ void setLightDirection(Vec3 lightDir)
     light->l->l.dir[1] = (s8)(s32)lightDir[1];
     light->l->l.dir[2] = (s8)(s32)lightDir[2];
 
-    lookAt->l[0].l.dir[0] = -light->l->l.dir[0];
-    lookAt->l[0].l.dir[1] = -light->l->l.dir[1];
-    lookAt->l[0].l.dir[2] = -light->l->l.dir[2];
+    // lookAt->l[0].l.dir[0] = -light->l[0].l.dir[0];
+    // lookAt->l[0].l.dir[1] = -light->l[0].l.dir[1];
+    // lookAt->l[0].l.dir[2] = -light->l[0].l.dir[2];
 
-    lookAt->l[1].l.dir[0] = 0;
-    lookAt->l[1].l.dir[1] = 127;
-    lookAt->l[1].l.dir[2] = 0;
+    // lookAt->l[1].l.dir[0] = 0;
+    // lookAt->l[1].l.dir[1] = 127;
+    // lookAt->l[1].l.dir[2] = 0;
 }
 
 float get_aspect_ratio()
