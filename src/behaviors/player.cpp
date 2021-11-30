@@ -148,10 +148,10 @@ void (*stateProcessCallbacks[])(PlayerState *state, InputData *input, Vec3 pos, 
     processAir, // Air
 };
 
-void createPlayer()
+void createPlayer(Vec3 position)
 {
     // debug_printf("Creating player entity\n");
-    createEntitiesCallback(ARCHETYPE_PLAYER, nullptr, 1, createPlayerCallback);
+    createEntitiesCallback(ARCHETYPE_PLAYER, position, 1, createPlayerCallback);
 }
 
 extern Model *get_cube_model();
@@ -167,6 +167,7 @@ std::array<uint8_t, sizeof(BehaviorState::data)> player_control_state;
 
 void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
+    Vec3& pos_in = *(Vec3*)arg;
     // debug_printf("Creating player entity\n");
 
     // Components: Position, Velocity, Rotation, BehaviorState, Model, AnimState, Gravity
@@ -235,9 +236,9 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
         pointer_entity = nullptr;
     }
 
-    (*pos)[0] = 2229.0f;
-    (*pos)[1] = 512.0f;
-    (*pos)[2] = 26620.0f;
+    (*pos)[0] = pos_in[0];
+    (*pos)[1] = pos_in[1];
+    (*pos)[2] = pos_in[2];
 }
 
 uint32_t last_player_hit_time = 0;

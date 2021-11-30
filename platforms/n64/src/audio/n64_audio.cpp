@@ -1,3 +1,5 @@
+#include <array>
+
 #include <ultra64.h>
 #include <PR/libmus.h>
 extern "C" {
@@ -25,6 +27,8 @@ extern u8 _fxBankStart[];
 // wavetable rom address
 extern u8 _wavetableSegmentStart[];
 
+alignas(16) std::array<uint8_t, audio_heap_size> audio_heap;
+
 void audioInit(void)
 {
     // osCreateMesgQueue(&audioMsgQueue, &audioMsg, 1);
@@ -37,7 +41,7 @@ void audioInit(void)
     mus_config.sched = &scheduler;
     mus_config.thread_priority = 12;
 
-    mus_config.heap = static_cast<uint8_t*>(allocRegion(audio_heap_size, ALLOC_AUDIO));
+    mus_config.heap = audio_heap.data();
     mus_config.heap_length = audio_heap_size;
     bzero(mus_config.heap, mus_config.heap_length);
 

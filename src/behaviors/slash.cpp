@@ -15,13 +15,14 @@
 SlasherDefinition slasher_definitions[] = {
     { // 0
         { // base
-            "models/Box", // model_name
+            "models/slash_Mend-E", // model_name
             nullptr,      // model
             "Mend-E",     // enemy_name
             100,          // max_health
             25,           // controllable_health
             7.0f,         // move_speed
             EnemyType::Slash, // enemy_type
+            140, // head_y_offset
         },
         { // params
             1536.0f, // sight_radius
@@ -29,7 +30,7 @@ SlasherDefinition slasher_definitions[] = {
             200, // slash_length
             40, // slash_width
             40, // slash_height
-            30, // slash_y_offset
+            65, // slash_y_offset
             degrees_to_angle(120.0f), // slash_angle
             degrees_to_angle(120.0f / 15) // slash_angular_rate
         }
@@ -95,7 +96,7 @@ void setup_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3&
 
     if (slash_weapon_model == nullptr)
     {
-        slash_weapon_model = load_model("models/Weapon");
+        slash_weapon_model = load_model("models/arm_Mend-E");
     }
     *model = slash_weapon_model;
 
@@ -262,7 +263,7 @@ void on_slasher_enter(BaseEnemyState* base_state, InputData* input, void** playe
 
     if (slash_weapon_model == nullptr)
     {
-        slash_weapon_model = load_model("models/Weapon");
+        slash_weapon_model = load_model("models/arm_Mend-E");
     }
 }
 

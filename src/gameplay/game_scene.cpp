@@ -62,8 +62,13 @@ void createHitboxCallback(UNUSED size_t count, UNUSED void *arg, void **componen
 
 bool GameplayScene::load()
 {
+    Vec3 pos;
+    pos[0] = 2229.0f;
+    pos[1] = 512.0f;
+    pos[2] = 26620.0f;
+
     // Create the player entity
-    createPlayer();
+    createPlayer(pos);
 
     // create_enemy(3229.0f, 0.0f, 26620.0f, EnemyType::Slash, 0);
     // create_shoot_enemy(3229.0f, 0.0f, 26620.0f, 0);

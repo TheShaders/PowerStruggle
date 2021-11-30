@@ -124,7 +124,7 @@ MemoryPool::MemoryPool(void *start, void *end)
     // Initialize the last memory block
     new (curBlock) MemoryBlock(lastBlock, nullptr, _totalBlocks - 1);
     // Clear the block ownership table
-    memset(_blockTable, 0, _totalBlocks);
+    memset(_blockTable, ALLOC_FREE, _totalBlocks);
 }
 
 // Calculates a block's index from its address
@@ -146,6 +146,7 @@ std::mutex mem_mutex{};
 // Allocates a contiguous number of blocks with the given owner
 void *MemoryPool::alloc(int num_blocks, owner_t owner)
 {
+    std::lock_guard guard(mem_mutex);
     // No free chunks, return nullptr
     if (_firstFree == nullptr)
         return nullptr;
@@ -154,6 +155,11 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
     if (num_blocks == 1)
     {
         MemoryBlock *retBlock = _firstFree;
+        if (_blockTable[index_from_block(retBlock)] != ALLOC_FREE)
+        {
+            // Double alloc
+            *(volatile uint8_t*)index_from_block(retBlock) = 0;
+        }
         _firstFree = _firstFree->unlink();
         _blockTable[retBlock->index()] = owner;
         
@@ -215,12 +221,18 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
 // Frees a previously allocated block(s)
 void MemoryPool::free(void *mem) noexcept
 {
+    std::lock_guard guard(mem_mutex);
     // debug_printf("Freeing alloc %08X\n", mem);
     // Cast the input memory address to a MemoryBlock
     MemoryBlock *toFree = static_cast<MemoryBlock*>(mem);
     // Get the index of the block being freed
     size_t toFreeIndex = index_from_block(toFree);
     // Free any blocks that are part of the start block's allocation
+    if (_blockTable[toFreeIndex] == ALLOC_FREE)
+    {
+        // Double free
+        *(volatile uint8_t*)toFreeIndex = 0;
+    }
     do 
     {
         // Reinitialize the MemoryBlock with its index and no linked blocks
@@ -231,6 +243,8 @@ void MemoryPool::free(void *mem) noexcept
             // Insert this block at the start of the free block list
             _firstFree->insert_link(toFree);
         }
+        // Update the ownership table
+        _blockTable[toFreeIndex] = ALLOC_FREE;
         // Update the start of the free block list with the current block
         _firstFree = toFree;
         // Move on to the next block

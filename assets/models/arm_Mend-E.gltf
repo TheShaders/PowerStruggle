@@ -1,0 +1,739 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.16",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "N64_materials_gltf64",
+        "N64_image_format",
+        "N64_texture_inputs"
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                2,
+                5,
+                9,
+                12,
+                15,
+                18,
+                23,
+                25,
+                27,
+                30
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "name" : "Head",
+            "rotation" : [
+                0,
+                1.1920926112907182e-07,
+                0,
+                1
+            ],
+            "scale" : [
+                1,
+                0.9999999403953552,
+                1
+            ],
+            "translation" : [
+                -3.5527130435257905e-15,
+                0.39643752574920654,
+                0.24827907979488373
+            ]
+        },
+        {
+            "children" : [
+                0
+            ],
+            "name" : "Root"
+        },
+        {
+            "children" : [
+                1
+            ],
+            "name" : "shot_Grease-E",
+            "translation" : [
+                -9.679547309875488,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "translation" : [
+                0,
+                1.0571666955947876,
+                0.6620776057243347
+            ]
+        },
+        {
+            "children" : [
+                3
+            ],
+            "name" : "Root"
+        },
+        {
+            "children" : [
+                4
+            ],
+            "name" : "shot_Peat-E",
+            "translation" : [
+                -9.7470121383667,
+                0,
+                -8.611687660217285
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                0,
+                1.1920926823449918e-07,
+                0,
+                1
+            ],
+            "scale" : [
+                1,
+                0.9999999403953552,
+                1
+            ],
+            "translation" : [
+                0,
+                0.7997236847877502,
+                -1.6741454601287842e-05
+            ]
+        },
+        {
+            "name" : "Spin",
+            "translation" : [
+                0,
+                0.375,
+                0
+            ]
+        },
+        {
+            "children" : [
+                6,
+                7
+            ],
+            "name" : "Root"
+        },
+        {
+            "children" : [
+                8
+            ],
+            "name" : "spinner_Harv-E",
+            "translation" : [
+                -14.454300880432129,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                0,
+                -1.1920927533992653e-07,
+                0,
+                1
+            ],
+            "translation" : [
+                3.991473384451494e-12,
+                1.401012897491455,
+                -1.6741454601287842e-05
+            ]
+        },
+        {
+            "children" : [
+                10
+            ],
+            "name" : "Root",
+            "rotation" : [
+                0,
+                1.1920927533992653e-07,
+                0,
+                1
+            ]
+        },
+        {
+            "children" : [
+                11
+            ],
+            "name" : "slash_Mend-E",
+            "translation" : [
+                -18.67173194885254,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                -1.26349874573356e-12,
+                -1.1240546200497192e-06,
+                -1.1240546200497192e-06,
+                1
+            ],
+            "translation" : [
+                -2.3047130071063293e-06,
+                3.859632968902588,
+                -0.06482112407684326
+            ]
+        },
+        {
+            "children" : [
+                13
+            ],
+            "name" : "Root"
+        },
+        {
+            "children" : [
+                14
+            ],
+            "name" : "stab_Drill-R",
+            "translation" : [
+                -23.7684326171875,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "translation" : [
+                9.125106430474261e-07,
+                1.1393258571624756,
+                -0.013606313616037369
+            ]
+        },
+        {
+            "children" : [
+                16
+            ],
+            "name" : "Root"
+        },
+        {
+            "children" : [
+                17
+            ],
+            "name" : "multishot_Fume-R",
+            "translation" : [
+                -5.5967278480529785,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                5.064992869563412e-10,
+                -4.76837158203125e-07,
+                -2.4151768062417086e-16,
+                1
+            ],
+            "translation" : [
+                1.2302953109610826e-06,
+                4.330989837646484,
+                -1.5378691387013532e-07
+            ]
+        },
+        {
+            "name" : "Wheel.L",
+            "rotation" : [
+                5.615581888385179e-10,
+                -4.76837158203125e-07,
+                -2.677718109314527e-16,
+                1
+            ],
+            "translation" : [
+                3.317758083343506,
+                3.431321859359741,
+                -0.0029521125834435225
+            ]
+        },
+        {
+            "name" : "Wheel.R",
+            "rotation" : [
+                5.615581888385179e-10,
+                4.76837158203125e-07,
+                2.677718109314527e-16,
+                1
+            ],
+            "translation" : [
+                -3.317758083343506,
+                3.431321859359741,
+                -0.0029521125834435225
+            ]
+        },
+        {
+            "children" : [
+                19,
+                20,
+                21
+            ],
+            "name" : "Root",
+            "translation" : [
+                3.2172593478208e-08,
+                0,
+                -9.270693368534921e-08
+            ]
+        },
+        {
+            "children" : [
+                22
+            ],
+            "name" : "Jet or Ram?",
+            "scale" : [
+                0.7751588821411133,
+                0.7751588821411133,
+                0.7751588821411133
+            ],
+            "translation" : [
+                -30.133588790893555,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "children" : [
+                24
+            ],
+            "name" : "blade_Harv-E",
+            "translation" : [
+                -12,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "children" : [
+                26
+            ],
+            "name" : "Head_Enemy"
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "mesh" : 0,
+            "name" : "Cube.007",
+            "skin" : 0
+        },
+        {
+            "children" : [
+                29,
+                28
+            ],
+            "name" : "arm_Mend-E",
+            "translation" : [
+                -18.67173194885254,
+                0,
+                0
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "TEXEL0",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "TEXEL0",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "geometryMode" : 2491397,
+                    "drawLayer" : "Opaque"
+                }
+            },
+            "name" : "metal_f3d",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 0
+                },
+                "extensions" : {
+                    "N64_texture_inputs" : {
+                        "tex0" : {
+                            "index" : 0
+                        }
+                    }
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        },
+        {
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "TEXEL0",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "TEXEL0",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "othermodeH" : [
+                        "point_filter"
+                    ],
+                    "drawLayer" : "Opaque"
+                }
+            },
+            "name" : "stripe_f3d",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1
+                },
+                "extensions" : {
+                    "N64_texture_inputs" : {
+                        "tex0" : {
+                            "index" : 1
+                        }
+                    }
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Cube.001",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2,
+                        "COLOR_0" : 3,
+                        "COLOR_1" : 4,
+                        "JOINTS_0" : 5,
+                        "WEIGHTS_0" : 6
+                    },
+                    "indices" : 7,
+                    "material" : 0
+                },
+                {
+                    "attributes" : {
+                        "POSITION" : 8,
+                        "NORMAL" : 9,
+                        "TEXCOORD_0" : 10,
+                        "COLOR_0" : 11,
+                        "COLOR_1" : 12,
+                        "JOINTS_0" : 13,
+                        "WEIGHTS_0" : 14
+                    },
+                    "indices" : 15,
+                    "material" : 1
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 1,
+            "source" : 1
+        }
+    ],
+    "images" : [
+        {
+            "extensions" : {
+                "N64_image_format" : {
+                    "format" : "RGBA16"
+                }
+            },
+            "mimeType" : "image/png",
+            "name" : "metal_shiny.RGBA16",
+            "uri" : "../textures/metal_shiny_RGBA16.png"
+        },
+        {
+            "extensions" : {
+                "N64_image_format" : {
+                    "format" : "RGBA16"
+                }
+            },
+            "mimeType" : "image/png",
+            "name" : "warningstripe.RGBA16",
+            "uri" : "../textures/warningstripe_RGBA16.png"
+        }
+    ],
+    "skins" : [
+        {
+            "inverseBindMatrices" : 16,
+            "joints" : [
+                28
+            ],
+            "name" : "arm_Mend-E"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 46,
+            "max" : [
+                -17.95907211303711,
+                0.27596575021743774,
+                0.24372966587543488
+            ],
+            "min" : [
+                -19.384387969970703,
+                0.1240343302488327,
+                -0.24373377859592438
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 46,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 46,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 46,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5123,
+            "count" : 46,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5121,
+            "count" : 46,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 6,
+            "componentType" : 5126,
+            "count" : 46,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 7,
+            "componentType" : 5123,
+            "count" : 90,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 8,
+            "componentType" : 5126,
+            "count" : 6,
+            "max" : [
+                -18.44770050048828,
+                0.27591758966445923,
+                0.24280941486358643
+            ],
+            "min" : [
+                -19.03127098083496,
+                0.1241791620850563,
+                -0.2434270679950714
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 9,
+            "componentType" : 5126,
+            "count" : 6,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 10,
+            "componentType" : 5126,
+            "count" : 6,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 11,
+            "componentType" : 5123,
+            "count" : 6,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 12,
+            "componentType" : 5123,
+            "count" : 6,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 13,
+            "componentType" : 5121,
+            "count" : 6,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 14,
+            "componentType" : 5126,
+            "count" : 6,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 15,
+            "componentType" : 5123,
+            "count" : 12,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 16,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "MAT4"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 552,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 552,
+            "byteOffset" : 552
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 368,
+            "byteOffset" : 1104
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 368,
+            "byteOffset" : 1472
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 368,
+            "byteOffset" : 1840
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 184,
+            "byteOffset" : 2208
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 736,
+            "byteOffset" : 2392
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 180,
+            "byteOffset" : 3128
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 72,
+            "byteOffset" : 3308
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 72,
+            "byteOffset" : 3380
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 3452
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 3500
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 3548
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 24,
+            "byteOffset" : 3596
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 96,
+            "byteOffset" : 3620
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 24,
+            "byteOffset" : 3716
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 64,
+            "byteOffset" : 3740
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987,
+            "wrapS" : 10497,
+            "wrapT" : 10497
+        },
+        {
+            "magFilter" : 9728,
+            "minFilter" : 9984,
+            "wrapS" : 10497,
+            "wrapT" : 10497
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 3804,
+            "uri" : "arm_Mend-E.bin"
+        }
+    ]
+}

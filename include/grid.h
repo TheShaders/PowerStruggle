@@ -141,10 +141,10 @@ struct ChunkEntry {
 class Grid {
 public:
     Grid() :
-        definition_{}, tile_types_{}, loaded_chunks_{}
+        definition_{}, tile_types_{}, loaded_chunks_{}, loading_chunks_{}
     {}
     Grid(GridDefinition definition, dynamic_array<TileType>&& tile_types) :
-        definition_(definition), tile_types_{std::move(tile_types)}, loaded_chunks_{}
+        definition_(definition), tile_types_{std::move(tile_types)}, loaded_chunks_{}, loading_chunks_{}
     {}
 
     // // [{row, col}]

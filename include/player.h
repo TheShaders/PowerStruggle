@@ -37,7 +37,7 @@ constexpr float player_speed_buff = 1.1f;
 // Maximum health multiplier applied to the player's controlled body
 constexpr float player_health_buff = 1.1f;
 
-void createPlayer();
+void createPlayer(Vec3 pos);
 void createPlayerCallback(size_t count, void *arg, void **componentArrays);
 void playerCallback(void **components, void *data);
 

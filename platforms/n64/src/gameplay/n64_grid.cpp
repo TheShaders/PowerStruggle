@@ -744,6 +744,7 @@ chunk_pos Grid::get_minimum_loaded_chunk()
 
 void Grid::load_objects()
 {
+    if (definition_.num_objects == 0) return;
     dynamic_array<LevelObject> level_objs(definition_.num_objects);
     uint32_t asset_address = (uint32_t)_assetsSegmentStart;
     load_data(level_objs.data(), asset_address + definition_.object_array_rom_offset, sizeof(LevelObject) * definition_.num_objects);
