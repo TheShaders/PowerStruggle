@@ -30562,45 +30562,12 @@
   ],
   "Objects": [
     {
-      "X": -4,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 1,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
-      "X": -2,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 1,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
-      "X": 0,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 1,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
       "X": 2,
       "Y": 0,
       "Z": -1,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 1,
+        "ObjectType": 8,
         "ObjectSubtype": 0
       },
       "ObjectParam": 0

@@ -15,13 +15,14 @@
 StabDefinition stab_definitions[] = {
     { // 0
         { // base
-            "models/Box", // model_name
+            "models/stab_Drill-R", // model_name
             nullptr,      // model
             "Drill-R",     // enemy_name
             100,          // max_health
             25,           // controllable_health
             7.0f,         // move_speed
             EnemyType::Stab, // enemy_type
+            144 // head_y_offset
         },
         { // params
             1536.0f, // sight_radius
@@ -29,9 +30,9 @@ StabDefinition stab_definitions[] = {
             150, // stab_length
             60, // stab_width
             60, // stab_height
-            30, // stab_y_offset
+            40, // stab_y_offset
             20, // stab_start_pos
-            20, // stab_forward_speed
+            10, // stab_forward_speed
             10, // stab_duration
         }
     }
@@ -107,9 +108,9 @@ void setup_stab_hitbox(const Vec3& stab_pos, const Vec3s& stab_rot, Vec3& stab_v
 
     if (stab_weapon_model == nullptr)
     {
-        stab_weapon_model = load_model("models/Weapon");
+        stab_weapon_model = load_model("models/drill_Drill-R");
     }
-    *model = nullptr;// stab_weapon_model;
+    *model = stab_weapon_model;
 
     hitbox.mask = hitbox_mask;
     hitbox.radius = params->stab_width;
@@ -241,7 +242,7 @@ void on_stab_enter(BaseEnemyState* base_state, InputData* input, void** player_c
 
     if (stab_weapon_model == nullptr)
     {
-        stab_weapon_model = load_model("models/Weapon");
+        stab_weapon_model = load_model("models/drill_Drill-R");
     }
 }
 

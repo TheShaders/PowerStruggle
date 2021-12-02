@@ -84,7 +84,7 @@ bool GameplayScene::load()
     dynamic_array<TileType> tiles(24);
 
     int i = 0;
-    
+
     tiles[i++] = TileType{load_model("models/Floor"),       TileCollision::floor};
     tiles[i++] = TileType{load_model("models/FloorBlue"),   TileCollision::floor};
     tiles[i++] = TileType{load_model("models/FloorBrown"),  TileCollision::floor};
@@ -198,7 +198,7 @@ void GameplayScene::draw()
         set_text_color(0, 128, 0, 255);
         print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
         draw_all_text();
-        drawAllHitboxes();
+        // drawAllHitboxes();
     }
 }
 

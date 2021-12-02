@@ -39,11 +39,16 @@ static std::array<OSMesg, NUM_SI_MESSAGES> siMessages;
 static std::array<OSThread, NUM_THREADS> g_threads;
 OSPiHandle *g_romHandle;
 
+u8 g_isEmulator;
+
 extern "C" void init(void)
 {
+    bzero(_mainSegmentBssStart, (u32)_mainSegmentBssEnd - (u32)_mainSegmentBssStart);
     osInitialize();
     
-    bzero(_mainSegmentBssStart, (u32)_mainSegmentBssEnd - (u32)_mainSegmentBssStart);
+    if (IO_READ(DPC_CLOCK_REG) == 0) {
+        g_isEmulator = 1;
+    }
 
     // TODO figure out what's uninitialized that requires this to work
     // bzero(_mainSegmentBssEnd, 0x80400000 -  (u32)_mainSegmentBssEnd);
