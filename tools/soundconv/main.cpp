@@ -48,6 +48,20 @@ std::vector<fs::path> get_sample_files(const fs::path& sample_folder)
         }
     }
 
+    // fmt::print("Before sorting\n");
+    // for (auto& val : ret)
+    // {
+    //     fmt::print("  {}\n", val.string());
+    // }
+
+    std::sort(ret.begin(), ret.end());
+    
+    // fmt::print("After sorting\n");
+    // for (auto& val : ret)
+    // {
+    //     fmt::print("  {}\n", val.string());
+    // }
+
     return ret;
 }
 

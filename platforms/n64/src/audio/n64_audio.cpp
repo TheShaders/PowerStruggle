@@ -67,6 +67,29 @@ void playSound(uint32_t soundIndex)
     MusStartEffect2(soundIndex, 0xFF, 0x80, 1, 100);
 }
 
+int song_ids[] {
+    Sfx::song0
+};
+
+musHandle cur_song = 0;
+
+void stopMusic()
+{
+    MusHandleStop(cur_song, 1);
+    cur_song = 0;
+}
+
+void playMusic(uint32_t song_idx)
+{
+    if (cur_song != 0)
+    {
+        stopMusic();
+    }
+    // please forgive me
+    cur_song = MusStartEffect2(song_ids[song_idx], 0xFF, 0x80, 1, 100);
+    // cur_song = MusStartSong(&songs[song_idx]);
+}
+
 // void audioThreadFunc(UNUSED void *arg)
 // {
 //     audioInit();

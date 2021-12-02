@@ -13,6 +13,7 @@
 #include <behaviors.h>
 #include <control.h>
 #include <text.h>
+#include <audio.h>
 
 extern "C" {
 #include <debug.h>
@@ -143,6 +144,8 @@ bool GameplayScene::load()
     // }
 
     grid_.load_objects();
+
+    playMusic(0);
 
     return true;
 }

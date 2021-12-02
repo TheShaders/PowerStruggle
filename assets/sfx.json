@@ -11,6 +11,10 @@
         {
             "name": "bootup",
             "sample": "bootup.wav"
+        },
+        {
+            "name": "song0",
+            "sample": "0_echo_blues_effect.aiff"
         }
     ]
 }

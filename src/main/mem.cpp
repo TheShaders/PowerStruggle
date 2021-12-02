@@ -66,6 +66,9 @@ MemoryBlock *MemoryBlock::unlink()
     return _nextFree;
 }
 
+// Links a block into the list, directly before this block.
+// Sets this block's previous to the new block, the prior previous block's next to the new block,
+// the new block's previous to the prior previous block, and the new block's next to this block.
 void MemoryBlock::insert_link(MemoryBlock *newPrev)
 {
     MemoryBlock *oldPrev = _prevFree;
