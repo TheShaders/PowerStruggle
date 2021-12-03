@@ -244,7 +244,7 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
 }
 
 uint32_t last_player_hit_time = 0;
-constexpr uint32_t player_iframes = 30;
+constexpr uint32_t player_iframes = 20;
 
 void take_player_damage(HealthState* health_state, int damage)
 {
@@ -268,7 +268,7 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state)
         {
             if (!taken_damage)
             {
-                if (g_gameTimer - health_state->last_hit_time < player_iframes)
+                if (g_gameTimer - health_state->last_hit_time > player_iframes)
                 {
                     taken_damage = true;
                     take_player_damage(health_state, 10);
