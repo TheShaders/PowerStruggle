@@ -26,7 +26,15 @@ std::unique_ptr<Scene> loading_scene;
 
 void start_scene_load(std::unique_ptr<Scene>&& new_scene)
 {
-    loading_scene = std::move(new_scene);
+    if (!loading_scene)
+    {
+        loading_scene = std::move(new_scene);
+    }
+}
+
+bool is_scene_loading()
+{
+    return bool{loading_scene};
 }
 
 void update()
@@ -38,6 +46,7 @@ void update()
         bool loaded = loading_scene->load();
         if (loaded)
         {
+            cur_scene.reset();
             cur_scene = std::move(loading_scene);
             loading_scene.reset();
         }
@@ -105,7 +114,7 @@ int main(UNUSED int argc, UNUSED char **arg)
         g_gameTimer++;
 #endif
         // Draw the current scene
-        cur_scene->draw();
+        cur_scene->draw(is_scene_loading());
 
 #ifdef PROFILING
         profileBeforeGfxMainLoop();

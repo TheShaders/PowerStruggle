@@ -902,27 +902,13 @@ Vtx fullscreenVerts[] = {
 
 void shadeScreen(float alphaPercent)
 {
-    Mtx *ortho = (Mtx *)allocGfx(sizeof(Mtx));
-    Mtx *ident = (Mtx *)allocGfx(sizeof(Mtx));
-    Gfx *fadeDL = (Gfx *)allocGfx(sizeof(Gfx) * 11);
-    Gfx *fadeDLHead = fadeDL;
-
-    guOrtho(ortho, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f);
-    guMtxIdent(ident);
-
-    gSPMatrix(fadeDLHead++, ident, G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    gSPMatrix(fadeDLHead++, ortho, G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
-    gSPPerspNormalize(fadeDLHead++, 0xFFFF);
-    gSPVertex(fadeDLHead++, fullscreenVerts, 4, 0);
-    gSPClearGeometryMode(fadeDLHead++, G_ZBUFFER);
-    gDPPipeSync(fadeDLHead++);
-    gDPSetEnvColor(fadeDLHead++, 0, 0, 0, (u8)(alphaPercent * 255.0f));
-    gDPSetCombineLERP(fadeDLHead++, 0, 0, 0, 0, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 0, 0, 0, 0, ENVIRONMENT);
-    gDPSetRenderMode(fadeDLHead++, G_RM_XLU_SURF, G_RM_XLU_SURF);
-    gSP2Triangles(fadeDLHead++, 0, 2, 1, 0x00, 2, 3, 1, 0x00);
-    gSPEndDisplayList(fadeDLHead++);
-
-    addGfxToDrawLayer(DrawLayer::xlu_surf, fadeDL);
+    gDPPipeSync(g_gui_dlist_head++);
+    gDPSetCycleType(g_gui_dlist_head++, G_CYC_1CYCLE);
+    gDPSetTexturePersp(g_gui_dlist_head++, G_TP_NONE);
+    gDPSetCombineLERP(g_gui_dlist_head++, 0, 0, 0, 0, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 0, 0, 0, 0, ENVIRONMENT);
+    gDPSetRenderMode(g_gui_dlist_head++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gDPSetEnvColor(g_gui_dlist_head++, 0, 0, 0, (int)(alphaPercent * 255.0f));
+    gDPFillRectangle(g_gui_dlist_head++, 0, 0, screen_width, screen_height);
 }
 
 extern "C" {

@@ -53,7 +53,7 @@ void TitleScene::update()
         case TitleState::DisplayTitle:
             if (title_timer_ > 120 && g_PlayerInput.buttonsHeld & START_BUTTON)
             {
-                start_scene_load(std::make_unique<GameplayScene>());
+                start_scene_load(std::make_unique<GameplayScene>(0));
             }
     }
     title_timer_++;
@@ -79,7 +79,7 @@ const char title_text[][52] = {
     R"(-------------------------------------------------)",
 };
 
-void TitleScene::draw()
+void TitleScene::draw(UNUSED bool unloading)
 {
     switch (title_state_)
     {

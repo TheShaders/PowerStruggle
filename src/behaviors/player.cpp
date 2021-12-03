@@ -21,6 +21,8 @@ extern "C" {
 #include <behaviors.h>
 #include <control.h>
 #include <text.h>
+#include <scene.h>
+#include <gameplay.h>
 
 #include <memory>
 
@@ -206,7 +208,7 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     collider->height = PLAYER_HEIGHT;
     collider->friction_damping = 1.0f;
     collider->floor_surface_type = surface_none;
-    collider->mask = player_hitbox_mask;
+    collider->mask = player_hitbox_mask | key_hitbox_mask | load_hitbox_mask;
     
     setAnim(animState, nullptr);
 
@@ -259,15 +261,29 @@ void take_player_damage(HealthState* health_state, int damage)
 void handle_player_hits(ColliderParams* collider, HealthState* health_state)
 {
     ColliderHit* cur_hit = collider->hits;
+    int taken_damage = false;
     while (cur_hit != nullptr)
     {
-        if (g_gameTimer - health_state->last_hit_time < player_iframes)
+        if (cur_hit->hitbox->mask & player_hitbox_mask)
         {
-            break;
+            if (!taken_damage)
+            {
+                if (g_gameTimer - health_state->last_hit_time < player_iframes)
+                {
+                    taken_damage = true;
+                    take_player_damage(health_state, 10);
+                    health_state->last_hit_time = g_gameTimer;
+                    // queue_entity_deletion(cur_hit->entity);
+                }
+            }
         }
-        take_player_damage(health_state, 10);
-        health_state->last_hit_time = g_gameTimer;
-        // queue_entity_deletion(cur_hit->entity);
+        if (cur_hit->hitbox->mask & load_hitbox_mask)
+        {
+            if (!is_scene_loading())
+            {
+                start_scene_load(std::make_unique<LevelTransitionScene>(get_current_level() + 1));
+            }
+        }
         cur_hit = cur_hit->next;
     }
 }

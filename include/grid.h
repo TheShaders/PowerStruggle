@@ -146,6 +146,14 @@ public:
     Grid(GridDefinition definition, dynamic_array<TileType>&& tile_types) :
         definition_(definition), tile_types_{std::move(tile_types)}, loaded_chunks_{}, loading_chunks_{}
     {}
+    ~Grid()
+    {
+        for (auto& tile_type : tile_types_)
+        {
+            freeAlloc(tile_type.model);
+            tile_type.model = nullptr;
+        }
+    }
 
     // // [{row, col}]
     // Tile& operator[](grid_pos pos) { return tiles_[pos.first * width_ + pos.second]; }

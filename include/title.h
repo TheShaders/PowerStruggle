@@ -16,7 +16,7 @@ public:
     // Called every frame while the scene is active at a fixed 60Hz rate for logic handling
     void update() override final;
     // Called every frame while the scene is active every frame for drawing the scene contents
-    void draw() override final;
+    void draw(bool unloading) override final;
     // Called every frame while the scene is active after graphics processing is complete
     void after_gfx() override final;
     // Called every frame while the scene is being unloaded
