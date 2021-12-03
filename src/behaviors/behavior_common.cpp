@@ -244,3 +244,40 @@ void create_explosion(Vec3 pos, int radius, int time, int mask)
     explosion_hitbox.mask = mask;
     explosion_hitbox.hits = nullptr;
 }
+
+Entity* create_load_trigger(float x, float y, float z, int size)
+{
+    Entity* ret = createEntity(ARCHETYPE_LOAD_TRIGGER);
+    void* components[NUM_COMPONENTS(ARCHETYPE_LOAD_TRIGGER) + 1];
+    getEntityComponents(ret, components);
+    Vec3* pos = get_component<Bit_Position, Vec3>(components, ARCHETYPE_LOAD_TRIGGER);
+    Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(components, ARCHETYPE_LOAD_TRIGGER);
+
+    (*pos)[0] = x;
+    (*pos)[1] = y;
+    (*pos)[2] = z;
+
+    hitbox->size_z = hitbox->radius = (size * tile_size) - 5;
+    hitbox->size_y = tile_size;
+    hitbox->mask = load_hitbox_mask;
+
+    return ret;
+}
+
+Entity* create_interactable(float x, float y, float z, InteractableType type, int subtype, uint32_t param)
+{
+    switch (type)
+    {
+        case InteractableType::LoadTrigger:
+            return create_load_trigger(x, y, z, param);
+            break;
+        case InteractableType::Door:
+            return placeholder_create(x, y, z, subtype);
+            // return create_door(x, y, z, param);
+            break;
+        case InteractableType::Key:
+            return placeholder_create(x, y, z, subtype);
+            break;
+    }
+    return nullptr;
+}

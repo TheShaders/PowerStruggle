@@ -756,13 +756,20 @@ void Grid::load_objects()
         {
             case ObjectClass::enemy:
                 create_enemy(
-                    static_cast<float>(static_cast<int>(cur_obj.x * tile_size)),
+                    static_cast<float>(static_cast<int>(cur_obj.x * tile_size + tile_size / 2)),
                     static_cast<float>(static_cast<int>(cur_obj.y * tile_size)),
-                    static_cast<float>(static_cast<int>(cur_obj.z * tile_size)),
+                    static_cast<float>(static_cast<int>(cur_obj.z * tile_size + tile_size / 2)),
                     static_cast<EnemyType>(cur_obj.object_type),
                     cur_obj.object_subtype);
                 break;
             case ObjectClass::interactable:
+                create_interactable(
+                    static_cast<float>(static_cast<int>(cur_obj.x * tile_size + tile_size / 2)),
+                    static_cast<float>(static_cast<int>(cur_obj.y * tile_size)),
+                    static_cast<float>(static_cast<int>(cur_obj.z * tile_size + tile_size / 2)),
+                    static_cast<InteractableType>(cur_obj.object_type),
+                    cur_obj.object_subtype,
+                    cur_obj.object_param);
                 break;
         }
     }

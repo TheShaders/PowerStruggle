@@ -33,23 +33,6 @@ GameplayScene::~GameplayScene()
 
 // LoadHandle handle;
 
-#define ARCHETYPE_LOAD_TRIGGER (ARCHETYPE_RECTANGLE_HITBOX)
-
-void createLoadTriggerCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
-{
-    // Components: Position, Rotation Model, Hitbox
-    Vec3* pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_LOAD_TRIGGER);
-    Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(componentArrays, ARCHETYPE_LOAD_TRIGGER);
-
-    (*pos)[0] = 2229.0f + 1024.0f;
-    (*pos)[1] = 0.0f;
-    (*pos)[2] = 26620.0f;
-
-    hitbox->size_z = hitbox->radius = 256.0f;
-    hitbox->size_y = 100.0f;
-    hitbox->mask = load_hitbox_mask;
-}
-
 // Entity* rect_hitbox;
 
 std::array levels {
@@ -67,17 +50,6 @@ bool GameplayScene::load()
 
     // Create the player entity
     createPlayer(pos);
-
-    // createEntitiesCallback(ARCHETYPE_LOAD_TRIGGER, nullptr, 1, createLoadTriggerCallback);
-
-    // create_enemy(3229.0f, 0.0f, 26620.0f, EnemyType::Slash, 0);
-    // create_shoot_enemy(3229.0f, 0.0f, 26620.0f, 0);
-    // create_shoot_enemy(2229.0f, 0.0f, 27020.0f, 0);
-    // create_slash_enemy(3229.0f, 0.0f, 26620.0f, 0);
-    // create_slash_enemy(3229.0f, 0.0f, 26120.0f, 0);
-    // create_slash_enemy(3229.0f, 0.0f, 27120.0f, 0);
-    // create_slash_enemy(2729.0f, 0.0f, 26120.0f, 0);
-    // create_enemy(3729.0f, 0.0f, 27120.0f, EnemyType::Shoot, 0);
 
     debug_printf("Loading tiles\n");
 
@@ -109,7 +81,6 @@ bool GameplayScene::load()
     tiles[i++] = TileType{load_model("models/WallRed"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallWhite"),   TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallYellow"),  TileCollision::wall};
-
 
     debug_printf("Getting grid definition\n");
 
@@ -165,7 +136,7 @@ void GameplayScene::draw(bool unloading)
         set_text_color(0, 128, 0, 255);
         print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
         draw_all_text();
-        // drawAllHitboxes();
+        drawAllHitboxes();
     }
 
     if (unloading)

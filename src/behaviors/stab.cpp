@@ -128,6 +128,7 @@ void setup_stab_hitbox(const Vec3& stab_pos, const Vec3s& stab_rot, Vec3& stab_v
 
 void stab_callback(void **components, void *data)
 {
+    return;
     // Entity* entity = get_entity(components);
     Entity* stab = get_entity(components);
     Vec3& pos = *get_component<Bit_Position, Vec3>(components, ARCHETYPE_STAB);

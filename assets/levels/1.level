@@ -30571,6 +30571,17 @@
         "ObjectSubtype": 0
       },
       "ObjectParam": 0
+    },
+    {
+      "X": 4,
+      "Y": 0,
+      "Z": -1,
+      "Definition": {
+        "ObjectClass": 1,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 1
     }
   ]
 }

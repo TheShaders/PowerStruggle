@@ -18,7 +18,14 @@ enum class EnemyType : uint8_t {
     Flame, // e.g. Heat-O
 };
 
+enum class InteractableType: uint8_t {
+    LoadTrigger,
+    Key,
+    Door
+};
+
 #define ARCHETYPE_EXPLOSION (ARCHETYPE_SCALED_MODEL | Bit_Hitbox | Bit_DestroyTimer)
+#define ARCHETYPE_LOAD_TRIGGER (ARCHETYPE_RECTANGLE_HITBOX)
 
 #include <enemies/base.h>
 #include <enemies/shoot.h>
@@ -37,6 +44,8 @@ enum class EnemyType : uint8_t {
 float approach_target(float sight_radius, float follow_distance, float move_speed, Vec3 pos, Vec3 vel, Vec3s rot, Vec3 target_pos);
 // Creates an enemy of the given type and subtype at the given position
 Entity* create_enemy(float x, float y, float z, EnemyType type, int subtype);
+// Creates an enemy of the given type and subtype at the given position
+Entity* create_interactable(float x, float y, float z, InteractableType type, int subtype, uint32_t param);
 // Common initialiation routine for enemies
 void init_enemy_common(BaseEnemyInfo *base_info, Model** model_out, HealthState* health_out);
 // Common hitbox handling routine for enemies, returns true if the entity has run out of health
