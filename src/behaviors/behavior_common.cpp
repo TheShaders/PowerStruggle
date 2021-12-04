@@ -276,7 +276,7 @@ Entity* create_interactable(float x, float y, float z, InteractableType type, in
             // return create_door(x, y, z, param);
             break;
         case InteractableType::Key:
-            return placeholder_create(x, y, z, subtype);
+            return create_key(x, y, z);
             break;
     }
     return nullptr;

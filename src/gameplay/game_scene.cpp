@@ -21,7 +21,7 @@ extern "C" {
 
 extern GridDefinition get_grid_definition(const char *file);
 
-GameplayScene::GameplayScene(int level_index) : grid_{}, level_index_{level_index}, unload_timer_{0}
+GameplayScene::GameplayScene(int level_index) : grid_{}, level_index_{level_index}, unload_timer_{0}, keys_{0}
 {
 }
 
@@ -135,8 +135,14 @@ void GameplayScene::draw(bool unloading)
         drawAllEntitiesHealth();
         set_text_color(0, 128, 0, 255);
         print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
+        if (keys_ > 0)
+        {
+            char key_text[17];
+            sprintf(key_text, "Keys: %d", keys_);
+            print_text(10, screen_height - 8 - 20 - border_height, key_text);
+        }
         draw_all_text();
-        drawAllHitboxes();
+        // drawAllHitboxes();
     }
 
     if (unloading)
@@ -165,6 +171,14 @@ int get_current_level()
         return cur_scene->get_level_index();
     }
     return -1;
+}
+
+void collect_key()
+{
+    if (cur_scene)
+    {
+        cur_scene->collect_key();
+    }
 }
 
 LevelTransitionScene::LevelTransitionScene(int level_index) : level_index_{level_index}, load_timer_{0}

@@ -11,6 +11,9 @@ constexpr int level_unload_time = 120;
 constexpr int level_transition_time = 300;
 
 int get_current_level();
+void collect_key();
+int num_keys();
+void use_key();
 
 class GameplayScene : public Scene {
 public:
@@ -32,10 +35,14 @@ public:
     void unloading_update() override final;
     // Gets the current level's index
     int get_level_index() override final { return level_index_; }
+    virtual void collect_key() { keys_++; }
+    virtual int num_keys() { return keys_; }
+    virtual void use_key() { keys_--; }
 private:
     Grid grid_;
     int level_index_;
     int unload_timer_;
+    int keys_;
 };
 
 class LevelTransitionScene : public Scene {

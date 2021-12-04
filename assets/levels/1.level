@@ -30573,15 +30573,26 @@
       "ObjectParam": 0
     },
     {
-      "X": 4,
+      "X": 10,
       "Y": 0,
-      "Z": -1,
+      "Z": 0,
       "Definition": {
         "ObjectClass": 1,
         "ObjectType": 0,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 1
+      "ObjectParam": 3
+    },
+    {
+      "X": -5,
+      "Y": 0,
+      "Z": -1,
+      "Definition": {
+        "ObjectClass": 1,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 2
     }
   ]
 }

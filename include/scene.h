@@ -18,6 +18,10 @@ public:
     virtual void unloading_update() = 0;
     // Gets the current level's index, returns -1 unless this scene is that of an actual level
     virtual int get_level_index() { return -1; }
+    // Functions for increasing, checking, and decreasing the numbers of keys
+    virtual void collect_key() {}
+    virtual int num_keys() { return 0; }
+    virtual void use_key() {}
 };
 
 void start_scene_load(std::unique_ptr<Scene>&& new_scene);

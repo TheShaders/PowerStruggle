@@ -60,10 +60,10 @@ struct ColliderHit
     Hitbox* hitbox;
 };
 
-constexpr uint16_t player_hitbox_mask = 0x0001;
-constexpr uint16_t enemy_hitbox_mask  = 0x0002;
-constexpr uint16_t key_hitbox_mask    = 0x0004;
-constexpr uint16_t load_hitbox_mask   = 0x0008;
+constexpr uint16_t player_hitbox_mask   = 0x0001;
+constexpr uint16_t enemy_hitbox_mask    = 0x0002;
+constexpr uint16_t interact_hitbox_mask = 0x0004;
+constexpr uint16_t load_hitbox_mask     = 0x0008;
 
 void find_collisions(Grid& grid);
 

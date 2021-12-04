@@ -208,7 +208,7 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     collider->height = PLAYER_HEIGHT;
     collider->friction_damping = 1.0f;
     collider->floor_surface_type = surface_none;
-    collider->mask = player_hitbox_mask | key_hitbox_mask | load_hitbox_mask;
+    collider->mask = player_hitbox_mask | interact_hitbox_mask | load_hitbox_mask;
     
     setAnim(animState, nullptr);
 

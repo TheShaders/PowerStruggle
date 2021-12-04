@@ -54,4 +54,6 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
 // Also applies recoil to the hit entity if it has a velocity component
 void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength);
 
+Entity* create_key(float x, float y, float z);
+
 #endif
