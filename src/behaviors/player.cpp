@@ -208,7 +208,7 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     collider->height = PLAYER_HEIGHT;
     collider->friction_damping = 1.0f;
     collider->floor_surface_type = surface_none;
-    collider->mask = player_hitbox_mask | interact_hitbox_mask | load_hitbox_mask;
+    collider->mask = player_hitbox_mask | interact_hitbox_mask | load_hitbox_mask | collision_hitbox_mask;
     
     setAnim(animState, nullptr);
 
@@ -258,7 +258,7 @@ void take_player_damage(HealthState* health_state, int damage)
     }
 }
 
-void handle_player_hits(ColliderParams* collider, HealthState* health_state)
+void handle_player_hits(ColliderParams* collider, HealthState* health_state, Vec3 pos, Vec3 vel)
 {
     ColliderHit* cur_hit = collider->hits;
     int taken_damage = false;
@@ -283,6 +283,37 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state)
             {
                 start_scene_load(std::make_unique<LevelTransitionScene>(get_current_level() + 1));
             }
+        }
+        if (cur_hit->hitbox->mask & collision_hitbox_mask)
+        {
+            float size_x = static_cast<float>(static_cast<int>(cur_hit->hitbox->radius / 2));
+            float size_z = static_cast<float>(static_cast<int>(cur_hit->hitbox->size_z / 2));
+
+            float dx, dz;
+
+            // TODO proper rotated hitbox collision
+            // TODO move this into common collider code so that all colliders respect collision hitboxes
+            if ((*cur_hit->rot)[1] & 0x4000)
+            {
+                dz = size_x;
+                dx = size_z;
+            }
+            else
+            {
+                dx = size_x;
+                dz = size_z;
+            }
+
+            float min_x = (*cur_hit->pos)[0] - dx;
+            float max_x = (*cur_hit->pos)[0] + dx;
+            float min_z = (*cur_hit->pos)[2] - dz;
+            float max_z = (*cur_hit->pos)[2] + dz;
+
+            float hit_dist;
+            Vec3 hit_pos;
+
+            circle_aabb_intersect(pos[0], pos[2], min_x, max_x, min_z, max_z, PLAYER_RADIUS * PLAYER_RADIUS, &hit_dist, hit_pos);
+            resolve_circle_collision(pos, vel, hit_pos, hit_dist, PLAYER_RADIUS);
         }
         cur_hit = cur_hit->next;
     }
@@ -313,7 +344,7 @@ void playerCallback(void **components, void *data)
     stateUpdateCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
     // Process the current state
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
-    handle_player_hits(collider, health);
+    handle_player_hits(collider, health, *pos, *vel);
 
     VEC3_COPY(g_Camera.target, *pos);
 

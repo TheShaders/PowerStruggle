@@ -55,5 +55,6 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
 void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength);
 
 Entity* create_key(float x, float y, float z);
+Entity* create_door(float x, float y, float z, uint32_t param);
 
 #endif

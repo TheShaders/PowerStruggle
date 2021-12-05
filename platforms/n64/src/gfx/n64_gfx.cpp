@@ -1012,6 +1012,11 @@ Gfx set_purple_env[] = {
     gsSPEndDisplayList(),
 };
 
+Gfx set_gray_env[] = {
+    gsDPSetEnvColor(0x3F, 0x3F, 0x3F, 0x3F),
+    gsSPEndDisplayList(),
+};
+
 void draw_cylinder_hitboxes_callback(size_t count, UNUSED void *arg, void **componentArrays)
 {
     Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CYLINDER_HITBOX);
@@ -1036,6 +1041,10 @@ void draw_cylinder_hitboxes_callback(size_t count, UNUSED void *arg, void **comp
         else if (cur_hitbox->mask & player_hitbox_mask)
         {
             addGfxToDrawLayer(DrawLayer::xlu_surf, set_red_env);
+        }
+        else
+        {
+            addGfxToDrawLayer(DrawLayer::xlu_surf, set_gray_env);
         }
 
         drawModel(cylinder_hitbox_model, nullptr, 0);
@@ -1079,6 +1088,10 @@ void draw_rectangle_hitboxes_callback(size_t count, UNUSED void *arg, void **com
         else if (cur_hitbox->mask & player_hitbox_mask)
         {
             addGfxToDrawLayer(DrawLayer::xlu_surf, set_red_env);
+        }
+        else
+        {
+            addGfxToDrawLayer(DrawLayer::xlu_surf, set_gray_env);
         }
 
         if (cur_hitbox->size_z == 0)

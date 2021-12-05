@@ -590,6 +590,23 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
     return found_y;
 }
 
+int circle_aabb_intersect(float x, float z, float min_x, float max_x, float min_z, float max_z, float rad_sq, float* dist_out, Vec3 hit_out)
+{
+    float closest_x = std::max(min_x, std::min(x, max_x));
+    float closest_z = std::max(min_z, std::min(z, max_z));
+    float dx = closest_x - x;
+    float dz = closest_z - z;
+    float dist_sq = dx * dx + dz * dz;
+    if (dist_sq < rad_sq)
+    {
+        *dist_out = sqrtf(dist_sq);
+        hit_out[0] = closest_x;
+        hit_out[2] = closest_z;
+        return true;
+    }
+    return false;
+}
+
 int Grid::get_wall_collisions(Vec3 hits[4], float dists[4], float x, float z, float radius, float min_y, float max_y)
 {
     int num_hits = 0;
@@ -692,18 +709,15 @@ int Grid::get_wall_collisions(Vec3 hits[4], float dists[4], float x, float z, fl
                                 float tile_y_world = tile_y * static_cast<int>(tile_size);
                                 if (tile_y_world >= min_y && tile_y_world < max_y)
                                 {
-                                    float closest_x = std::max(static_cast<float>(tile_x), std::min(x, static_cast<float>(tile_x + static_cast<int>(tile_size))));
-                                    float closest_z = std::max(static_cast<float>(tile_z), std::min(z, static_cast<float>(tile_z + static_cast<int>(tile_size))));
-                                    float dx = closest_x - x;
-                                    float dz = closest_z - z;
-                                    float dist_sq = dx * dx + dz * dz;
-                                    if (dist_sq < rad_sq)
+
+                                    if (circle_aabb_intersect(
+                                        x, z,
+                                        tile_x, tile_x + static_cast<int>(tile_size),
+                                        tile_z, tile_z + static_cast<int>(tile_size),
+                                        rad_sq, &dists[num_hits], hits[num_hits]))
                                     {
-                                        dists[num_hits] = sqrtf(dist_sq);
-                                        hits[num_hits][0] = closest_x;
-                                        hits[num_hits][1] = tile_y_world;
-                                        hits[num_hits][2] = closest_z;
                                         num_hits++;
+                                        hits[num_hits][1] = tile_y_world;
                                         if (num_hits >= 4)
                                         {
                                             return num_hits;

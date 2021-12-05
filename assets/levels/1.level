@@ -30562,15 +30562,15 @@
   ],
   "Objects": [
     {
-      "X": 2,
+      "X": 5,
       "Y": 0,
-      "Z": -1,
+      "Z": 1,
       "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 8,
+        "ObjectClass": 1,
+        "ObjectType": 2,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 0
+      "ObjectParam": 1
     },
     {
       "X": 10,

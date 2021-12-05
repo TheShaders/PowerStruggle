@@ -181,6 +181,23 @@ void collect_key()
     }
 }
 
+int num_keys()
+{
+    if (cur_scene)
+    {
+        return cur_scene->num_keys();
+    }
+    return 0;
+}
+
+void use_key()
+{
+    if (cur_scene)
+    {
+        cur_scene->use_key();
+    }
+}
+
 LevelTransitionScene::LevelTransitionScene(int level_index) : level_index_{level_index}, load_timer_{0}
 {
 }

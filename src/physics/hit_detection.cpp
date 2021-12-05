@@ -247,7 +247,7 @@ void test_collider(
                                 {
                                     // The collider intersects with the hitbox
                                     // Allocate a new hit node and swap the current one with it
-                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox, &hitbox_pos, &hitbox_rot));
                                     cur_hitbox->hits = &(*hitbox_hit_pool.emplace_back(cur_hitbox->hits, entity));
                                     // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
                                 }
@@ -261,7 +261,7 @@ void test_collider(
                                 {
                                     // The collider intersects with the hitbox
                                     // Allocate a new hit node and swap the current one with it
-                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox));
+                                    cur_hit = &(*collider_hit_pool.emplace_back(cur_hit, hitbox_entity, cur_hitbox, &hitbox_pos, &hitbox_rot));
                                     cur_hitbox->hits = &(*hitbox_hit_pool.emplace_back(cur_hitbox->hits, entity));
                                     // debug_printf("Collider entity %08X intersects with hitbox entity %08X\n", entity, hitbox_entity);
                                 }

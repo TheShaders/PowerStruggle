@@ -272,8 +272,7 @@ Entity* create_interactable(float x, float y, float z, InteractableType type, in
             return create_load_trigger(x, y, z, param);
             break;
         case InteractableType::Door:
-            return placeholder_create(x, y, z, subtype);
-            // return create_door(x, y, z, param);
+            return create_door(x, y, z, param);
             break;
         case InteractableType::Key:
             return create_key(x, y, z);

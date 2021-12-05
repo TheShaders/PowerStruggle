@@ -20,6 +20,8 @@ float rayVsAABB(Vec3 rayStart, Vec3 rayDirInv, AABB *box, float tmin, float tmax
 float raycastVertical(Vec3 rayOrigin, float rayLength, float tmin, float tmax, SurfaceType *floorSurface);
 float raycast(Vec3 rayOrigin, Vec3 rayDir, float tmin, float tmax, SurfaceType *floorSurface);
 
+void resolve_circle_collision(Vec3 pos, Vec3 vel, Vec3 hit_pos, float hit_dist, float radius);
+int circle_aabb_intersect(float x, float z, float min_x, float max_x, float min_z, float max_z, float rad_sq, float* dist_out, Vec3 hit_out);
 void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel);
 SurfaceType handleFloorOnGround(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel, float stepUp, float stepDown);
 SurfaceType handleFloorInAir(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel);
@@ -58,12 +60,15 @@ struct ColliderHit
     ColliderHit* next;
     Entity* entity;
     Hitbox* hitbox;
+    Vec3* pos;
+    Vec3s* rot;
 };
 
-constexpr uint16_t player_hitbox_mask   = 0x0001;
-constexpr uint16_t enemy_hitbox_mask    = 0x0002;
-constexpr uint16_t interact_hitbox_mask = 0x0004;
-constexpr uint16_t load_hitbox_mask     = 0x0008;
+constexpr uint16_t player_hitbox_mask    = 0x0001;
+constexpr uint16_t enemy_hitbox_mask     = 0x0002;
+constexpr uint16_t interact_hitbox_mask  = 0x0004;
+constexpr uint16_t load_hitbox_mask      = 0x0008;
+constexpr uint16_t collision_hitbox_mask = 0x0010;
 
 void find_collisions(Grid& grid);
 

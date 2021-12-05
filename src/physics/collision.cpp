@@ -125,6 +125,30 @@ float rayVsAABB(Vec3 rayStart, Vec3 rayDirInv, AABB *box, float tmin, float tmax
 
 #define VEL_THRESHOLD 0.1f
 
+void resolve_circle_collision(Vec3 pos, Vec3 vel, Vec3 hit_pos, float hit_dist, float radius)
+{
+    float dx = hit_pos[0] - pos[0];
+    float dz = hit_pos[2] - pos[2];
+    if (hit_dist > EPSILON)
+    {
+        float nx = dx * (1.0f / hit_dist);
+        float nz = dz * (1.0f / hit_dist);
+
+        float vel_dot_norm = nx * vel[0] + nz * vel[2];
+        vel[0] -= vel_dot_norm * nx;
+        vel[2] -= vel_dot_norm * nz;
+
+        float push_dist = radius - hit_dist;
+        pos[0] -= push_dist * nx;
+        pos[2] -= push_dist * nz;
+    }
+    else
+    {
+        vel[0] = 0;
+        vel[2] = 0;
+    }
+}
+
 void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 {
     collider->hit_wall = false;
@@ -137,26 +161,7 @@ void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 
         for (int i = 0; i < num_hits; i++)
         {
-            float dx = wall_hits[i][0] - pos[0];
-            float dz = wall_hits[i][2] - pos[2];
-            if (wall_dists[i] > EPSILON)
-            {
-                float nx = dx * (1.0f / wall_dists[i]);
-                float nz = dz * (1.0f / wall_dists[i]);
-
-                float vel_dot_norm = nx * vel[0] + nz * vel[2];
-                vel[0] -= vel_dot_norm * nx;
-                vel[2] -= vel_dot_norm * nz;
-
-                float push_dist = radius - wall_dists[i];
-                pos[0] -= push_dist * nx;
-                pos[2] -= push_dist * nz;
-            }
-            else
-            {
-                vel[0] = 0;
-                vel[2] = 0;
-            }
+            resolve_circle_collision(pos, vel, wall_hits[i], wall_dists[i], radius);
             collider->hit_wall = true;
         }
     }
