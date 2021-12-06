@@ -37,7 +37,7 @@ enum class InteractableType: uint8_t {
 #include <enemies/multishot.h>
 // jet
 #include <enemies/stab.h>
-// mortar
+#include <enemies/mortar.h>
 // flame
 
 // Check if the target is in the sight radius and if so moves towards being the given distance from it

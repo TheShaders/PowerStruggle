@@ -33,9 +33,9 @@ static_assert(sizeof(PlayerState) <= sizeof(BehaviorState::data), "PlayerState d
 #define PLAYER_SLOW_TERMINAL_VELOCITY 5.0f
 
 // Movement speed multiplier applied to the player's controlled body
-constexpr float player_speed_buff = 1.1f;
+constexpr float player_speed_buff = 1.5f;
 // Maximum health multiplier applied to the player's controlled body
-constexpr float player_health_buff = 1.1f;
+constexpr float player_health_buff = 3.0f;
 
 void createPlayer(Vec3 pos);
 void createPlayerCallback(size_t count, void *arg, void **componentArrays);

@@ -30572,24 +30572,13 @@
     {
       "X": 0,
       "Y": 0,
-      "Z": -1,
+      "Z": -3,
       "Definition": {
         "ObjectClass": 0,
-        "ObjectType": 1,
+        "ObjectType": 10,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 0
-    },
-    {
-      "X": 3,
-      "Y": 0,
-      "Z": 1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 1,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
+      "ObjectParam": 1
     },
     {
       "X": 9,
@@ -31371,39 +31360,6 @@
         "ObjectSubtype": 0
       },
       "ObjectParam": 0
-    },
-    {
-      "X": -5,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 1,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
-      "X": 0,
-      "Y": 0,
-      "Z": -3,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 2,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
-    {
-      "X": 3,
-      "Y": 0,
-      "Z": -3,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 2,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
     }
   ]
 }

@@ -92,7 +92,7 @@ std::array create_enemy_funcs {
     placeholder_create2, // jet
     create_stab_enemy,
     placeholder_create2, // slam
-    placeholder_create2, // mortar
+    create_mortar_enemy,
     placeholder_create2, // flamethrower
 };
 
@@ -136,6 +136,8 @@ extern ControlHandler bomb_control_handler;
 extern ControlHandler multishot_control_handler;
 // jet
 extern ControlHandler stab_control_handler;
+// slam
+extern ControlHandler mortar_control_handler;
 
 ControlHandler* control_handlers[] = {
     &shoot_control_handler,
@@ -147,9 +149,9 @@ ControlHandler* control_handlers[] = {
     &multishot_control_handler,
     nullptr, // jet
     &stab_control_handler, // stab
-    // slam
-    // mortar
-    // flamethrower
+    nullptr, // slam
+    &mortar_control_handler,
+    nullptr, // flamethrower
 };
 
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
