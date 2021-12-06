@@ -161,6 +161,14 @@ void *load_data(void *ret, uint32_t rom_pos, uint32_t size)
 Model *load_model(const char *path)
 {
     Model *ret = load_file<Model>(path);
+    auto start = osGetCount();
+#ifndef NDEBUG
+//????
+    while (osGetCount() - start < OS_USEC_TO_CYCLES(1000))
+    {
+        ;
+    }
+#endif
     ret->adjust_offsets();
     ret->setup_gfx();
     return ret;

@@ -34,10 +34,10 @@ struct ColliderParams {
     float height; // Height of the collision cylinder
     float friction_damping; // The fraction of velocity maintained while on the ground each physics frame (e.g. if it's 0 then the object will instantly stop)
     float floor_height; // The height of the floor that the collider is on
-    SurfaceType floor_surface_type; // The surface type of the floor
     ColliderHit* hits; // The list of hitboxes this collider is intersecting with
     uint16_t mask; // The mask applied to hitboxes to restrict intersections
     uint8_t hit_wall; // Whether or not this collider hit a wall this frame
+    SurfaceType floor_surface_type; // The surface type of the floor
 };
 
 struct Hitbox

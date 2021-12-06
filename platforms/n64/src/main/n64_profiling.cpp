@@ -44,7 +44,11 @@ void profileEndMainLoop()
     //     // ProfilerData.rdpPipeTime, ProfilerData.rdpTmemTime,
     //     (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
 
-    // char text_buf[32];
-    // sprintf(text_buf, "CPU us: %" PRIu32 "\n", (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
-    // print_text(10, 10, text_buf);
+    char text_buf[64];
+    sprintf(text_buf, "CPU us:      %" PRIu32 "\n", (u32)OS_CYCLES_TO_USEC((u64)ProfilerData.cpuTime));
+    print_text(10, 10, text_buf);
+    sprintf(text_buf, "RDP cmd us:  %" PRIu32 "\n", (10 * ProfilerData.rdpCmdTime) / 625);
+    print_text(10, 20, text_buf);
+    sprintf(text_buf, "RDP pipe us: %" PRIu32 "\n", (10 * ProfilerData.rdpPipeTime) / 625);
+    print_text(10, 30, text_buf);
 }

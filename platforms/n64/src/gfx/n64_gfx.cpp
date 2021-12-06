@@ -90,10 +90,14 @@ void initGfx(void)
         // // Set up the gfx task gfx microcode text pointer and size
         gfxTasks[i].list.t.ucode = (u64*) gspF3DEX2_fifoTextStart;
         gfxTasks[i].list.t.ucode_size = (u32)gspF3DEX2_fifoTextEnd - (u32)gspF3DEX2_fifoTextStart;
+        // gfxTasks[i].list.t.ucode = (u64*) gspF3DEX2_Rej_fifoTextStart;
+        // gfxTasks[i].list.t.ucode_size = (u32)gspF3DEX2_Rej_fifoTextEnd - (u32)gspF3DEX2_Rej_fifoTextStart;
 
         // // Set up the gfx task gfx microcode data pointer and size
         gfxTasks[i].list.t.ucode_data = (u64*) gspF3DEX2_fifoDataStart;
         gfxTasks[i].list.t.ucode_data_size = (u32)gspF3DEX2_fifoDataEnd - (u32)gspF3DEX2_fifoDataStart;
+        // gfxTasks[i].list.t.ucode_data = (u64*) gspF3DEX2_Rej_fifoDataStart;
+        // gfxTasks[i].list.t.ucode_data_size = (u32)gspF3DEX2_Rej_fifoDataEnd - (u32)gspF3DEX2_Rej_fifoDataStart;
 
         gfxTasks[i].list.t.dram_stack = &taskStack[0];
         gfxTasks[i].list.t.dram_stack_size = SP_DRAM_STACK_SIZE8;

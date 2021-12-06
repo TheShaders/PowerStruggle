@@ -167,6 +167,7 @@ public:
     // void set_tile(unsigned int row, unsigned int col, Tile type) { tiles_[row * width_ + col] = type; }
     void get_loaded_chunks_in_area(int min_chunk_x, int min_chunk_z, int max_chunk_x, int max_chunk_z, bool* found);
     bool is_loaded(chunk_pos pos);
+    bool is_pos_loaded(float x, float z);
     bool is_loaded_or_loading(chunk_pos pos);
     void load_visible_chunks(Camera& camera);
     void unload_nonvisible_chunks(Camera& camera);

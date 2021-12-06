@@ -261,12 +261,14 @@ OCOPYFLAGS := --pad-to=0x400000 --gap-fill=0xFF
 #    --param max-inline-insns-auto=X/2
 
 # These were all basically the same in testing, and all 3 were faster than just -Ofast or -O3
-OPT_FLAGS  := -Os -ffast-math
+# OPT_FLAGS  := -Os -ffast-math
+OPT_FLAGS  := -Os -ffast-math -gdwarf-2
 # OPT_FLAGS := -Ofast -freorder-blocks-algorithm=simple --param max-loop-header-insns=1
 # OPT_FLAGS  := -Os -ffast-math -freorder-blocks-algorithm=stc
 
 ifneq ($(DEBUG),0)
 CPPFLAGS     += -DDEBUG_MODE
+OPT_FLAGS += -Ofast -freorder-blocks-algorithm=simple --param max-loop-header-insns=1
 else
 CPPFLAGS     += -DNDEBUG
 endif

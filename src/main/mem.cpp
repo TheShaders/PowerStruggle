@@ -155,7 +155,8 @@ void *MemoryPool::alloc(int num_blocks, owner_t owner)
         return nullptr;
     
     // Only allocating 1 chunk, simply return the first free one and update the first free chunk index
-    if (num_blocks == 1)
+    // TODO fix this, zero byte allocations should never be happening
+    if (num_blocks == 0 || num_blocks == 1)
     {
         MemoryBlock *retBlock = _firstFree;
         if (_blockTable[index_from_block(retBlock)] != ALLOC_FREE)

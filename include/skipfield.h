@@ -270,7 +270,7 @@ public:
     }
     
     template <typename... Args>
-    constexpr iterator emplace(Args&&... args) noexcept
+    __attribute__((noinline)) constexpr iterator emplace(Args&&... args) noexcept
     {
         if (num_items_ == Length)
         {

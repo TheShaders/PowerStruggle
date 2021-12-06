@@ -152,7 +152,7 @@ public:
     }
 
     template <typename... Args>
-    constexpr iterator emplace_back(Args&&... args) noexcept
+    __attribute__((noinline)) constexpr iterator emplace_back(Args&&... args) noexcept
     {
         new (&last_->contents[last_->count]) T(std::forward<Args>(args)...);
         iterator ret{last_, last_->count++};

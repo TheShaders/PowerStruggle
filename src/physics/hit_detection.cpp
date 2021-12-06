@@ -197,6 +197,7 @@ int circle_rectangle_intersection(Vec3 rect_pos, float rect_size_x, float rect_s
     // debug_printf("  Delta %5.2f %5.2f\n", delta_x, delta_z);
     return (delta_x * delta_x + delta_z * delta_z) < (circle_radius * circle_radius);
 }
+int g_x, g_z;
 
 void test_collider(
     Entity* entity, ColliderParams* collider, Vec3 pos,
@@ -210,6 +211,8 @@ void test_collider(
     {
         for (int z = min_array_z; z <= max_array_z; z++)
         {
+            g_x = x;
+            g_z = z;
             // Get the hitbox list for this tile
             HitboxNode* cur_node = tile_hitboxes[x][z];
             // Ensure that the tile has an associated hitbox list
@@ -314,6 +317,10 @@ void test_hitboxes(size_t count, void *arg, void **componentArrays)
         int min_array_z = round_down_divide<tile_size>(min_z) - start_tile_z;
         int max_array_x = round_up_divide<tile_size>(max_x)   - start_tile_x;
         int max_array_z = round_up_divide<tile_size>(max_z)   - start_tile_z;
+        min_array_x = std::max(0, min_array_x);
+        min_array_z = std::max(0, min_array_z);
+        max_array_x = std::min(max_tiles_x - 1, min_array_x);
+        max_array_z = std::min(max_tiles_z - 1, min_array_z);
         // Test the collider
         test_collider(*cur_entity, cur_collider, *cur_pos, min_array_x, min_array_z, max_array_x, max_array_z, checked_entities);
         count--;

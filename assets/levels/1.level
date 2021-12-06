@@ -29,7 +29,15 @@
     "../models/WallGreen.gltf",
     "../models/WallRed.gltf",
     "../models/WallWhite.gltf",
-    "../models/WallYellow.gltf"
+    "../models/WallYellow.gltf",
+    "../models/Corner.gltf",
+    "../models/CornerBlue.gltf",
+    "../models/CornerBrown.gltf",
+    "../models/CornerGray.gltf",
+    "../models/CornerGreen.gltf",
+    "../models/CornerRed.gltf",
+    "../models/CornerWhite.gltf",
+    "../models/CornerYellow.gltf"
   ],
   "Cells": [
     {
@@ -575,8 +583,8 @@
       "X": 5,
       "Y": 0,
       "Z": 2,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 1
     },
     {
       "X": 6,
@@ -596,8 +604,8 @@
       "X": 8,
       "Y": 0,
       "Z": 2,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 3
     },
     {
       "X": 9,
@@ -834,8 +842,8 @@
       "X": 9,
       "Y": 0,
       "Z": 3,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 3
     },
     {
       "X": 10,
@@ -897,8 +905,8 @@
       "X": 18,
       "Y": 0,
       "Z": 3,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 1
     },
     {
       "X": -7,
@@ -1079,8 +1087,8 @@
       "X": 10,
       "Y": 0,
       "Z": 4,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 3
     },
     {
       "X": 11,
@@ -1128,8 +1136,8 @@
       "X": 17,
       "Y": 0,
       "Z": 4,
-      "TileIndex": 16,
-      "Rotation": 2
+      "TileIndex": 22,
+      "Rotation": 1
     },
     {
       "X": -6,
@@ -29863,14 +29871,14 @@
       "X": 4,
       "Y": 0,
       "Z": -3,
-      "TileIndex": 16,
+      "TileIndex": 24,
       "Rotation": 1
     },
     {
       "X": 10,
       "Y": 0,
       "Z": -3,
-      "TileIndex": 16,
+      "TileIndex": 24,
       "Rotation": 0
     },
     {
@@ -29919,8 +29927,8 @@
       "X": 17,
       "Y": 0,
       "Z": -3,
-      "TileIndex": 16,
-      "Rotation": 0
+      "TileIndex": 24,
+      "Rotation": 1
     },
     {
       "X": -6,
@@ -29961,8 +29969,8 @@
       "X": -1,
       "Y": 0,
       "Z": -3,
-      "TileIndex": 16,
-      "Rotation": 3
+      "TileIndex": 24,
+      "Rotation": 0
     },
     {
       "X": 28,
@@ -30101,7 +30109,7 @@
       "X": 9,
       "Y": 0,
       "Z": -2,
-      "TileIndex": 16,
+      "TileIndex": 24,
       "Rotation": 0
     },
     {
@@ -30164,8 +30172,8 @@
       "X": 18,
       "Y": 0,
       "Z": -2,
-      "TileIndex": 16,
-      "Rotation": 0
+      "TileIndex": 24,
+      "Rotation": 1
     },
     {
       "X": -7,
@@ -30346,7 +30354,7 @@
       "X": 5,
       "Y": 0,
       "Z": -1,
-      "TileIndex": 16,
+      "TileIndex": 24,
       "Rotation": 1
     },
     {
@@ -30367,7 +30375,7 @@
       "X": 8,
       "Y": 0,
       "Z": -1,
-      "TileIndex": 16,
+      "TileIndex": 24,
       "Rotation": 0
     },
     {
@@ -30562,26 +30570,807 @@
   ],
   "Objects": [
     {
-      "X": 5,
+      "X": 0,
+      "Y": 0,
+      "Z": -1,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 3,
       "Y": 0,
       "Z": 1,
       "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 2,
+        "ObjectClass": 0,
+        "ObjectType": 1,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 1
+      "ObjectParam": 0
     },
     {
-      "X": 10,
-      "Y": 0,
-      "Z": 0,
+      "X": 9,
+      "Y": -2,
+      "Z": -12,
       "Definition": {
-        "ObjectClass": 1,
+        "ObjectClass": 0,
         "ObjectType": 0,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 3
+      "ObjectParam": 0
+    },
+    {
+      "X": 9,
+      "Y": -2,
+      "Z": -11,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 17,
+      "Y": 0,
+      "Z": -1,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 17,
+      "Y": 0,
+      "Z": 2,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 1,
+      "Y": 2,
+      "Z": -27,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": -9,
+      "Y": 2,
+      "Z": -34,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": -1,
+      "Y": 2,
+      "Z": -42,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 4,
+      "Y": 2,
+      "Z": -42,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 11,
+      "Y": 2,
+      "Z": -38,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 22,
+      "Y": 2,
+      "Z": -26,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 19,
+      "Y": 2,
+      "Z": -30,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 19,
+      "Y": 2,
+      "Z": -26,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 22,
+      "Y": 2,
+      "Z": -29,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 30,
+      "Y": 2,
+      "Z": -5,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 38,
+      "Y": 2,
+      "Z": -5,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 32,
+      "Y": 2,
+      "Z": -5,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 36,
+      "Y": 2,
+      "Z": -5,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 33,
+      "Y": 2,
+      "Z": -7,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 35,
+      "Y": 2,
+      "Z": -5,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 31,
+      "Y": 2,
+      "Z": 3,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 37,
+      "Y": 2,
+      "Z": 3,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 35,
+      "Y": 4,
+      "Z": -35,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 37,
+      "Y": 4,
+      "Z": -35,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 37,
+      "Y": 4,
+      "Z": -43,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 35,
+      "Y": 4,
+      "Z": -44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 35,
+      "Y": 6,
+      "Z": -45,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 34,
+      "Y": 6,
+      "Z": -53,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 38,
+      "Y": 6,
+      "Z": -52,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 35,
+      "Y": 6,
+      "Z": -60,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 33,
+      "Y": 6,
+      "Z": -64,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 38,
+      "Y": 6,
+      "Z": -64,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 34,
+      "Y": 6,
+      "Z": -78,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 38,
+      "Y": 6,
+      "Z": -78,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 31,
+      "Y": 8,
+      "Z": -84,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 44,
+      "Y": 10,
+      "Z": -86,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 45,
+      "Y": 10,
+      "Z": -94,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 53,
+      "Y": 10,
+      "Z": -94,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 56,
+      "Y": 10,
+      "Z": -94,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 54,
+      "Y": 10,
+      "Z": -86,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 78,
+      "Y": 10,
+      "Z": -87,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 78,
+      "Y": 10,
+      "Z": -93,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 3,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 75,
+      "Y": 10,
+      "Z": -90,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 75,
+      "Y": 10,
+      "Z": -89,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 61,
+      "Y": 13,
+      "Z": -91,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 61,
+      "Y": 13,
+      "Z": -89,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 100,
+      "Y": 20,
+      "Z": -94,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 100,
+      "Y": 20,
+      "Z": -84,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 110,
+      "Y": 20,
+      "Z": -81,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 119,
+      "Y": 20,
+      "Z": -87,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 119,
+      "Y": 20,
+      "Z": -93,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 114,
+      "Y": 20,
+      "Z": -99,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 108,
+      "Y": 20,
+      "Z": -98,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 102,
+      "Y": 20,
+      "Z": -100,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 105,
+      "Y": 20,
+      "Z": -83,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 113,
+      "Y": 29,
+      "Z": -93,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 109,
+      "Y": 42,
+      "Z": -90,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 117,
+      "Y": 42,
+      "Z": -90,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 130,
+      "Y": 42,
+      "Z": -93,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 130,
+      "Y": 42,
+      "Z": -89,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 130,
+      "Y": 42,
+      "Z": -86,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 147,
+      "Y": 42,
+      "Z": -76,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 148,
+      "Y": 42,
+      "Z": -87,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 148,
+      "Y": 42,
+      "Z": -74,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 170,
+      "Y": 42,
+      "Z": -76,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 180,
+      "Y": 43,
+      "Z": -84,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 180,
+      "Y": 43,
+      "Z": -67,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 4,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 203,
+      "Y": 42,
+      "Z": -79,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 203,
+      "Y": 42,
+      "Z": -71,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 208,
+      "Y": 42,
+      "Z": -76,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 205,
+      "Y": 42,
+      "Z": -78,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 205,
+      "Y": 42,
+      "Z": -73,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
     },
     {
       "X": -5,
@@ -30592,7 +31381,29 @@
         "ObjectType": 1,
         "ObjectSubtype": 0
       },
-      "ObjectParam": 2
+      "ObjectParam": 0
+    },
+    {
+      "X": 0,
+      "Y": 0,
+      "Z": -3,
+      "Definition": {
+        "ObjectClass": 1,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 3,
+      "Y": 0,
+      "Z": -3,
+      "Definition": {
+        "ObjectClass": 1,
+        "ObjectType": 2,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 1
     }
   ]
 }

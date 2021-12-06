@@ -29,7 +29,15 @@
     "../models/WallGreen.gltf",
     "../models/WallRed.gltf",
     "../models/WallWhite.gltf",
-    "../models/WallYellow.gltf"
+    "../models/WallYellow.gltf",
+    "../models/Corner.gltf",
+    "../models/CornerBlue.gltf",
+    "../models/CornerBrown.gltf",
+    "../models/CornerGray.gltf",
+    "../models/CornerGreen.gltf",
+    "../models/CornerRed.gltf",
+    "../models/CornerWhite.gltf",
+    "../models/CornerYellow.gltf"
   ],
   "Cells": [
     {
@@ -14584,6 +14592,437 @@
       "Z": 53,
       "TileIndex": 19,
       "Rotation": 2
+    }
+  ],
+  "Objects": [
+    {
+      "X": 15,
+      "Y": -6,
+      "Z": 18,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 26,
+      "Y": -6,
+      "Z": 17,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 17,
+      "Y": -6,
+      "Z": 11,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 42,
+      "Y": -6,
+      "Z": 36,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 54,
+      "Y": -6,
+      "Z": 20,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 57,
+      "Y": -6,
+      "Z": 17,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 57,
+      "Y": -6,
+      "Z": 23,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 73,
+      "Y": -3,
+      "Z": 20,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 80,
+      "Y": -3,
+      "Z": 24,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 80,
+      "Y": -3,
+      "Z": 28,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 89,
+      "Y": -3,
+      "Z": 26,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 89,
+      "Y": -3,
+      "Z": 18,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 105,
+      "Y": -6,
+      "Z": 21,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 107,
+      "Y": -6,
+      "Z": 17,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 108,
+      "Y": -6,
+      "Z": 24,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 118,
+      "Y": -6,
+      "Z": 21,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 117,
+      "Y": -6,
+      "Z": 18,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 121,
+      "Y": -6,
+      "Z": 24,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 1,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 125,
+      "Y": -6,
+      "Z": 20,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 137,
+      "Y": -6,
+      "Z": 20,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 137,
+      "Y": -6,
+      "Z": 23,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 135,
+      "Y": -6,
+      "Z": 21,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 139,
+      "Y": -6,
+      "Z": 29,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 137,
+      "Y": -6,
+      "Z": 37,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 141,
+      "Y": -6,
+      "Z": 44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 154,
+      "Y": -6,
+      "Z": 41,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 155,
+      "Y": -6,
+      "Z": 48,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 163,
+      "Y": -6,
+      "Z": 41,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 169,
+      "Y": -6,
+      "Z": 48,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 186,
+      "Y": -5,
+      "Z": 44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 186,
+      "Y": -5,
+      "Z": 51,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 193,
+      "Y": -5,
+      "Z": 51,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 193,
+      "Y": -5,
+      "Z": 44,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 205,
+      "Y": -4,
+      "Z": 46,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 205,
+      "Y": -4,
+      "Z": 49,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 6,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 207,
+      "Y": -4,
+      "Z": 47,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 207,
+      "Y": -4,
+      "Z": 48,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 0,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 218,
+      "Y": -4,
+      "Z": 45,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
+    },
+    {
+      "X": 218,
+      "Y": -4,
+      "Z": 50,
+      "Definition": {
+        "ObjectClass": 0,
+        "ObjectType": 5,
+        "ObjectSubtype": 0
+      },
+      "ObjectParam": 0
     }
   ]
 }

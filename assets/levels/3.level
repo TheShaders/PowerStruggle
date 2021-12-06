@@ -29,7 +29,15 @@
     "../models/WallGreen.gltf",
     "../models/WallRed.gltf",
     "../models/WallWhite.gltf",
-    "../models/WallYellow.gltf"
+    "../models/WallYellow.gltf",
+    "../models/Corner.gltf",
+    "../models/CornerBlue.gltf",
+    "../models/CornerBrown.gltf",
+    "../models/CornerGray.gltf",
+    "../models/CornerGreen.gltf",
+    "../models/CornerRed.gltf",
+    "../models/CornerWhite.gltf",
+    "../models/CornerYellow.gltf"
   ],
   "Cells": [
     {

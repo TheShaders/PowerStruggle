@@ -75,16 +75,25 @@ Entity* placeholder_create(float, float, float, int)
     while (1);
 }
 
+Entity* placeholder_create2(float, float, float, int)
+{
+    return nullptr;
+}
+
+
 std::array create_enemy_funcs {
     create_shoot_enemy,
     create_slash_enemy,
     create_spinner_enemy,
     create_ram_enemy,
     create_bomb_enemy,
-    placeholder_create, // beam
+    placeholder_create2, // beam
     create_multishot_enemy,
-    placeholder_create, // jet
+    placeholder_create2, // jet
     create_stab_enemy,
+    placeholder_create2, // slam
+    placeholder_create2, // mortar
+    placeholder_create2, // flamethrower
 };
 
 using delete_enemy_func_t = void(Entity*);

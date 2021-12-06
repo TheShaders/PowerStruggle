@@ -78,21 +78,33 @@ void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED
     // Twin stick, dpad moves and joystick aims
     float dir_x = 0;
     float dir_z = 0;
+    float magnitude_sq = 0;
     if (input->buttonsHeld & D_JPAD)
     {
         dir_z -= 1;
+        magnitude_sq += 1.0f;
     }
-    if (input->buttonsHeld & U_JPAD)
+    else if (input->buttonsHeld & U_JPAD)
     {
         dir_z += 1;
+        magnitude_sq += 1.0f;
     }
     if (input->buttonsHeld & R_JPAD)
     {
         dir_x += 1;
+        magnitude_sq += 1.0f;
     }
-    if (input->buttonsHeld & L_JPAD)
+    else if (input->buttonsHeld & L_JPAD)
     {
         dir_x -= 1;
+        magnitude_sq += 1.0f;
+    }
+
+    if (magnitude_sq != 0.0f)
+    {
+        float magnitude = sqrtf(magnitude_sq);
+        dir_x *= 1.0f / magnitude;
+        dir_z *= 1.0f / magnitude;
     }
 
     // if (input->buttonsHeld & D_CBUTTONS)
@@ -364,12 +376,12 @@ void playerCallback(void **components, void *data)
         g_Camera.distance += 50.0f;
     }
 
-    if (g_PlayerInput.buttonsPressed & R_TRIG)
-    {
-        (*pos)[0] = 2229.0f;
-        (*pos)[1] = 512.0f;
-        (*pos)[2] = 26620.0f;
-    }
+    // if (g_PlayerInput.buttonsPressed & R_TRIG)
+    // {
+    //     (*pos)[0] = 2229.0f;
+    //     (*pos)[1] = 512.0f;
+    //     (*pos)[2] = 26620.0f;
+    // }
 
     if (to_control != nullptr)
     {

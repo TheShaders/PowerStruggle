@@ -3,6 +3,8 @@
 
 #include <memory>
 
+class Grid;
+
 class Scene {
 public:
     virtual ~Scene() {}
@@ -22,6 +24,7 @@ public:
     virtual void collect_key() {}
     virtual int num_keys() { return 0; }
     virtual void use_key() {}
+    virtual Grid* get_grid() { return nullptr; }
 };
 
 void start_scene_load(std::unique_ptr<Scene>&& new_scene);

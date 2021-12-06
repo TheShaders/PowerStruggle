@@ -44,43 +44,66 @@ std::array levels {
 bool GameplayScene::load()
 {
     Vec3 pos;
-    pos[0] = 2229.0f;
-    pos[1] = 512.0f;
-    pos[2] = 26620.0f;
+    switch (level_index_)
+    {
+        case 0:
+            pos[0] = 2229.0f;
+            pos[1] = 10.0f;
+            pos[2] = 26620.0f;
+            break;
+        case 1:
+            pos[0] = (-1 - -4) * tile_size + tile_size / 2;
+            pos[1] = 10.0f;
+            pos[2] = (2 - 0) * tile_size + tile_size / 2;
+            break;
+        case 2:
+            pos[0] = 2229.0f;
+            pos[1] = 512.0f;
+            pos[2] = 26620.0f;
+            break;
+    }
 
     // Create the player entity
     createPlayer(pos);
 
     debug_printf("Loading tiles\n");
 
-    dynamic_array<TileType> tiles(24);
+    dynamic_array<TileType> tiles(32);
 
     int i = 0;
 
-    tiles[i++] = TileType{load_model("models/Floor"),       TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorBlue"),   TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorBrown"),  TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorGray"),   TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorGreen"),  TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorRed"),    TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorWhite"),  TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorYellow"), TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/Slope"),       TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeBlue"),   TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeBrown"),  TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeGray"),   TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeGreen"),  TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeRed"),    TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeWhite"),  TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeYellow"), TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/Wall"),        TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallBlue"),    TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallBrown"),   TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallGray"),    TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallGreen"),   TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallRed"),     TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallWhite"),   TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallYellow"),  TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/Floor"),         TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorBlue"),     TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorBrown"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorGray"),     TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorGreen"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorRed"),      TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorWhite"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/FloorYellow"),   TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/Slope"),         TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeBlue"),     TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeBrown"),    TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeGray"),     TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeGreen"),    TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeRed"),      TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeWhite"),    TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/SlopeYellow"),   TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/Wall"),          TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallBlue"),      TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallBrown"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallGray"),      TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallGreen"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallRed"),       TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallWhite"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/WallYellow"),    TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/Corner"),        TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerBlue"),    TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerBrown"),   TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerGray"),    TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerGreen"),   TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerRed"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerWhite"),   TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/CornerYellow"),  TileCollision::wall};
 
     debug_printf("Getting grid definition\n");
 
@@ -128,11 +151,11 @@ void GameplayScene::draw(bool unloading)
     if (g_gameTimer > 30)
     {
         // debug_printf("before drawing\n");
-        grid_.draw(&g_Camera);
-
         draw_enemy_heads();
         drawAllEntities();
-        drawAllEntitiesHealth();
+        grid_.draw(&g_Camera);
+
+        // drawAllEntitiesHealth();
         set_text_color(0, 128, 0, 255);
         print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
         if (keys_ > 0)
@@ -196,6 +219,15 @@ void use_key()
     {
         cur_scene->use_key();
     }
+}
+
+Grid* get_grid()
+{
+    if (cur_scene)
+    {
+        return cur_scene->get_grid();
+    }
+    return nullptr;
 }
 
 LevelTransitionScene::LevelTransitionScene(int level_index) : level_index_{level_index}, load_timer_{0}

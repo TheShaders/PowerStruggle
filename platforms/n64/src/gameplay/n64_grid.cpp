@@ -79,6 +79,17 @@ bool Grid::is_loaded(chunk_pos pos)
     return false;
 }
 
+bool Grid::is_pos_loaded(float x, float z)
+{
+    int32_t x_cell = round_down_divide<tile_size>(lround(x));
+    int32_t z_cell = round_down_divide<tile_size>(lround(z));
+
+    int32_t x_chunk = round_down_divide<chunk_size>(x_cell);
+    int32_t z_chunk = round_down_divide<chunk_size>(z_cell);
+
+    return is_loaded({x_chunk, z_chunk});
+}
+
 bool Grid::is_loaded_or_loading(chunk_pos pos)
 {
     for (auto& entry : loading_chunks_)
@@ -354,6 +365,12 @@ void drawTileModel(Model *toDraw, Mtx* curMtx);
 
 void Grid::draw(Camera *camera)
 {
+    int pos_x = static_cast<int>(g_Camera.target[0]) - camera->model_offset[0];
+    int pos_z = static_cast<int>(g_Camera.target[2]) - camera->model_offset[2];
+    int min_draw_x = pos_x - visible_inner_range_x;
+    int max_draw_x = pos_x + visible_inner_range_x;
+    int min_draw_z = pos_z - visible_inner_range_neg_z;
+    int max_draw_z = pos_z + visible_inner_range_pos_z;
     for (auto& entry : loaded_chunks_)
     {
         // debug_printf("Drawing chunk {%d, %d}\n", entry.pos.first, entry.pos.second);
@@ -365,9 +382,11 @@ void Grid::draw(Camera *camera)
         auto mtx_iter = cur_matrices.begin();
         for (unsigned int x = 0; x < chunk_size; x++)
         {
+            bool outside_x = cur_x > max_draw_x || cur_x < min_draw_x;
             int32_t cur_z = chunk_world_z;
             for (unsigned int z = 0; z < chunk_size; z++)
             {
+                bool outside_z = cur_z > max_draw_z || cur_z < min_draw_z;
                 const ChunkColumn &col = chunk->columns[x][z];
                 unsigned int tile_idx;
                 int y;
@@ -377,19 +396,22 @@ void Grid::draw(Camera *camera)
                     if (tile.id != 0xFF)
                     {
                         Mtx* cur_mtx = &(*mtx_iter);
-    
-                        // Set up the translation in the matrix
-                        cur_mtx->m[1][2] = ((uint32_t)cur_x & 0xFFFF) << 16 | ((uint32_t)(y * tile_size) & 0xFFFF);
-                        cur_mtx->m[1][3] = ((uint32_t)cur_z & 0xFFFF) << 16 | (1 & 0xFFFF);
 
-                        drawTileModel(tile_types_[tile.id].model, cur_mtx);
+                        if (!outside_x && !outside_z)
+                        {
+                            // Set up the translation in the matrix
+                            cur_mtx->m[1][2] = ((uint32_t)cur_x & 0xFFFF) << 16 | ((uint32_t)(y * tile_size) & 0xFFFF);
+                            cur_mtx->m[1][3] = ((uint32_t)cur_z & 0xFFFF) << 16 | (1 & 0xFFFF);
+
+                            drawTileModel(tile_types_[tile.id].model, cur_mtx);
+                        }
 
                         ++mtx_iter;
                     }
                 }
-                cur_z += 256;
+                cur_z += tile_size;
             }
-            cur_x += 256;
+            cur_x += tile_size;
         }
         for (auto block_it = cur_matrices.blocks_begin(); block_it != cur_matrices.blocks_end(); ++block_it)
         {

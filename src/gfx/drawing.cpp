@@ -7,6 +7,7 @@
 #include <model.h>
 #include <files.h>
 #include <behaviors.h>
+#include <gameplay.h>
 
 #include <cmath>
 
@@ -17,16 +18,20 @@ void drawAnimatedModels(size_t count, UNUSED void *arg, void **componentArrays)
     Vec3s *curRot = static_cast<Vec3s *>(componentArrays[COMPONENT_INDEX(Rotation, ARCHETYPE_ANIM_MODEL)]);
     Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_ANIM_MODEL)]);
     AnimState *curAnimState = static_cast<AnimState *>(componentArrays[COMPONENT_INDEX(AnimState, ARCHETYPE_ANIM_MODEL)]);
+    Grid* grid = reinterpret_cast<Grid*>(arg);
 
     while (count)
     {
         Animation *anim = segmentedToVirtual(curAnimState->anim);
 
-        gfx::push_mat();
-         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
-         gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-          drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
-        gfx::pop_mat();
+        if (grid->is_pos_loaded((*curPos)[0], (*curPos)[2]))
+        {
+            gfx::push_mat();
+            gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+            gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
+            drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
+            gfx::pop_mat();
+        }
 
         curAnimState->counter += curAnimState->speed;
 #ifdef FPS30
@@ -61,14 +66,18 @@ void drawModels(size_t count, UNUSED void *arg, void **componentArrays)
     Vec3 *curPos = static_cast<Vec3 *>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_MODEL)]);
     Vec3s *curRot = static_cast<Vec3s *>(componentArrays[COMPONENT_INDEX(Rotation, ARCHETYPE_MODEL)]);
     Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_MODEL)]);
+    Grid* grid = reinterpret_cast<Grid*>(arg);
 
     while (count)
     {
-        gfx::push_mat();
-         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
-         gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-          drawModel(*curModel, nullptr, 0);
-        gfx::pop_mat();
+        if (grid->is_pos_loaded((*curPos)[0], (*curPos)[2]))
+        {
+            gfx::push_mat();
+            gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+            gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
+            drawModel(*curModel, nullptr, 0);
+            gfx::pop_mat();
+        }
         count--;
         curPos++;
         curRot++;
@@ -81,13 +90,17 @@ void drawModelsNoRotation(size_t count, UNUSED void *arg, void **componentArrays
     // Components: Position, Rotation, Model
     Vec3 *curPos = static_cast<Vec3 *>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_MODEL_NO_ROTATION)]);
     Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_MODEL_NO_ROTATION)]);
+    Grid* grid = reinterpret_cast<Grid*>(arg);
 
     while (count)
     {
-        gfx::push_mat();
-         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
-          drawModel(*curModel, nullptr, 0);
-        gfx::pop_mat();
+        if (grid->is_pos_loaded((*curPos)[0], (*curPos)[2]))
+        {
+            gfx::push_mat();
+            gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+            drawModel(*curModel, nullptr, 0);
+            gfx::pop_mat();
+        }
         count--;
         curPos++;
         curModel++;
@@ -102,17 +115,21 @@ void drawResizableAnimatedModels(size_t count, UNUSED void *arg, void **componen
     Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_SCALED_ANIM_MODEL)]);
     AnimState *curAnimState = static_cast<AnimState *>(componentArrays[COMPONENT_INDEX(AnimState, ARCHETYPE_SCALED_ANIM_MODEL)]);
     float *curScale = static_cast<float *>(componentArrays[COMPONENT_INDEX(Scale, ARCHETYPE_SCALED_ANIM_MODEL)]);
+    Grid* grid = reinterpret_cast<Grid*>(arg);
 
     while (count)
     {
         Animation *anim = segmentedToVirtual(curAnimState->anim);
 
-        gfx::push_mat();
-         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
-         gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-         gfx::apply_scale_affine(*curScale, *curScale, *curScale);
-          drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
-        gfx::pop_mat();
+        if (grid->is_pos_loaded((*curPos)[0], (*curPos)[2]))
+        {
+            gfx::push_mat();
+            gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+            gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
+            gfx::apply_scale_affine(*curScale, *curScale, *curScale);
+            drawModel(*curModel, anim, ANIM_COUNTER_TO_FRAME(curAnimState->counter));
+            gfx::pop_mat();
+        }
 
         curAnimState->counter += curAnimState->speed;
 #ifdef FPS30
@@ -142,22 +159,26 @@ void drawResizableAnimatedModels(size_t count, UNUSED void *arg, void **componen
     }
 }
 
-void drawResizableModels(size_t count, UNUSED void *arg, void **componentArrays)
+void drawResizableModels(size_t count, void *arg, void **componentArrays)
 {
     // Components: Position, Rotation, Model, Resizable
     Vec3 *curPos = static_cast<Vec3 *>(componentArrays[COMPONENT_INDEX(Position, ARCHETYPE_SCALED_MODEL)]);
     Vec3s *curRot = static_cast<Vec3s *>(componentArrays[COMPONENT_INDEX(Rotation, ARCHETYPE_SCALED_MODEL)]);
     Model **curModel = static_cast<Model **>(componentArrays[COMPONENT_INDEX(Model, ARCHETYPE_SCALED_MODEL)]);
     float *curScale = static_cast<float *>(componentArrays[COMPONENT_INDEX(Scale, ARCHETYPE_SCALED_MODEL)]);
+    Grid* grid = reinterpret_cast<Grid*>(arg);
 
     while (count)
     {
-        gfx::push_mat();
-         gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
-         gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
-         gfx::apply_scale_affine(*curScale, *curScale, *curScale);
-          drawModel(*curModel, nullptr, 0);
-        gfx::pop_mat();
+        if (grid->is_pos_loaded((*curPos)[0], (*curPos)[2]))
+        {
+            gfx::push_mat();
+            gfx::apply_translation_affine((*curPos)[0], (*curPos)[1], (*curPos)[2]);
+            gfx::rotate_euler_xyz((*curRot)[0], (*curRot)[1], (*curRot)[2]);
+            gfx::apply_scale_affine(*curScale, *curScale, *curScale);
+            drawModel(*curModel, nullptr, 0);
+            gfx::pop_mat();
+        }
         count--;
         curPos++;
         curRot++;
@@ -225,16 +246,17 @@ void mtxf_align_camera(MtxF dest, MtxF mtx, Vec3 position, int16_t angle) {
 
 void drawAllEntities()
 {
+    Grid* grid = get_grid();
     // Draw all non-resizable entities that have a model and no rotation or animation
-    iterateOverEntities(drawModelsNoRotation, nullptr, ARCHETYPE_MODEL_NO_ROTATION, Bit_Rotation | Bit_AnimState | Bit_Scale);
+    iterateOverEntities(drawModelsNoRotation, grid, ARCHETYPE_MODEL_NO_ROTATION, Bit_Rotation | Bit_AnimState | Bit_Scale);
     // Draw all non-resizable entities that have a model and no animation
-    iterateOverEntities(drawModels, nullptr, ARCHETYPE_MODEL, Bit_AnimState | Bit_Scale);
+    iterateOverEntities(drawModels, grid, ARCHETYPE_MODEL, Bit_AnimState | Bit_Scale);
     // Draw all non-resizable entities that have a model and an animation
-    iterateOverEntities(drawAnimatedModels, nullptr, ARCHETYPE_ANIM_MODEL, Bit_Scale);
+    iterateOverEntities(drawAnimatedModels, grid, ARCHETYPE_ANIM_MODEL, Bit_Scale);
     // Draw all resizable entities that have a model and no animation
-    iterateOverEntities(drawResizableModels, nullptr, ARCHETYPE_SCALED_MODEL, Bit_AnimState);
+    iterateOverEntities(drawResizableModels, grid, ARCHETYPE_SCALED_MODEL, Bit_AnimState);
     // Draw all resizable entities that have a model and an animation
-    iterateOverEntities(drawResizableAnimatedModels, nullptr, ARCHETYPE_SCALED_ANIM_MODEL, 0);
+    iterateOverEntities(drawResizableAnimatedModels, grid, ARCHETYPE_SCALED_ANIM_MODEL, 0);
 
     animateTextures();
     scrollTextures();
@@ -248,6 +270,7 @@ void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
     Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CONTROLLABLE);
     Vec3s* cur_rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_CONTROLLABLE);
     BehaviorState* cur_bhv = get_component<Bit_Behavior, BehaviorState>(componentArrays, ARCHETYPE_CONTROLLABLE);
+    Grid* grid = get_grid();
 
     while (count)
     {
@@ -257,20 +280,23 @@ void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
         float x = (*cur_pos)[0];
         float z = (*cur_pos)[2];
 
-        int z_offset = enemy_state->definition->base.head_z_offset;
-
-        if (z_offset != 0)
+        if (grid->is_pos_loaded(x, z))
         {
-            x -= static_cast<float>(z_offset) * sinsf((*cur_rot)[1]);
-            z -= static_cast<float>(z_offset) * cossf((*cur_rot)[1]);
+            int z_offset = enemy_state->definition->base.head_z_offset;
+
+            if (z_offset != 0)
+            {
+                x -= static_cast<float>(z_offset) * sinsf((*cur_rot)[1]);
+                z -= static_cast<float>(z_offset) * cossf((*cur_rot)[1]);
+            }
+
+            gfx::push_mat();
+            gfx::apply_translation_affine(x, (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, z);
+            gfx::rotate_euler_xyz(0, head_rot, 0);
+            drawModel(head_model, nullptr, 0);
+
+            gfx::pop_mat();
         }
-
-        gfx::push_mat();
-         gfx::apply_translation_affine(x, (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, z);
-         gfx::rotate_euler_xyz(0, head_rot, 0);
-         drawModel(head_model, nullptr, 0);
-
-        gfx::pop_mat();
 
         cur_pos++;
         cur_rot++;
