@@ -338,8 +338,6 @@ void startFrame(void)
 // Does not inherit from or affect the matrix stack
 void drawTileModel(Model *toDraw, Mtx* curMtx)
 {
-    int cur_material = -1;
-
     if (toDraw == nullptr) return;
 
     // Draw the model's singular joint
@@ -362,11 +360,16 @@ void drawTileModel(Model *toDraw, Mtx* curMtx)
         for (size_t draw_idx = 0; draw_idx < curJointLayer->num_draws; draw_idx++)
         {
             auto& cur_draw = curJointLayer->draws[draw_idx];
+            MaterialHeader* cur_material = toDraw->materials[cur_draw.material_index];
             // Check if we've changed materials; if so load the new material
-            if (cur_draw.material_index != cur_material)
+            if (cur_material != cur_layer_materials[cur_layer])
             {
-                cur_material = cur_draw.material_index;
-                addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), toDraw->materials[cur_material]->gfx);
+                if (cur_layer_materials[cur_layer] != nullptr)
+                {
+                    resetMaterial(cur_layer_materials[cur_layer], static_cast<DrawLayer>(cur_layer));
+                }
+                cur_layer_materials[cur_layer] = cur_material;
+                addGfxToDrawLayer(static_cast<DrawLayer>(cur_layer), cur_material->gfx);
             }
             // Check if this draw has any groups and skip it if it doesn't
             if (cur_draw.num_groups != 0)

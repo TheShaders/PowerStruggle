@@ -49,10 +49,13 @@ bool GameplayScene::load()
         case 0:
             pos[0] = (-4 - -11) * tile_size + tile_size / 2;
             pos[1] = (0) * tile_size;
-            pos[2] = (1 - -104) * tile_size + tile_size / 2;
+            pos[2] = (1 - -99) * tile_size + tile_size / 2;
             // pos[0] = 0x0000DFD6 - 8192 + 1024;
             // pos[1] = (42) * tile_size;
             // pos[2] = 0x00001D3F;
+            // pos[0] = 0x00002F26;
+            // pos[1] = (10) * tile_size;
+            // pos[2] = 0x00004DCE;
             break;
         case 1:
             pos[0] = (-1 - -4) * tile_size + tile_size / 2;
@@ -75,35 +78,35 @@ bool GameplayScene::load()
 
     int i = 0;
 
-    tiles[i++] = TileType{load_model("models/Floor"),         TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorBlue"),     TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorBrown"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/metalRim.mid"),  TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/metalGrate"),     TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/dirtrocky.B"),    TileCollision::floor};
     tiles[i++] = TileType{load_model("models/FloorGray"),     TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorGreen"),    TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorRed"),      TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/FloorWhite"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/grass.A"),    TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/dirt.A"),      TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/metalEmboss"),   TileCollision::floor};
     tiles[i++] = TileType{load_model("models/FloorYellow"),   TileCollision::floor};
-    tiles[i++] = TileType{load_model("models/Slope"),         TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/metalRamp"),     TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeBlue"),     TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeBrown"),    TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeGray"),     TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeGreen"),    TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeRed"),      TileCollision::slope};
     tiles[i++] = TileType{load_model("models/SlopeWhite"),    TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeYellow"),   TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/Wall"),          TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallBlue"),      TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/crop.B"),   TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/wall_Out"),      TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/crop_Obstacle"),      TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallBrown"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallGray"),      TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallGreen"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallRed"),       TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallWhite"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallYellow"),    TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/Corner"),        TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/CornerBlue"),    TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/CornerBrown"),   TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/wallC_Out"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/grass.B"),       TileCollision::floor};
+    tiles[i++] = TileType{load_model("models/grass.C"),       TileCollision::floor};
     tiles[i++] = TileType{load_model("models/CornerGray"),    TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/CornerGreen"),   TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/grass.D"),       TileCollision::floor};
     tiles[i++] = TileType{load_model("models/CornerRed"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/CornerWhite"),   TileCollision::wall};
     tiles[i++] = TileType{load_model("models/CornerYellow"),  TileCollision::wall};

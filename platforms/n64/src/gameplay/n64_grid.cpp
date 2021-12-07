@@ -399,11 +399,15 @@ void Grid::draw(Camera *camera)
 
                         if (!outside_x && !outside_z)
                         {
-                            // Set up the translation in the matrix
-                            cur_mtx->m[1][2] = ((uint32_t)cur_x & 0xFFFF) << 16 | ((uint32_t)(y * tile_size) & 0xFFFF);
-                            cur_mtx->m[1][3] = ((uint32_t)cur_z & 0xFFFF) << 16 | (1 & 0xFFFF);
+                            // Don't draw walls facing away from the camera
+                            if (!(tile.id == 16 && tile.rotation == 2))
+                            {
+                                // Set up the translation in the matrix
+                                cur_mtx->m[1][2] = ((uint32_t)cur_x & 0xFFFF) << 16 | ((uint32_t)(y * tile_size) & 0xFFFF);
+                                cur_mtx->m[1][3] = ((uint32_t)cur_z & 0xFFFF) << 16 | (1 & 0xFFFF);
 
-                            drawTileModel(tile_types_[tile.id].model, cur_mtx);
+                                drawTileModel(tile_types_[tile.id].model, cur_mtx);
+                            }
                         }
 
                         ++mtx_iter;

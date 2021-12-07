@@ -270,20 +270,20 @@ struct LoadedImageEntry
     std::unique_ptr<uint8_t> data;
 };
 
-skipfield<LoadedImageEntry, 32> images;
+skipfield<LoadedImageEntry, 64> images;
 
 void* get_or_load_image(const char* path)
 {
     const struct filerecord *file_record = FileRecords::get_offset(path, strlen(path));
     uint32_t rom_pos = (uint32_t)(_assetsSegmentStart + file_record->offset);
 
-    // for (auto it = images.begin(); it != images.end(); ++it)
-    // {
-    //     if (it->rom_pos == rom_pos)
-    //     {
-    //         return it->data.get();
-    //     }
-    // }
+    for (auto it = images.begin(); it != images.end(); ++it)
+    {
+        if (it->rom_pos == rom_pos)
+        {
+            return it->data.get();
+        }
+    }
 
     uint8_t* data = (uint8_t*)load_data(rom_pos, file_record->size);
     images.emplace(rom_pos, std::unique_ptr<uint8_t>(data));

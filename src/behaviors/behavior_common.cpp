@@ -283,6 +283,7 @@ Entity* create_interactable(float x, float y, float z, InteractableType type, in
             return create_load_trigger(x, y, z, param);
             break;
         case InteractableType::Door:
+            return nullptr;
             return create_door(x, y, z, param);
             break;
         case InteractableType::Key:

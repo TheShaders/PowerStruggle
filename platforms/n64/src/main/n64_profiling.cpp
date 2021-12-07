@@ -51,4 +51,6 @@ void profileEndMainLoop()
     print_text(10, 20, text_buf);
     sprintf(text_buf, "RDP pipe us: %" PRIu32 "\n", (10 * ProfilerData.rdpPipeTime) / 625);
     print_text(10, 30, text_buf);
+    sprintf(text_buf, "RDP tmem us: %" PRIu32 "\n", (10 * ProfilerData.rdpTmemTime) / 625);
+    print_text(10, 40, text_buf);
 }
