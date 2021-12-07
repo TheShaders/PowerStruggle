@@ -87,7 +87,7 @@ std::array create_enemy_funcs {
     create_spinner_enemy,
     create_ram_enemy,
     create_bomb_enemy,
-    placeholder_create2, // beam
+    create_beam_enemy, // beam
     create_multishot_enemy,
     placeholder_create2, // jet
     create_stab_enemy,
@@ -132,7 +132,7 @@ extern ControlHandler slash_control_handler;
 extern ControlHandler spinner_control_handler;
 extern ControlHandler ram_control_handler;
 extern ControlHandler bomb_control_handler;
-// beam
+extern ControlHandler beam_control_handler;
 extern ControlHandler multishot_control_handler;
 // jet
 extern ControlHandler stab_control_handler;
@@ -145,7 +145,7 @@ ControlHandler* control_handlers[] = {
     &spinner_control_handler,
     &ram_control_handler,
     &bomb_control_handler,
-    nullptr,
+    &beam_control_handler,
     &multishot_control_handler,
     nullptr, // jet
     &stab_control_handler, // stab
@@ -256,7 +256,7 @@ void create_explosion(Vec3 pos, int radius, int time, int mask)
     explosion_hitbox.hits = nullptr;
 }
 
-Entity* create_load_trigger(float x, float y, float z, int size)
+Entity* create_load_trigger(float x, float y, float z, UNUSED int size)
 {
     Entity* ret = createEntity(ARCHETYPE_LOAD_TRIGGER);
     void* components[NUM_COMPONENTS(ARCHETYPE_LOAD_TRIGGER) + 1];
@@ -268,7 +268,7 @@ Entity* create_load_trigger(float x, float y, float z, int size)
     (*pos)[1] = y;
     (*pos)[2] = z;
 
-    hitbox->size_z = hitbox->radius = (size * tile_size) - 5;
+    hitbox->size_z = hitbox->radius = (1 * tile_size) - 5;
     hitbox->size_y = tile_size;
     hitbox->mask = load_hitbox_mask;
 

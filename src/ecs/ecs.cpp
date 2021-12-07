@@ -624,7 +624,7 @@ void deleteAllEntities(void)
     numEntities = 0;
     entitiesEnd = 0;
     numGaps = 0;
-    firstGap = 0;
+    firstGap = INT32_MAX;
 }
 
 void processBehaviorEntities(size_t count, UNUSED void *arg, int numComponents, archetype_t archetype, void **componentArrays, size_t *componentSizes)

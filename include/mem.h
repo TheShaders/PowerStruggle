@@ -3,6 +3,7 @@
 
 #include <types.h>
 
+// #define USE_EXT_RAM
 #ifdef USE_EXT_RAM
 #define MEM_END 0x80800000
 #else
@@ -23,7 +24,7 @@ typedef uint8_t owner_t;
 #define ALLOC_NEW_ARR    254 // Memory allocated by new[]
 #define ALLOC_CONTIGUOUS 255 // Allocation from previous chunk
 
-constexpr size_t mem_block_size = 4096;
+constexpr size_t mem_block_size = 1024;
 constexpr size_t mem_small_block_size = 256; // TODO: implement small chunks in memory pool
 #define SEGMENT_COUNT 32
 #define ROUND_UP(val, multiple) (((val) + (multiple) - 1) & ~((multiple) - 1))

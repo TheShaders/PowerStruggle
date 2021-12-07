@@ -21,5 +21,6 @@ FORCEINLINE void print_text_centered(int x, int y, char const* text)
 void draw_all_text();
 
 void text_init(); // Called once on startup for the text system to do any one-time setup
+void text_reset(); // Called at the end of the frame to throw out any undrawn text labels
 
 #endif

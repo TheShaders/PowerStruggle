@@ -204,6 +204,7 @@ Gfx *process_texture_params(TextureParams* params, Gfx *cur_gfx, char const* con
 
 Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos, char const* const* images)
 {
+    Gfx* gfx_start = gfx_pos;
     const char* material_data = reinterpret_cast<const char*>(this) + sizeof(*this);
     gDPPipeSync(gfx_pos++);
     if ((flags & MaterialFlags::set_rendermode) != MaterialFlags::none)
@@ -274,6 +275,12 @@ Gfx *MaterialHeader::setup_gfx(Gfx *gfx_pos, char const* const* images)
         gDPSetTextureFilter(gfx_pos++, G_TF_POINT);
     }
     gSPEndDisplayList(gfx_pos++);
+
+    if (gfx_pos - gfx_start != gfx_length)
+    {
+        while (1);
+    }
+
     return gfx_pos;
 }
 

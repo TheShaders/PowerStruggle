@@ -17,6 +17,7 @@
 #include <n64_task_sched.h>
 #include <ecs.h>
 #include <interaction.h>
+#include <text.h>
 
 extern "C" {
 #include <debug.h>
@@ -882,6 +883,7 @@ void endFrame()
     gDPFullSync(g_dlist_head++);
     gSPEndDisplayList(g_dlist_head++);
 
+    text_reset();
     sendGfxTask();
 
     // debug_printf("Pool usage: %d bytes remaining\n", curGfxPoolEnd - curGfxPoolPtr);

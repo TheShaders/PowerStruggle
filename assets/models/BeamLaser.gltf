@@ -5,8 +5,8 @@
     },
     "extensionsUsed" : [
         "N64_materials_gltf64",
-        "N64_image_format",
-        "N64_texture_inputs"
+        "N64_texture_inputs",
+        "N64_image_format"
     ],
     "scene" : 0,
     "scenes" : [
@@ -20,8 +20,14 @@
                 20,
                 23,
                 28,
-                31,
-                33
+                30,
+                32,
+                35,
+                38,
+                40,
+                42,
+                44,
+                47
             ]
         }
     ],
@@ -281,15 +287,15 @@
         {
             "name" : "Head",
             "rotation" : [
-                -1.26349874573356e-12,
+                -1.2634989625739945e-12,
                 -1.1240546200497192e-06,
-                -1.1240546200497192e-06,
+                -1.124054733736557e-06,
                 1
             ],
             "translation" : [
-                -2.3047130071063293e-06,
-                3.859632968902588,
-                -0.06482112407684326
+                -8.642673492431641e-07,
+                1.4473624229431152,
+                -0.024307921528816223
             ]
         },
         {
@@ -304,7 +310,7 @@
             ],
             "name" : "stab_Drill-R",
             "translation" : [
-                -23.7684326171875,
+                8.786985397338867,
                 0,
                 0
             ]
@@ -414,25 +420,163 @@
             "name" : "Bone"
         },
         {
-            "mesh" : 0,
-            "name" : "blade_Harv-E_mesh",
-            "skin" : 0
-        },
-        {
             "children" : [
-                30,
                 29
             ],
-            "name" : "blade_Harv-E"
+            "name" : "blade_Harv-E",
+            "translation" : [
+                -12,
+                0,
+                0
+            ]
         },
         {
             "name" : "Bone"
         },
         {
             "children" : [
-                32
+                31
             ],
-            "name" : "Head_Enemy"
+            "name" : "Head_Enemy",
+            "translation" : [
+                -4,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                0,
+                -4.76837158203125e-07,
+                0,
+                1
+            ],
+            "translation" : [
+                -8.58130952110514e-05,
+                3.6397042274475098,
+                0.9291809797286987
+            ]
+        },
+        {
+            "children" : [
+                33
+            ],
+            "name" : "Root",
+            "translation" : [
+                3.2172593478208e-08,
+                0,
+                -9.270693368534921e-08
+            ]
+        },
+        {
+            "children" : [
+                34
+            ],
+            "name" : "flame_Burn-R",
+            "scale" : [
+                0.7751588821411133,
+                0.7751588821411133,
+                0.7751588821411133
+            ]
+        },
+        {
+            "name" : "Head",
+            "rotation" : [
+                0,
+                -4.76837158203125e-07,
+                0,
+                1
+            ],
+            "translation" : [
+                -3.890132234118937e-07,
+                1.5311789512634277,
+                1.2156663231621678e-08
+            ]
+        },
+        {
+            "children" : [
+                36
+            ],
+            "name" : "Root",
+            "translation" : [
+                3.2172593478208e-08,
+                0,
+                -9.270693368534921e-08
+            ]
+        },
+        {
+            "children" : [
+                37
+            ],
+            "name" : "beam_Beam-E",
+            "translation" : [
+                4,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "children" : [
+                39
+            ],
+            "name" : "drill_Drill-R",
+            "translation" : [
+                8.787141799926758,
+                0.5688098669052124,
+                0.4674485921859741
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "children" : [
+                41
+            ],
+            "name" : "Keycard",
+            "translation" : [
+                12,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "children" : [
+                43
+            ],
+            "name" : "Door",
+            "translation" : [
+                14,
+                0,
+                0
+            ]
+        },
+        {
+            "name" : "Bone"
+        },
+        {
+            "mesh" : 0,
+            "name" : "BeamLaserMesh",
+            "skin" : 0
+        },
+        {
+            "children" : [
+                46,
+                45
+            ],
+            "name" : "BeamLaser",
+            "translation" : [
+                17,
+                0,
+                0
+            ]
         }
     ],
     "animations" : [
@@ -698,30 +842,85 @@
     ],
     "materials" : [
         {
+            "alphaMode" : "BLEND",
+            "doubleSided" : true,
             "extensions" : {
                 "N64_materials_gltf64" : {
                     "combiner" : [
-                        "TEXEL0",
+                        "NOISE",
+                        "ENVIRONMENT",
+                        "PRIMITIVE",
+                        "ENVIRONMENT",
+                        "0",
+                        "0",
                         "0",
                         "SHADE",
+                        "NOISE",
+                        "ENVIRONMENT",
+                        "PRIMITIVE",
+                        "ENVIRONMENT",
                         "0",
                         "0",
                         "0",
-                        "0",
-                        "1",
-                        "TEXEL0",
-                        "0",
-                        "SHADE",
-                        "0",
-                        "0",
-                        "0",
-                        "0",
-                        "1"
+                        "SHADE"
                     ],
-                    "drawLayer" : "Opaque"
+                    "envColor" : [
+                        0,
+                        0.18954132497310638,
+                        1,
+                        1
+                    ],
+                    "primColor" : [
+                        0.44999998807907104,
+                        0.44999998807907104,
+                        0.44999998807907104,
+                        1
+                    ],
+                    "geometryMode" : 2228229,
+                    "drawLayer" : "Transparent"
                 }
             },
-            "name" : "poleshine_f3d.002",
+            "name" : "beam_f3d",
+            "pbrMetallicRoughness" : {
+                "extensions" : {},
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        },
+        {
+            "alphaMode" : "BLEND",
+            "doubleSided" : true,
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "0",
+                        "0",
+                        "0",
+                        "PRIMITIVE",
+                        "TEXEL0",
+                        "0",
+                        "PRIMITIVE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "PRIMITIVE",
+                        "TEXEL0",
+                        "0",
+                        "PRIMITIVE",
+                        "0"
+                    ],
+                    "primColor" : [
+                        0,
+                        0.45859670639038086,
+                        1,
+                        1
+                    ],
+                    "geometryMode" : 2228229,
+                    "drawLayer" : "Transparent"
+                }
+            },
+            "name" : "lightglow_f3d",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0
@@ -736,84 +935,11 @@
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
-        },
-        {
-            "alphaCutoff" : 0.20000000298023224,
-            "alphaMode" : "MASK",
-            "extensions" : {
-                "N64_materials_gltf64" : {
-                    "combiner" : [
-                        "TEXEL0",
-                        "0",
-                        "SHADE",
-                        "0",
-                        "SHADE",
-                        "1",
-                        "PRIMITIVE",
-                        "1",
-                        "COMBINED",
-                        "PRIMITIVE",
-                        "COMBINED_ALPHA",
-                        "PRIMITIVE",
-                        "0",
-                        "0",
-                        "0",
-                        "TEXEL1"
-                    ],
-                    "primColor" : [
-                        1,
-                        0.11380143463611603,
-                        0,
-                        0.6357143521308899
-                    ],
-                    "othermodeH" : [
-                        "two_cycle"
-                    ],
-                    "drawLayer" : "Cutout",
-                    "renderMode" : {
-                        "zmode" : "OPA",
-                        "cvgDst" : "CLAMP",
-                        "flags" : [
-                            "Z_CMP",
-                            "IM_RD",
-                            "CVG_X_ALPHA",
-                            "Z_UPD",
-                            "ALPHA_CVG_SEL",
-                            "AA_EN"
-                        ],
-                        "blender" : [
-                            "IN",
-                            "0",
-                            "IN",
-                            "1",
-                            "IN",
-                            "IN",
-                            "MEM",
-                            "MEM"
-                        ]
-                    }
-                }
-            },
-            "name" : "scythe_f3d.002",
-            "pbrMetallicRoughness" : {
-                "baseColorTexture" : {
-                    "index" : 1
-                },
-                "extensions" : {
-                    "N64_texture_inputs" : {
-                        "tex0" : {
-                            "index" : 1
-                        }
-                    }
-                },
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
         }
     ],
     "meshes" : [
         {
-            "name" : "Roundcube.003",
+            "name" : "Circle.003",
             "primitives" : [
                 {
                     "attributes" : {
@@ -848,41 +974,27 @@
         {
             "sampler" : 0,
             "source" : 0
-        },
-        {
-            "sampler" : 0,
-            "source" : 1
         }
     ],
     "images" : [
         {
             "extensions" : {
                 "N64_image_format" : {
-                    "format" : "RGBA16"
+                    "format" : "I8"
                 }
             },
             "mimeType" : "image/png",
-            "name" : "metalshine_I4",
-            "uri" : "../textures/metalshine_I4.png"
-        },
-        {
-            "extensions" : {
-                "N64_image_format" : {
-                    "format" : "IA4"
-                }
-            },
-            "mimeType" : "image/png",
-            "name" : "scythe_IA4",
-            "uri" : "../textures/scythe_IA4.png"
+            "name" : "lightflash.I8",
+            "uri" : "../textures/lightflash_I8.png"
         }
     ],
     "skins" : [
         {
             "inverseBindMatrices" : 16,
             "joints" : [
-                29
+                45
             ],
-            "name" : "blade_Harv-E"
+            "name" : "BeamLaser"
         }
     ],
     "accessors" : [
@@ -891,14 +1003,14 @@
             "componentType" : 5126,
             "count" : 4,
             "max" : [
-                -11.514050483703613,
-                0.5000001192092896,
-                0.054309993982315063
+                17.109189987182617,
+                0.7199999690055847,
+                6.371829032897949
             ],
             "min" : [
-                -13,
-                0.5000001192092896,
-                -0.054309993982315063
+                16.890810012817383,
+                0.7199999690055847,
+                -6.371829032897949
             ],
             "type" : "VEC3"
         },
@@ -949,61 +1061,61 @@
         {
             "bufferView" : 8,
             "componentType" : 5126,
-            "count" : 3,
+            "count" : 8,
             "max" : [
-                -11.108010292053223,
-                0.5504987835884094,
-                0.3793579339981079
+                17.717823028564453,
+                1.2485687732696533,
+                -4.65198278427124
             ],
             "min" : [
-                -12.090173721313477,
-                0.5504987835884094,
-                -1.436906337738037
+                16.282176971435547,
+                0.720000147819519,
+                -7.515960216522217
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 9,
             "componentType" : 5126,
-            "count" : 3,
+            "count" : 8,
             "type" : "VEC3"
         },
         {
             "bufferView" : 10,
             "componentType" : 5126,
-            "count" : 3,
+            "count" : 8,
             "type" : "VEC2"
         },
         {
             "bufferView" : 11,
             "componentType" : 5123,
-            "count" : 3,
+            "count" : 8,
             "normalized" : true,
             "type" : "VEC4"
         },
         {
             "bufferView" : 12,
             "componentType" : 5123,
-            "count" : 3,
+            "count" : 8,
             "normalized" : true,
             "type" : "VEC4"
         },
         {
             "bufferView" : 13,
             "componentType" : 5121,
-            "count" : 3,
+            "count" : 8,
             "type" : "VEC4"
         },
         {
             "bufferView" : 14,
             "componentType" : 5126,
-            "count" : 3,
+            "count" : 8,
             "type" : "VEC4"
         },
         {
             "bufferView" : 15,
             "componentType" : 5123,
-            "count" : 3,
+            "count" : 12,
             "type" : "SCALAR"
         },
         {
@@ -1194,172 +1306,172 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 36,
+            "byteLength" : 96,
             "byteOffset" : 284
         },
         {
             "buffer" : 0,
-            "byteLength" : 36,
-            "byteOffset" : 320
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 24,
-            "byteOffset" : 356
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 24,
+            "byteLength" : 96,
             "byteOffset" : 380
         },
         {
             "buffer" : 0,
-            "byteLength" : 24,
-            "byteOffset" : 404
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 12,
-            "byteOffset" : 428
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 48,
-            "byteOffset" : 440
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 6,
-            "byteOffset" : 488
+            "byteLength" : 64,
+            "byteOffset" : 476
         },
         {
             "buffer" : 0,
             "byteLength" : 64,
-            "byteOffset" : 496
+            "byteOffset" : 540
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 64,
+            "byteOffset" : 604
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 32,
+            "byteOffset" : 668
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 128,
+            "byteOffset" : 700
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 24,
+            "byteOffset" : 828
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 64,
+            "byteOffset" : 852
         },
         {
             "buffer" : 0,
             "byteLength" : 480,
-            "byteOffset" : 560
+            "byteOffset" : 916
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 1040
+            "byteOffset" : 1396
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 2480
+            "byteOffset" : 2836
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 4400
+            "byteOffset" : 4756
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 5840
+            "byteOffset" : 6196
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 7280
+            "byteOffset" : 7636
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 9200
+            "byteOffset" : 9556
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 10640
+            "byteOffset" : 10996
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 12080
+            "byteOffset" : 12436
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 14000
+            "byteOffset" : 14356
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 15440
+            "byteOffset" : 15796
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 16880
+            "byteOffset" : 17236
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 18800
+            "byteOffset" : 19156
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 20240
+            "byteOffset" : 20596
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 21680
+            "byteOffset" : 22036
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 23600
+            "byteOffset" : 23956
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 25040
+            "byteOffset" : 25396
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 26480
+            "byteOffset" : 26836
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 28400
+            "byteOffset" : 28756
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 29840
+            "byteOffset" : 30196
         },
         {
             "buffer" : 0,
             "byteLength" : 1920,
-            "byteOffset" : 31280
+            "byteOffset" : 31636
         },
         {
             "buffer" : 0,
             "byteLength" : 1440,
-            "byteOffset" : 33200
+            "byteOffset" : 33556
         }
     ],
     "samplers" : [
         {
             "magFilter" : 9729,
             "minFilter" : 9987,
-            "wrapS" : 10497,
-            "wrapT" : 10497
+            "wrapS" : 33648,
+            "wrapT" : 33648
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 34640,
-            "uri" : "blade_Harv-E_mesh.bin"
+            "byteLength" : 34996,
+            "uri" : "BeamLaser.bin"
         }
     ]
 }

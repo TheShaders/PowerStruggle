@@ -26,6 +26,8 @@ extern "C" {
 
 #include <memory>
 
+float player_speed_mul = 1.0f;
+
 #define POINTER_ARCHETYPE (Bit_Model | Bit_Rotation | Bit_Position)
 
 void setAnim(AnimState *animState, Animation *newAnim)
@@ -71,7 +73,7 @@ void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED
     // {
     //     rot[1] = atan2s(dir_z, dir_x);
     // }
-    // float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
+    // float targetSpeed = player_speed_mul * player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
     // vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
     // vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
     
@@ -127,13 +129,13 @@ void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED
     {
         rot[1] = input->angle + 0x4000;
     }
-    float targetSpeed = player_speed_buff * state->controlled_state->definition->base.move_speed;
+    float targetSpeed = player_speed_mul * player_speed_buff * state->controlled_state->definition->base.move_speed;
     vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * dir_x * (PLAYER_GROUND_ACCEL_TIME_CONST);
     vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * dir_z * (PLAYER_GROUND_ACCEL_TIME_CONST);
 
     // Single stick
     // rot[1] = atan2s(vel[2], vel[0]);
-    // float targetSpeed = player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
+    // float targetSpeed = player_speed_mul * player_speed_buff * state->controlled_definition->base.move_speed * input->magnitude;
     // vel[0] = vel[0] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) + targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * cossf(input->angle + g_Camera.yaw);
     // vel[2] = vel[2] * (1.0f - PLAYER_GROUND_ACCEL_TIME_CONST) - targetSpeed * (PLAYER_GROUND_ACCEL_TIME_CONST) * sinsf(input->angle + g_Camera.yaw);
 }
@@ -269,6 +271,7 @@ void take_player_damage(HealthState* health_state, int damage)
         health_state->health -= damage;
     }
 }
+extern int cur_level_idx;
 
 void handle_player_hits(ColliderParams* collider, HealthState* health_state, Vec3 pos, Vec3 vel)
 {
@@ -293,6 +296,7 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state, Vec
         {
             if (!is_scene_loading())
             {
+                cur_level_idx = get_current_level() + 1;                
                 start_scene_load(std::make_unique<LevelTransitionScene>(get_current_level() + 1));
             }
         }
@@ -409,6 +413,7 @@ void playerCallback(void **components, void *data)
                 &g_PlayerInput,
                 components);
 
+            player_speed_mul = 1.0f;
             player_control_state.fill(0);
             state->controlled_state->definition = new_controlled_state->definition;
             state->controlled_handler = control_handlers[(int)new_controlled_state->definition->base.enemy_type];

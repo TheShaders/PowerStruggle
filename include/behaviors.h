@@ -33,7 +33,7 @@ enum class InteractableType: uint8_t {
 #include <enemies/spinner.h>
 #include <enemies/ram.h>
 #include <enemies/bomb.h>
-// beam
+#include <enemies/beam.h>
 #include <enemies/multishot.h>
 // jet
 #include <enemies/stab.h>

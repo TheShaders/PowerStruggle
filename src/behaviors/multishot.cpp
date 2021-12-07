@@ -38,7 +38,10 @@ MultishotDefinition multishoter_definitions[] = {
     }
 };
 
-void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* definition, void** shot_components, unsigned int shot_mask)
+// HACK
+int shot_idx = 0;
+
+void setup_multishot_hitboxes(int count, const Vec3& multishoter_pos, MultishotDefinition* definition, void** shot_components, unsigned int shot_mask)
 {
     MultishotParams* params = &definition->params;
 
@@ -49,7 +52,7 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
     Hitbox* hitbox = get_component<Bit_Hitbox, Hitbox>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
     ActiveState* active_state = get_component<Bit_Deactivatable, ActiveState>(shot_components, ARCHETYPE_MULTISHOT_HITBOX);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < count; i++)
     {
         *model = params->shot_model;
 
@@ -58,9 +61,9 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
         hitbox->size_y = params->shot_height;
         hitbox->size_z = 0;
 
-        if ((i % 2) == 0)
+        if ((shot_idx % 2) == 0)
         {
-            if (i >= 2)
+            if (shot_idx >= 2)
             {
                 (*vel)[0] = params->shot_speed;
             }
@@ -72,7 +75,7 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
         }
         else
         {
-            if (i >= 2)
+            if (shot_idx >= 2)
             {
                 (*vel)[2] = params->shot_speed;
             }
@@ -94,6 +97,7 @@ void setup_multishot_hitboxes(const Vec3& multishoter_pos, MultishotDefinition* 
         model++;
         hitbox++;
         active_state++;
+        shot_idx++;
     }
 }
 
@@ -106,7 +110,7 @@ void create_multishot_hitbox_callback(UNUSED size_t count, void *arg, void **com
     BehaviorState& multishoter_bhv = *get_component<Bit_Behavior, BehaviorState>(multishoter_components, ARCHETYPE_MULTISHOT);
     MultishotState* state = reinterpret_cast<MultishotState*>(multishoter_bhv.data.data());
     MultishotDefinition* definition = static_cast<MultishotDefinition*>(state->definition);
-    setup_multishot_hitboxes(multishoter_pos, definition, componentArrays, player_hitbox_mask);
+    setup_multishot_hitboxes(count, multishoter_pos, definition, componentArrays, player_hitbox_mask);
 }
 
 void multishoter_callback(void **components, void *data)
@@ -139,6 +143,7 @@ void multishoter_callback(void **components, void *data)
     // Otherwise if the player is close enough to be shot at, shoot
     else if (player_dist < params->fire_radius)
     {
+        shot_idx = 0;
         createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, enemy, 4, create_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }
@@ -225,7 +230,7 @@ void create_player_multishot_hitbox_callback(UNUSED size_t count, void *arg, voi
     PlayerState* state = reinterpret_cast<PlayerState*>(player_bhv.data.data());
     MultishotDefinition* definition = static_cast<MultishotDefinition*>(state->controlled_state->definition);
 
-    setup_multishot_hitboxes(player_pos, definition, componentArrays, enemy_hitbox_mask);
+    setup_multishot_hitboxes(count, player_pos, definition, componentArrays, enemy_hitbox_mask);
 }
 
 void on_multishoter_update(BaseEnemyState* base_state, InputData* input, void** player_components)
@@ -245,6 +250,7 @@ void on_multishoter_update(BaseEnemyState* base_state, InputData* input, void** 
     // Otherwise if the player is pressing the fire button, fire
     else if (input->buttonsPressed & Z_TRIG)
     {
+        shot_idx = 0;
         createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, player, 4, create_player_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }

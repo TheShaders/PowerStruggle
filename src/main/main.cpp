@@ -37,6 +37,8 @@ bool is_scene_loading()
     return bool{loading_scene};
 }
 
+int cur_level_idx = 0;
+
 void update()
 {
     // If there's a scene that is currently loading,

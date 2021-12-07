@@ -46,6 +46,12 @@ void text_init()
     text_storage = {};
 }
 
+void text_reset()
+{
+    text_entries = {};
+    text_storage = {};
+}
+
 void print_text(int x, int y, char const* text, int length)
 {
     text_entries.emplace_back(length, static_cast<uint16_t>(x), static_cast<uint16_t>(y), cur_color, text_storage.end());

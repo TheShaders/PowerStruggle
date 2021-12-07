@@ -60,6 +60,7 @@ void* segmentedToVirtual(void* segmentedAddress)
 
 extern "C" void abort()
 {
+    *(volatile int*)0 = 0;
     while (1);
 }
 

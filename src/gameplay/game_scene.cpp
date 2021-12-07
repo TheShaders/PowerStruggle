@@ -47,9 +47,12 @@ bool GameplayScene::load()
     switch (level_index_)
     {
         case 0:
-            pos[0] = 2229.0f;
-            pos[1] = 10.0f;
-            pos[2] = 26620.0f;
+            pos[0] = (-4 - -11) * tile_size + tile_size / 2;
+            pos[1] = (0) * tile_size;
+            pos[2] = (1 - -104) * tile_size + tile_size / 2;
+            // pos[0] = 0x0000DFD6 - 8192 + 1024;
+            // pos[1] = (42) * tile_size;
+            // pos[2] = 0x00001D3F;
             break;
         case 1:
             pos[0] = (-1 - -4) * tile_size + tile_size / 2;
@@ -165,7 +168,7 @@ void GameplayScene::draw(bool unloading)
             print_text(10, screen_height - 8 - 20 - border_height, key_text);
         }
         draw_all_text();
-        // drawAllHitboxes();
+        drawAllHitboxes();
     }
 
     if (unloading)
