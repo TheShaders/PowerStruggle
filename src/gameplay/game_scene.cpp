@@ -168,7 +168,7 @@ void GameplayScene::draw(bool unloading)
             print_text(10, screen_height - 8 - 20 - border_height, key_text);
         }
         draw_all_text();
-        drawAllHitboxes();
+        // drawAllHitboxes();
     }
 
     if (unloading)

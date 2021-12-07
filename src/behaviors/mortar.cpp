@@ -16,9 +16,9 @@
 MortarDefinition mortar_definitions[] = {
     { // Blast-E
         { // base
-            "models/Box", // model_name
+            "models/mortar_Boom-R", // model_name
             nullptr,      // model
-            "Blast-E",    // enemy_name
+            "Boom-R",    // enemy_name
             100,          // max_health
             25,           // controllable_health
             5.0f,        // move_speed
@@ -31,7 +31,7 @@ MortarDefinition mortar_definitions[] = {
             512.0f,  // follow_distance
             256,  // mortar_explosion_radius
             256,  // mortar_explosion_height
-            512.0f+64.0f,  // mortar_fire_radius
+            512.0f+128.0f,  // mortar_fire_radius
             15,      // mortar_time
             90,      // mortar_rate
         }
@@ -84,13 +84,16 @@ void setup_shell(const Vec3& mortar_pos, const Vec3s& mortar_rot, const Vec3& mo
 
     *model = params->mortar_model;
 
-    pos[0] = mortar_pos[0];
-    pos[1] = mortar_pos[1];
-    pos[2] = mortar_pos[2];
+    float sin_rot = sinsf(mortar_rot[1]);
+    float cos_rot = cossf(mortar_rot[1]);
 
-    vel[0] = shell_forward_vel * sinsf(mortar_rot[1]) + mortar_vel[0];
+    pos[0] = mortar_pos[0] - 45 * sin_rot;
+    pos[1] = mortar_pos[1] + 100;
+    pos[2] = mortar_pos[2] - 45 * cos_rot;
+
+    vel[0] = shell_forward_vel * sin_rot + mortar_vel[0];
     vel[1] = shell_y_vel;
-    vel[2] = shell_forward_vel * cossf(mortar_rot[1]) + mortar_vel[2];
+    vel[2] = shell_forward_vel * cos_rot + mortar_vel[2];
     
     rot[0] = 0;
     rot[1] = 0;
