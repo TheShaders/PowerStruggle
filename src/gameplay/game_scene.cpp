@@ -63,9 +63,9 @@ bool GameplayScene::load()
             pos[2] = (2 - 0) * tile_size + tile_size / 2;
             break;
         case 2:
-            pos[0] = 2229.0f;
-            pos[1] = 512.0f;
-            pos[2] = 26620.0f;
+            pos[0] = (-1 - -24) * tile_size + tile_size / 2;
+            pos[1] = 10.0f;
+            pos[2] = (0 - -35) * tile_size + tile_size / 2;
             break;
     }
 
@@ -87,7 +87,7 @@ bool GameplayScene::load()
     tiles[i++] = TileType{load_model("models/metalEmboss"),   TileCollision::floor};
     tiles[i++] = TileType{load_model("models/water_dirtrocky.A"),   TileCollision::floor};
     tiles[i++] = TileType{load_model("models/metalRamp"),     TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeBlue"),     TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/stoneLava.A"),     TileCollision::floor};
     tiles[i++] = TileType{load_model("models/dirtRockyRamp"),    TileCollision::slope};
     tiles[i++] = TileType{load_model("models/stone_Ramp"),     TileCollision::slope};
     tiles[i++] = TileType{load_model("models/dirtrockyXstone_Ramp"),    TileCollision::slope};

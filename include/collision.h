@@ -38,6 +38,7 @@ struct ColliderParams {
     uint16_t mask; // The mask applied to hitboxes to restrict intersections
     uint8_t hit_wall; // Whether or not this collider hit a wall this frame
     SurfaceType floor_surface_type; // The surface type of the floor
+    int16_t floor_tile_x, floor_tile_z;
 };
 
 struct Hitbox

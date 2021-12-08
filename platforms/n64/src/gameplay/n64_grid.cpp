@@ -424,10 +424,11 @@ void Grid::draw(Camera *camera)
     }
 }
 
-float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
+float Grid::get_height(float x, float z, float radius, float min_y, float max_y, int16_t* floor_tile_x, int16_t* floor_tile_z)
 {
     int x_int = lround(x);
     int z_int = lround(z);
+    int found_floor_x = 0, found_floor_z = 0;
     // Default to an unreasonably low grid height
     float found_y = std::numeric_limits<decltype(ChunkColumn::base_height)>::min() * static_cast<float>(tile_size);
 
@@ -571,6 +572,8 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
                             {
                                 // debug_printf("        Found new max height at %5.2f\n", tile_y_world);
                                 found_y = tile_y_world;
+                                found_floor_x = local_tile_x + cur_chunk_min_x;
+                                found_floor_z = local_tile_z + cur_chunk_min_z;
                                 // This is the highest tile in the column that fits the query, so don't check any more in the column
                                 break;
                             }
@@ -612,6 +615,8 @@ float Grid::get_height(float x, float z, float radius, float min_y, float max_y)
         }
     }
 
+    *floor_tile_x = found_floor_x;
+    *floor_tile_z = found_floor_z;
     // debug_printf("-> found_y: %d\n", found_y);
     return found_y;
 }

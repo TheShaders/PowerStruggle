@@ -1973,20 +1973,6 @@
       "Rotation": 0
     },
     {
-      "X": 20,
-      "Y": 0,
-      "Z": 11,
-      "TileIndex": 19,
-      "Rotation": 2
-    },
-    {
-      "X": 21,
-      "Y": 0,
-      "Z": 11,
-      "TileIndex": 19,
-      "Rotation": 2
-    },
-    {
       "X": 12,
       "Y": -7,
       "Z": 11,
@@ -2202,20 +2188,6 @@
       "Z": 11,
       "TileIndex": 27,
       "Rotation": 0
-    },
-    {
-      "X": 12,
-      "Y": 0,
-      "Z": 12,
-      "TileIndex": 19,
-      "Rotation": 2
-    },
-    {
-      "X": 13,
-      "Y": 0,
-      "Z": 12,
-      "TileIndex": 19,
-      "Rotation": 2
     },
     {
       "X": 11,

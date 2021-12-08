@@ -23,6 +23,7 @@ extern "C" {
 #include <text.h>
 #include <scene.h>
 #include <gameplay.h>
+#include <n64_mathutils.h>
 
 #include <memory>
 
@@ -183,6 +184,9 @@ Entity* pointer_entity = nullptr;
 // Extra space for storing the state related to the player's current body
 std::array<uint8_t, sizeof(BehaviorState::data)> player_control_state;
 
+int safeTile[2];
+float safeHeight;
+
 void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componentArrays)
 {
     Vec3& pos_in = *(Vec3*)arg;
@@ -257,6 +261,9 @@ void createPlayerCallback(UNUSED size_t count, UNUSED void *arg, void **componen
     (*pos)[0] = pos_in[0];
     (*pos)[1] = pos_in[1];
     (*pos)[2] = pos_in[2];
+
+    safeTile[0] = safeTile[1] = 0;
+    safeHeight = pos_in[1];
 }
 
 uint32_t last_player_hit_time = 0;
@@ -357,6 +364,21 @@ void playerCallback(void **components, void *data)
     HealthState *health = get_component<Bit_Health, HealthState>(components, ARCHETYPE_PLAYER);
     Model **model = get_component<Bit_Model, Model*>(components, ARCHETYPE_PLAYER);
     PlayerState *state = (PlayerState *)data;
+
+    if (collider->floor_surface_type != surface_none)
+    {
+        safeTile[0] = collider->floor_tile_x;
+        safeHeight = (*pos)[1];
+        safeTile[1] = collider->floor_tile_z;
+    }
+
+    if ((*pos)[1] < safeHeight - tile_size * 10)
+    {
+        (*pos)[0] = safeTile[0] * tile_size + tile_size / 2;
+        (*pos)[1] = safeHeight + tile_size;
+        (*pos)[2] = safeTile[1] * tile_size + tile_size / 2;
+        take_player_damage(health, 10);
+    }
     
     // Transition between states if applicable
     stateUpdateCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
