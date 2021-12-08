@@ -300,7 +300,7 @@ Entity* create_load_trigger(float x, float y, float z, UNUSED int size)
     return ret;
 }
 
-Entity* create_interactable(float x, float y, float z, InteractableType type, int subtype, uint32_t param)
+Entity* create_interactable(float x, float y, float z, InteractableType type, UNUSED int subtype, uint32_t param)
 {
     switch (type)
     {

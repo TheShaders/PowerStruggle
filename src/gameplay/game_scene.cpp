@@ -178,6 +178,7 @@ void GameplayScene::draw(bool unloading)
         grid_.draw(&g_Camera);
 
         // drawAllEntitiesHealth();
+        draw_player_health();
         set_text_color(0, 128, 0, 255);
         print_text(10, screen_height - 8 - 10 - border_height, get_player_controlled_definition()->base.enemy_name);
         if (keys_ > 0)

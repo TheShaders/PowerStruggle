@@ -239,10 +239,10 @@ Entity* create_stab_enemy(float x, float y, float z, int subtype)
 
 void delete_stab_enemy(Entity *stab_enemy)
 {
-    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_STAB)];
     getEntityComponents(stab_enemy, components);
 
-    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_STAB);
     StabState* state = reinterpret_cast<StabState*>(bhv_params->data.data());
 
     if (state->stab_hitbox != nullptr)

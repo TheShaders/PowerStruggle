@@ -18,6 +18,7 @@
 #include <ecs.h>
 #include <interaction.h>
 #include <text.h>
+#include <player.h>
 
 extern "C" {
 #include <debug.h>
@@ -930,6 +931,72 @@ glm::vec2 calculate_normalized_device_coords(const Vec3& pos, const MtxF* mat)
     glm::vec4 clip_pos = *reinterpret_cast<const glm::mat4*>(mat) * glm::vec4{reinterpret_cast<const glm::vec3&>(pos), 1.0f};
     // Perspective divide to convert from clip space to NDC
     return glm::vec2{clip_pos[0] / clip_pos[3], clip_pos[1] / clip_pos[3]};
+}
+
+void draw_player_health()
+{
+    void* player_components[NUM_COMPONENTS(ARCHETYPE_PLAYER) + 1];
+    getEntityComponents(g_PlayerEntity, player_components);
+
+    HealthState* cur_health_state = get_component<Bit_Health, HealthState>(player_components, ARCHETYPE_PLAYER);
+    Vec3* cur_position = get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+
+    int cur_health_bar_size = cur_health_state->max_health / health_per_pixel;
+    int filled_size = cur_health_state->health / health_per_pixel;
+    Vec3 cur_pos_corrected;
+    cur_pos_corrected[0] = (*cur_position)[0] - g_Camera.model_offset[0];
+    cur_pos_corrected[1] = (*cur_position)[1] - g_Camera.model_offset[1] + 256.0f;
+    cur_pos_corrected[2] = (*cur_position)[2] - g_Camera.model_offset[2];
+    glm::vec2 entity_ndc = calculate_normalized_device_coords(cur_pos_corrected, &g_gfxContexts[g_curGfxContext].viewProjMtxF);
+
+    int screen_space_x = lround(entity_ndc[0] *  (screen_width  / 2)) + screen_width  / 2;
+    int screen_space_y = lround(entity_ndc[1] * -(screen_height / 2)) + screen_height / 2;
+    
+    int cur_health_bar_pos_x = (screen_space_x - cur_health_bar_size / 2);
+    int cur_health_bar_pos_y = (screen_space_y - health_bar_height / 2);
+
+    // if (cur_health_bar_pos_x < 16)
+    // {
+    //     cur_health_bar_pos_x = 16;
+    // }
+    // if (cur_health_bar_pos_x > (int)(screen_width - 16 - 16))
+    // {
+    //     cur_health_bar_pos_x = screen_width - 16 - 16;
+    // }
+    
+    if (cur_health_bar_pos_y > screen_height)
+    {
+        return;
+    }
+    if (cur_health_bar_pos_y < -(int)health_bar_height)
+    {
+        return;
+    }
+    // if (cur_health_bar_pos_y < 16)
+    // {
+    //     cur_health_bar_pos_y = 16;
+    // }
+    // if (cur_health_bar_pos_y > static_cast<int>(screen_height - 16 - health_bar_height))
+    // {
+    //     cur_health_bar_pos_y = static_cast<int>(screen_height - 16 - health_bar_height);
+    // }
+
+    gDPPipeSync(g_gui_dlist_head++);
+    gDPSetCycleType(g_gui_dlist_head++, G_CYC_1CYCLE);
+    gDPSetTexturePersp(g_gui_dlist_head++, G_TP_NONE);
+    gDPSetCombineLERP(g_gui_dlist_head++, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1, 0, 0, 0, ENVIRONMENT, 0, 0, 0, 1);
+    if (cur_health_bar_pos_x < (int)screen_width && cur_health_bar_pos_x + (int)filled_size > 0)
+    {
+        gDPPipeSync(g_gui_dlist_head++);
+        gDPSetEnvColor(g_gui_dlist_head++, 255, 153, 0, 255);
+        gDPScisFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x, cur_health_bar_pos_y, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y + health_bar_height);
+    }
+    if (cur_health_bar_pos_x + filled_size < screen_width && cur_health_bar_pos_x + (int)cur_health_bar_size > 0)
+    {
+        gDPPipeSync(g_gui_dlist_head++);
+        gDPSetEnvColor(g_gui_dlist_head++, 60, 60, 60, 255);
+        gDPScisFillRectangle(g_gui_dlist_head++, cur_health_bar_pos_x + filled_size, cur_health_bar_pos_y, cur_health_bar_pos_x + cur_health_bar_size, cur_health_bar_pos_y + health_bar_height);
+    }
 }
 
 void drawHealthBars(size_t count, void *, void **componentArrays)

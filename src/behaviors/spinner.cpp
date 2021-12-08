@@ -214,10 +214,10 @@ void create_player_spinner_blade_callback(UNUSED size_t count, void *arg, void *
 
 void delete_spinner_enemy(Entity *beam_enemy)
 {
-    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_SPINNER)];
     getEntityComponents(beam_enemy, components);
 
-    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_SPINNER);
     SpinnerState* state = reinterpret_cast<SpinnerState*>(bhv_params->data.data());
 
     if (state->blade_entity != nullptr)

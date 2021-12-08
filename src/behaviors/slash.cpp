@@ -242,10 +242,10 @@ Entity* create_slash_enemy(float x, float y, float z, int subtype)
 
 void delete_slash_enemy(Entity *slash_enemy)
 {
-    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_SLASH)];
     getEntityComponents(slash_enemy, components);
 
-    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_SLASH);
     SlasherState* state = reinterpret_cast<SlasherState*>(bhv_params->data.data());
 
     if (state->slash_hitbox != nullptr)

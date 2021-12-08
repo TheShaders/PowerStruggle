@@ -129,12 +129,12 @@ Gfx *process_texture_params(TextureParams* params, Gfx *cur_gfx, char const* con
     uint32_t mask_t = (mask_shift_t >> 4) & 0xF;
     uint32_t shift_s = (mask_shift_s >> 0) & 0xF;
     uint32_t shift_t = (mask_shift_t >> 0) & 0xF;
-    uint32_t settile_bits =
-        (cwm_t        << 18) |
-        (mask_shift_t << 10) |
-        (cwm_s        <<  8) |
-        (mask_shift_s <<  0);
-    uint32_t tmem_size = width * height;
+    // uint32_t settile_bits =
+    //     (cwm_t        << 18) |
+    //     (mask_shift_t << 10) |
+    //     (cwm_s        <<  8) |
+    //     (mask_shift_s <<  0);
+    // uint32_t tmem_size = width * height;
 
     void* image_data = get_or_load_image(image);
 

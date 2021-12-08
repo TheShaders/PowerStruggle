@@ -23,6 +23,7 @@ extern "C" {
 #include <text.h>
 #include <scene.h>
 #include <gameplay.h>
+#include <misc_scenes.h>
 #include <n64_mathutils.h>
 
 #include <memory>
@@ -273,7 +274,7 @@ void take_player_damage(HealthState* health_state, int damage)
 {
     if (damage >= health_state->health)
     {
-        health_state->health = health_state->max_health;
+        start_scene_load(std::make_unique<GameOverScene>(get_current_level()));
     }
     else
     {
@@ -446,7 +447,7 @@ void playerCallback(void **components, void *data)
             // Set the player's body and max health
             init_enemy_common(&state->controlled_state->definition->base, model, health);
             health->max_health = static_cast<int>(player_health_buff * health->max_health);
-            health->health += control_health;
+            health->health += control_health * 4;
 
             if (health->health > health->max_health)
             {
