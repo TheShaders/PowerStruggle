@@ -15,6 +15,7 @@
 #include <text.h>
 #include <gameplay.h>
 #include <audio.h>
+#include <misc_scenes.h>
 
 extern "C" {
 #include <debug.h>
@@ -53,7 +54,7 @@ void TitleScene::update()
         case TitleState::DisplayTitle:
             if (title_timer_ > 120 && g_PlayerInput.buttonsHeld & START_BUTTON)
             {
-                start_scene_load(std::make_unique<GameplayScene>(0));
+                start_scene_load(std::make_unique<ControlsScene>());
             }
     }
     title_timer_++;
