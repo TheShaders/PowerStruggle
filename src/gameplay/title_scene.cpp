@@ -123,6 +123,21 @@ void TitleScene::draw(UNUSED bool unloading)
             break;
     }
 
+    // switch (osTvType)
+    // {
+    //     case OS_TV_PAL:
+    //         print_text(10, 200, "PAL");
+    //         break;
+    //     case OS_TV_MPAL:
+    //         print_text(10, 200, "MPAL");
+    //         break;
+    //     case OS_TV_NTSC:
+    //         print_text(10, 200, "NTSC");
+    //         break;
+    //     default:
+    //         print_text(10, 200, "UNK");
+    //         break;
+    // }
     draw_all_text();
 }
 

@@ -338,8 +338,18 @@ void draw_enemy_heads()
 
     BaseEnemyState* player_enemy_state = reinterpret_cast<BaseEnemyState*>(player_control_state.data());
 
+    int z_offset = player_enemy_state->definition->base.head_z_offset;
+    float x = (*player_pos)[0];
+    float z = (*player_pos)[2];
+
+    if (z_offset != 0)
+    {
+        x -= static_cast<float>(z_offset) * sinsf((*player_rot)[1]);
+        z -= static_cast<float>(z_offset) * cossf((*player_rot)[1]);
+    }
+
     gfx::push_mat();
-    gfx::apply_translation_affine((*player_pos)[0], (*player_pos)[1] + player_enemy_state->definition->base.head_y_offset, (*player_pos)[2]);
+    gfx::apply_translation_affine(x, (*player_pos)[1] + player_enemy_state->definition->base.head_y_offset, z);
     gfx::rotate_euler_xyz(0, (*player_rot)[1], 0);
     drawModel(player_head_model, nullptr, 0);
 

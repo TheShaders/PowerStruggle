@@ -84,22 +84,22 @@ void processGround(PlayerState *state, InputData *input, UNUSED Vec3 pos, UNUSED
     float dir_x = 0;
     float dir_z = 0;
     float magnitude_sq = 0;
-    if (input->buttonsHeld & D_JPAD)
+    if ((input->buttonsHeld & D_JPAD) || (input->buttonsHeld & D_CBUTTONS))
     {
         dir_z -= 1;
         magnitude_sq += 1.0f;
     }
-    else if (input->buttonsHeld & U_JPAD)
+    else if ((input->buttonsHeld & U_JPAD) || (input->buttonsHeld & U_CBUTTONS))
     {
         dir_z += 1;
         magnitude_sq += 1.0f;
     }
-    if (input->buttonsHeld & R_JPAD)
+    if ((input->buttonsHeld & R_JPAD) || (input->buttonsHeld & R_CBUTTONS))
     {
         dir_x += 1;
         magnitude_sq += 1.0f;
     }
-    else if (input->buttonsHeld & L_JPAD)
+    else if ((input->buttonsHeld & L_JPAD) || (input->buttonsHeld & L_CBUTTONS))
     {
         dir_x -= 1;
         magnitude_sq += 1.0f;
@@ -389,20 +389,20 @@ void playerCallback(void **components, void *data)
     VEC3_COPY(g_Camera.target, *pos);
 
     // if (g_PlayerInput.buttonsHeld & U_JPAD)
-    if (g_PlayerInput.buttonsHeld & U_CBUTTONS)
-    {
-        g_Camera.distance -= 50.0f;
-        if (g_Camera.distance <= 50.0f)
-        {
-            g_Camera.distance = 50.0f;
-        }
-    }
+    // if (g_PlayerInput.buttonsHeld & U_CBUTTONS)
+    // {
+    //     g_Camera.distance -= 50.0f;
+    //     if (g_Camera.distance <= 50.0f)
+    //     {
+    //         g_Camera.distance = 50.0f;
+    //     }
+    // }
 
-    // if (g_PlayerInput.buttonsHeld & D_JPAD)
-    if (g_PlayerInput.buttonsHeld & D_CBUTTONS)
-    {
-        g_Camera.distance += 50.0f;
-    }
+    // // if (g_PlayerInput.buttonsHeld & D_JPAD)
+    // if (g_PlayerInput.buttonsHeld & D_CBUTTONS)
+    // {
+    //     g_Camera.distance += 50.0f;
+    // }
 
     // if (g_PlayerInput.buttonsPressed & R_TRIG)
     // {

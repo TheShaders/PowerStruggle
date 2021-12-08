@@ -6,7 +6,7 @@
 
 #define ARCHETYPE_KEY (Bit_Position | Bit_Rotation | Bit_Model | Bit_Hitbox | Bit_Behavior)
 
-void key_bhv_callback(void** components, void* data)
+void key_bhv_callback(void** components, UNUSED void* data)
 {
     Entity* key = get_entity(components);
     Hitbox& hitbox = *get_component<Bit_Hitbox, Hitbox>(components, ARCHETYPE_KEY);

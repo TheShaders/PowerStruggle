@@ -26910,7 +26910,7 @@
       "X": 4,
       "Y": 0,
       "Z": -3,
-      "TileIndex": 30,
+      "TileIndex": 24,
       "Rotation": 1
     },
     {
@@ -27393,7 +27393,7 @@
       "X": 5,
       "Y": 0,
       "Z": -1,
-      "TileIndex": 30,
+      "TileIndex": 24,
       "Rotation": 1
     },
     {
@@ -27636,17 +27636,6 @@
     }
   ],
   "Objects": [
-    {
-      "X": 0,
-      "Y": 0,
-      "Z": -1,
-      "Definition": {
-        "ObjectClass": 0,
-        "ObjectType": 5,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 0
-    },
     {
       "X": 9,
       "Y": -2,

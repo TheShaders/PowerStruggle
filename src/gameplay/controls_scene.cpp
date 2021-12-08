@@ -27,6 +27,6 @@ void ControlsScene::update()
 {
     if (g_PlayerInput.buttonsPressed && START_BUTTON)
     {
-        start_scene_load(std::make_unique<GameplayScene>(2));
+        start_scene_load(std::make_unique<GameplayScene>(0));
     }
 }

@@ -75,7 +75,11 @@ void initScheduler(void)
     #endif
     osCreateMesgQueue(&schedQueue, &schedMesg, 1);
     osScAddClient(&scheduler, &gfxClient, &schedQueue);
-    osViSetSpecialFeatures(OS_VI_GAMMA_ON);
+    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON | OS_VI_GAMMA_ON | OS_VI_GAMMA_DITHER_OFF | OS_VI_DIVOT_ON);
+    if (osTvType == OS_TV_PAL)
+    {
+        osViSetYScale(0.833f); // Thanks pyoro
+    }
 }
 
 void scheduleGfxTask(OSScTask *task)
