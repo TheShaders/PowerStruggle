@@ -8,6 +8,8 @@
 #include <files.h>
 #include <behaviors.h>
 #include <gameplay.h>
+#include <interaction.h>
+#include <control.h>
 
 #include <cmath>
 
@@ -263,6 +265,7 @@ void drawAllEntities()
 }
 
 Model* head_model = nullptr;
+Model* player_head_model = nullptr;
 
 void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
 {
@@ -270,6 +273,8 @@ void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
     Vec3* cur_pos = get_component<Bit_Position, Vec3>(componentArrays, ARCHETYPE_CONTROLLABLE);
     Vec3s* cur_rot = get_component<Bit_Rotation, Vec3s>(componentArrays, ARCHETYPE_CONTROLLABLE);
     BehaviorState* cur_bhv = get_component<Bit_Behavior, BehaviorState>(componentArrays, ARCHETYPE_CONTROLLABLE);
+    HealthState* cur_health = get_component<Bit_Health, HealthState>(componentArrays, ARCHETYPE_CONTROLLABLE);
+    ControlParams* cur_control = get_component<Bit_Control, ControlParams>(componentArrays, ARCHETYPE_CONTROLLABLE);
     Grid* grid = get_grid();
 
     while (count)
@@ -280,32 +285,39 @@ void draw_enemy_heads_callback(size_t count, void *arg, void **componentArrays)
         float x = (*cur_pos)[0];
         float z = (*cur_pos)[2];
 
-        if (grid->is_pos_loaded(x, z))
+        if (cur_health->health > cur_control->controllable_health)
         {
-            int z_offset = enemy_state->definition->base.head_z_offset;
-
-            if (z_offset != 0)
+            if (grid->is_pos_loaded(x, z))
             {
-                x -= static_cast<float>(z_offset) * sinsf((*cur_rot)[1]);
-                z -= static_cast<float>(z_offset) * cossf((*cur_rot)[1]);
+                int z_offset = enemy_state->definition->base.head_z_offset;
+
+                if (z_offset != 0)
+                {
+                    x -= static_cast<float>(z_offset) * sinsf((*cur_rot)[1]);
+                    z -= static_cast<float>(z_offset) * cossf((*cur_rot)[1]);
+                }
+
+                gfx::push_mat();
+                gfx::apply_translation_affine(x, (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, z);
+                gfx::rotate_euler_xyz(0, head_rot, 0);
+                drawModel(head_model, nullptr, 0);
+
+                gfx::pop_mat();
             }
-
-            gfx::push_mat();
-            gfx::apply_translation_affine(x, (*cur_pos)[1] + enemy_state->definition->base.head_y_offset, z);
-            gfx::rotate_euler_xyz(0, head_rot, 0);
-            drawModel(head_model, nullptr, 0);
-
-            gfx::pop_mat();
         }
 
         cur_pos++;
         cur_rot++;
         cur_bhv++;
+        cur_health++;
+        cur_control++;
         count--;
     }
 }
 
 extern Entity* g_PlayerEntity;
+
+extern std::array<uint8_t, sizeof(BehaviorState::data)> player_control_state;
 
 void draw_enemy_heads()
 {
@@ -313,11 +325,25 @@ void draw_enemy_heads()
     {
         head_model = load_model("models/Head_Enemy");
     }
+    if (player_head_model == nullptr)
+    {
+        player_head_model = load_model("models/Head_Player");
+    }
     void* player_components[NUM_COMPONENTS(ARCHETYPE_PLAYER) + 1];
     getEntityComponents(g_PlayerEntity, player_components);
     Vec3* player_pos = get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
+    Vec3s* player_rot = get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
     // Draw all non-resizable entities that have a model and no rotation or animation
     iterateOverEntities(draw_enemy_heads_callback, player_pos, ARCHETYPE_CONTROLLABLE, 0);
+
+    BaseEnemyState* player_enemy_state = reinterpret_cast<BaseEnemyState*>(player_control_state.data());
+
+    gfx::push_mat();
+    gfx::apply_translation_affine((*player_pos)[0], (*player_pos)[1] + player_enemy_state->definition->base.head_y_offset, (*player_pos)[2]);
+    gfx::rotate_euler_xyz(0, (*player_rot)[1], 0);
+    drawModel(player_head_model, nullptr, 0);
+
+    gfx::pop_mat();
 }
 
 void drawAllEntitiesHealth()
