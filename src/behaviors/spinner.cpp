@@ -110,6 +110,17 @@ void spinner_callback(void **components, void *data)
     SpinnerDefinition* definition = static_cast<SpinnerDefinition*>(state->definition);
     SpinnerParams* params = &definition->params;
 
+    if (pos[1] < min_height)
+    {
+        if (state->blade_entity != nullptr)
+        {
+            queue_entity_deletion(state->blade_entity);
+            state->blade_entity = nullptr;
+        }
+        queue_entity_deletion(spinner);
+        return;
+    }
+
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);

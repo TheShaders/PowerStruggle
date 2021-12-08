@@ -126,6 +126,12 @@ void multishoter_callback(void **components, void *data)
     MultishotDefinition* definition = static_cast<MultishotDefinition*>(state->definition);
     MultishotParams* params = &definition->params;
 
+    if (pos[1] < min_height)
+    {
+        queue_entity_deletion(enemy);
+        return;
+    }
+
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);

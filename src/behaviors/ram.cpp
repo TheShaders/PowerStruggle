@@ -139,6 +139,17 @@ void ram_callback(void **components, void *data)
     RamDefinition* definition = static_cast<RamDefinition*>(state->definition);
     RamParams* params = &definition->params;
 
+    if (pos[1] < min_height)
+    {
+        if (state->ram_hitbox != nullptr)
+        {
+            queue_entity_deletion(state->ram_hitbox);
+            state->ram_hitbox = nullptr;
+        }
+        queue_entity_deletion(ram);
+        return;
+    }
+
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);

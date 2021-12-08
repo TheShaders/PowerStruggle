@@ -140,6 +140,17 @@ void stab_callback(void **components, void *data)
     StabDefinition* definition = static_cast<StabDefinition*>(state->definition);
     StabParams* params = &definition->params;
 
+    if (pos[1] < min_height)
+    {
+        if (state->stab_hitbox != nullptr)
+        {
+            queue_entity_deletion(state->stab_hitbox);
+            state->stab_hitbox = nullptr;
+        }
+        queue_entity_deletion(stab);
+        return;
+    }
+
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);

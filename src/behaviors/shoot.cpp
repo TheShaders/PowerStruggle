@@ -80,6 +80,12 @@ void shooter_callback(void **components, void *data)
     ShootDefinition* definition = static_cast<ShootDefinition*>(state->definition);
     ShootParams* params = &definition->params;
 
+    if (pos[1] < min_height)
+    {
+        queue_entity_deletion(shooter);
+        return;
+    }
+
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
     getEntityComponents(player, player_components);

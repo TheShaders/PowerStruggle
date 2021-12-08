@@ -18,4 +18,6 @@ Entity *findClosestEntity(Vec3 pos, archetype_t archetype, float maxDist, float 
 int take_damage(Entity* entity, HealthState& health_state, int damage);
 void create_explosion(Vec3 pos, int radius, int time, int mask);
 
+constexpr float min_height = -1024.0f;
+
 #endif

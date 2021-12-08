@@ -54,6 +54,13 @@ void shell_behavior_callback(void **components, void *data)
     Vec3& vel = *get_component<Bit_Velocity, Vec3>(components, ARCHETYPE_SHELL);
     ColliderParams& collider = *get_component<Bit_Collider, ColliderParams>(components, ARCHETYPE_SHELL);
     ShellState* mortar_state = reinterpret_cast<ShellState*>(data);
+
+    if (pos[1] < min_height)
+    {
+        queue_entity_deletion(shell);
+        return;
+    }
+
     if (collider.floor_surface_type != surface_none)
     {
         vel[0] = glm::lerp(vel[0], 0.0f, shell_damping);
@@ -144,6 +151,12 @@ void mortar_callback(void **components, void *data)
     MortarState* state = reinterpret_cast<MortarState*>(data);
     MortarDefinition* definition = static_cast<MortarDefinition*>(state->definition);
     MortarParams* params = &definition->params;
+
+    if (pos[1] < min_height)
+    {
+        queue_entity_deletion(mortar);
+        return;
+    }
 
     Entity* player = g_PlayerEntity;
     void *player_components[1 + NUM_COMPONENTS(ARCHETYPE_PLAYER)];
