@@ -16,6 +16,7 @@ enum class EnemyType : uint8_t {
     Slam, // e.g. Smash-O
     Mortar, // e.g. Blast-E
     Flame, // e.g. Heat-O
+    Mainframe
 };
 
 enum class InteractableType: uint8_t {
@@ -56,5 +57,6 @@ void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength
 
 Entity* create_key(float x, float y, float z);
 Entity* create_door(float x, float y, float z, uint32_t param);
+void create_mainframe(int tile_x, int tile_y, int tile_z);
 
 #endif

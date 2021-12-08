@@ -150,7 +150,10 @@ public:
     {
         for (auto& tile_type : tile_types_)
         {
-            freeAlloc(tile_type.model);
+            if (tile_type.model != nullptr)
+            {
+                freeAlloc(tile_type.model);
+            }
             tile_type.model = nullptr;
         }
     }

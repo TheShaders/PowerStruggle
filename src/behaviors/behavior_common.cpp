@@ -117,7 +117,8 @@ void init_enemy_common(BaseEnemyInfo* base_info, Model** model_out, HealthState*
 {
     // Set up the enemy's model
     // Load the model if it isn't already loaded
-    if (base_info->model == nullptr)
+    // Don't try to load the model if the model name is null
+    if (base_info->model == nullptr && base_info->model_name != nullptr)
     {
         base_info->model = load_model(base_info->model_name);
     }
@@ -138,6 +139,7 @@ extern ControlHandler multishot_control_handler;
 extern ControlHandler stab_control_handler;
 // slam
 extern ControlHandler mortar_control_handler;
+extern ControlHandler mainframe_control_handler;
 
 ControlHandler* control_handlers[] = {
     &shoot_control_handler,
@@ -152,6 +154,7 @@ ControlHandler* control_handlers[] = {
     nullptr, // slam
     &mortar_control_handler,
     nullptr, // flamethrower
+    &mainframe_control_handler,
 };
 
 extern DeleteHandler delete_slash_enemy;
@@ -173,6 +176,7 @@ DeleteHandler* delete_handlers[] = {
     nullptr, // slam
     nullptr, // mortar
     nullptr, // flamethrower
+    nullptr, // mainframe
 };
 
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)

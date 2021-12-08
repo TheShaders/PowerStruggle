@@ -108,8 +108,8 @@ bool GameplayScene::load()
     tiles[i++] = TileType{load_model("models/wallC_stone2"),    TileCollision::wall};
     tiles[i++] = TileType{load_model("models/grass.D"),       TileCollision::floor};
     tiles[i++] = TileType{load_model("models/CornerRed"),     TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/CornerWhite"),   TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/CornerYellow"),  TileCollision::wall};
+    tiles[i++] = TileType{nullptr,                         TileCollision::wall}; // invisible wall
+    tiles[i++] = TileType{load_model("models/mainframe"),  TileCollision::wall};
 
     debug_printf("Getting grid definition\n");
 
@@ -119,6 +119,22 @@ bool GameplayScene::load()
     debug_printf("Finished GameplayScene::load\n");
 
     grid_.load_objects();
+
+    if (level_index_ == 2)
+    {
+        create_mainframe(38 - -24, 9, -8 - -35);
+    // {
+    //   "X": 38,
+    //   "Y": 9,
+    //   "Z": -8,
+    //   "Definition": {
+    //     "ObjectClass": 0,
+    //     "ObjectType": 11,
+    //     "ObjectSubtype": 0
+    //   },
+    //   "ObjectParam": 0
+    // }
+    }
 
     playMusic(0);
 

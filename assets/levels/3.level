@@ -36,8 +36,8 @@
     "../models/wallC_stone2.gltf",
     "../models/grass.D.gltf",
     "../models/CornerRed.gltf",
-    "../models/CornerWhite.gltf",
-    "../models/CornerYellow.gltf"
+    "../models/WallBlue.gltf",
+    "../models/mainframe.gltf"
   ],
   "Cells": [
     {
@@ -10894,35 +10894,35 @@
       "X": 36,
       "Y": 9,
       "Z": -10,
-      "TileIndex": 6,
+      "TileIndex": 30,
       "Rotation": 0
     },
     {
       "X": 37,
       "Y": 9,
       "Z": -10,
-      "TileIndex": 6,
+      "TileIndex": 30,
       "Rotation": 0
     },
     {
       "X": 38,
       "Y": 9,
       "Z": -10,
-      "TileIndex": 6,
+      "TileIndex": 30,
       "Rotation": 0
     },
     {
       "X": 39,
       "Y": 9,
       "Z": -10,
-      "TileIndex": 6,
+      "TileIndex": 30,
       "Rotation": 0
     },
     {
       "X": 40,
       "Y": 9,
       "Z": -10,
-      "TileIndex": 6,
+      "TileIndex": 30,
       "Rotation": 0
     },
     {
@@ -11489,7 +11489,7 @@
       "X": 38,
       "Y": 9,
       "Z": -8,
-      "TileIndex": 6,
+      "TileIndex": 31,
       "Rotation": 0
     },
     {
@@ -13841,72 +13841,6 @@
       "Definition": {
         "ObjectClass": 1,
         "ObjectType": 2,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -10,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -9,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -8,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -7,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -6,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
-        "ObjectSubtype": 0
-      },
-      "ObjectParam": 1
-    },
-    {
-      "X": 39,
-      "Y": 9,
-      "Z": -5,
-      "Definition": {
-        "ObjectClass": 1,
-        "ObjectType": 0,
         "ObjectSubtype": 0
       },
       "ObjectParam": 1
