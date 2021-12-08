@@ -30,7 +30,7 @@ SpinnerDefinition spinner_definitions[] = {
             150.0f, // follow_distance
             30, // blade_y_offset
             0x400, // blade_speed
-            200, // blade_length
+            220, // blade_length
             40, // blade_height
             40, // blade_width
         }

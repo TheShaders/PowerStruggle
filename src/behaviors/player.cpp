@@ -387,6 +387,15 @@ void playerCallback(void **components, void *data)
     stateProcessCallbacks[state->state](state, &g_PlayerInput, *pos, *vel, collider, *rot, gravity, animState);
     handle_player_hits(collider, health, *pos, *vel);
 
+    if (collider->floor_surface_type == surface_water || collider->floor_surface_type == surface_hot)
+    {
+        // play chip damage sound
+        if (g_gameTimer % 4 == 0)
+        {
+            take_player_damage(health, 1);
+        }
+    }
+
     VEC3_COPY(g_Camera.target, *pos);
 
     // if (g_PlayerInput.buttonsHeld & U_JPAD)

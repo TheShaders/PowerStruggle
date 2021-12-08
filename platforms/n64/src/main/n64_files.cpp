@@ -270,7 +270,7 @@ struct LoadedImageEntry
     std::unique_ptr<uint8_t> data;
 };
 
-skipfield<LoadedImageEntry, 64> images;
+constinit skipfield<LoadedImageEntry, 64> images{};
 
 void* get_or_load_image(const char* path)
 {

@@ -169,9 +169,10 @@ void handleWalls(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 
 SurfaceType handleFloorOnGround(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel, float stepUp, float stepDown)
 {
-    SurfaceType floor_surface_type = 1; // TODO get surface type from get_height
+    SurfaceType floor_surface_type = surface_normal;
     int16_t tile_x, tile_z;
-    float hit_height = grid->get_height(pos[0], pos[2], collider->radius, pos[1] - stepDown, pos[1] + stepUp, &tile_x, &tile_z);
+    tile_id floor_id;
+    float hit_height = grid->get_height(pos[0], pos[2], collider->radius, pos[1] - stepDown, pos[1] + stepUp, &tile_x, &tile_z, &floor_id);
     if (hit_height < -16384.0f)
     {
         floor_surface_type = surface_none;
@@ -183,6 +184,15 @@ SurfaceType handleFloorOnGround(Grid* grid, ColliderParams *collider, Vec3 pos, 
         collider->floor_tile_x = tile_x;
         collider->floor_tile_z = tile_z;
 
+        if (floor_id == 7)
+        {
+            floor_surface_type = surface_water;
+        }
+        else if (floor_id == 9)
+        {
+            floor_surface_type = surface_hot;
+        }
+
         return floor_surface_type;
     }
     return surface_none;
@@ -190,9 +200,10 @@ SurfaceType handleFloorOnGround(Grid* grid, ColliderParams *collider, Vec3 pos, 
 
 SurfaceType handleFloorInAir(Grid* grid, ColliderParams *collider, Vec3 pos, Vec3 vel)
 {
-    SurfaceType floor_surface_type = 1; // TODO get surface type from get_height
+    SurfaceType floor_surface_type = surface_normal;
     int16_t tile_x, tile_z;
-    float hit_height = grid->get_height(pos[0], pos[2], collider->radius, pos[1] - EPSILON, pos[1] - vel[1] + 100.0f, &tile_x, &tile_z);
+    tile_id floor_type;
+    float hit_height = grid->get_height(pos[0], pos[2], collider->radius, pos[1] - EPSILON, pos[1] - vel[1] + 100.0f, &tile_x, &tile_z, &floor_type);
     if (hit_height < -16384.0f)
     {
         floor_surface_type = surface_none;

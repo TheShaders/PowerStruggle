@@ -23,6 +23,8 @@ MortarDefinition mortar_definitions[] = {
             25,           // controllable_health
             5.0f,        // move_speed
             EnemyType::Mortar, // enemy_type
+            122, // head_y_offset
+            -20, // head_z_offset
         },
         { // params
             "models/Sphere", // mortar_model_name
@@ -181,7 +183,7 @@ void mortar_callback(void **components, void *data)
     handle_enemy_hits(mortar, collider, health);
     if (fire_mortar && health.health > 0)
     {
-        queue_entity_creation(ARCHETYPE_SHELL, mortar, 1, create_shell_callback);
+        createEntitiesCallback(ARCHETYPE_SHELL, mortar, 1, create_shell_callback);
         state->mortar_timer = params->mortar_rate;
         state->mortar_x = pos[0];
         state->mortar_z = pos[2];
@@ -289,7 +291,7 @@ void on_mortar_update(BaseEnemyState* base_state, InputData* input, void** playe
     // Otherwise if the player is pressing the fire button, fire
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_SHELL, player, 1, create_player_mortar_callback);
+        createEntitiesCallback(ARCHETYPE_SHELL, player, 1, create_player_mortar_callback);
         state->mortar_timer = params->mortar_rate;
     }
 }

@@ -111,10 +111,20 @@ void control_update()
 
     Vec3& player_pos = *get_component<Bit_Position, Vec3>(player_components, ARCHETYPE_PLAYER);
     // Vec3s& player_rot = *get_component<Bit_Rotation, Vec3s>(player_components, ARCHETYPE_PLAYER);
+    float x = g_PlayerInput.x;
+    float z = -g_PlayerInput.y;
 
-    control_search_pos[0] = g_PlayerInput.x * 150.0f + player_pos[0];
+    float mag_sq = x * x + z * z;
+    if (mag_sq > EPSILON)
+    {
+        float magnitude = sqrtf(x * x + z * z);
+        x /= magnitude;
+        z /= magnitude;
+    }
+
+    control_search_pos[0] = x * 150.0f + player_pos[0];
     control_search_pos[1] = player_pos[1];
-    control_search_pos[2] = -g_PlayerInput.y * 150.0f + player_pos[2];
+    control_search_pos[2] = z * 150.0f + player_pos[2];
 
     to_control = get_controllable_entity_at_position(control_search_pos, 150.0f, control_pos, control_dist, to_control_behavior, control_health);
 }

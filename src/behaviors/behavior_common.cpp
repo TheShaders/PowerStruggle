@@ -194,6 +194,18 @@ int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 
 int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
 {
+    if (collider.floor_surface_type == surface_water || collider.floor_surface_type == surface_hot)
+    {
+        if (g_gameTimer % 4 == 0)
+        {
+            // play chip damage sound
+            if (take_damage(enemy, health_state, 2))
+            {
+                return true;
+            }
+        }
+    }
+
     ColliderHit* cur_hit = collider.hits;
     while (cur_hit != nullptr)
     {
@@ -201,12 +213,13 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
         {
             break;
         }
-        int ret = take_damage(enemy, health_state, 10);
+        int ret = take_damage(enemy, health_state, 20);
         health_state.last_hit_time = g_gameTimer;
         // queue_entity_deletion(cur_hit->entity);
         cur_hit = cur_hit->next;
         return ret;
     }
+
     return false;
 }
 

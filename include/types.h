@@ -28,6 +28,9 @@ struct AABB;
 typedef uint8_t SurfaceType;
 
 constexpr SurfaceType surface_none = 0;
+constexpr SurfaceType surface_normal = 1;
+constexpr SurfaceType surface_water = 2;
+constexpr SurfaceType surface_hot = 3;
 
 struct ColliderParams;
 

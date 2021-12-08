@@ -48,9 +48,7 @@ void update()
         bool loaded = loading_scene->load();
         if (loaded)
         {
-            cur_scene.reset();
             cur_scene = std::move(loading_scene);
-            loading_scene.reset();
         }
     }
     else

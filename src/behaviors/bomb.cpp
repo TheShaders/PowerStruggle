@@ -143,7 +143,7 @@ void bomber_callback(void **components, void *data)
     handle_enemy_hits(bomber, collider, health);
     if (make_bomb && health.health > 0)
     {
-        queue_entity_creation(ARCHETYPE_BOMB, bomber, 1, create_bomb_callback);
+        createEntitiesCallback(ARCHETYPE_BOMB, bomber, 1, create_bomb_callback);
         state->bomb_timer = params->bomb_rate;
         state->bomb_x = pos[0];
         state->bomb_z = pos[2];
@@ -249,7 +249,7 @@ void on_bomber_update(BaseEnemyState* base_state, InputData* input, void** playe
     // Otherwise if the player is pressing the fire button, fire
     else if (input->buttonsPressed & Z_TRIG)
     {
-        queue_entity_creation(ARCHETYPE_BOMB, player, 1, create_player_bomb_callback);
+        createEntitiesCallback(ARCHETYPE_BOMB, player, 1, create_player_bomb_callback);
         state->bomb_timer = params->bomb_rate;
     }
 }
