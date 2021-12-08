@@ -15,6 +15,18 @@
         {
             "name": "song0",
             "sample": "0_echo_blues_effect.aiff"
+        },
+        {
+            "name": "card_get",
+            "sample": "card_get.wav"
+        },
+        {
+            "name": "charge",
+            "sample": "charge_noise.wav"
+        },
+        {
+            "name": "beam",
+            "sample": "beam.wav"
         }
     ]
 }

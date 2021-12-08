@@ -12,6 +12,9 @@ enum Sfx {
     zap,
     bootup,
     song0,
+    card_get,
+    charge,
+    beam,
 };
 
 #endif

@@ -17,6 +17,10 @@ struct ControlHandler {
 
 extern ControlHandler* control_handlers[];
 
+using DeleteHandler = void(Entity*);
+
+extern DeleteHandler* delete_handlers[];
+
 Entity* get_controllable_entity_at_position(Vec3 pos, float radius, Vec3 foundPos, float& found_dist);
 void control_update();
 

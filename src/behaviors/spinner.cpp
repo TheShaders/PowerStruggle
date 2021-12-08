@@ -201,6 +201,20 @@ void create_player_spinner_blade_callback(UNUSED size_t count, void *arg, void *
     setup_blade_hitbox(player_pos, spinner_state, componentArrays, enemy_hitbox_mask);
 }
 
+void delete_spinner_enemy(Entity *beam_enemy)
+{
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    getEntityComponents(beam_enemy, components);
+
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    SpinnerState* state = reinterpret_cast<SpinnerState*>(bhv_params->data.data());
+
+    if (state->blade_entity != nullptr)
+    {
+        queue_entity_deletion(state->blade_entity);
+    }
+}
+
 void on_spinner_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
 {
     SpinnerDefinition* definition = static_cast<SpinnerDefinition*>(base_state->definition);
@@ -240,6 +254,12 @@ void on_spinner_leave(BaseEnemyState* base_state, UNUSED InputData* input, void*
     (void)state;
     (void)input;
     (void)player_components;
+
+    if (state->blade_entity != nullptr)
+    {
+        queue_entity_deletion(state->blade_entity);
+        state->blade_entity = nullptr;
+    }
 }
 
 ControlHandler spinner_control_handler {

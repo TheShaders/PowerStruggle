@@ -172,7 +172,7 @@ void beam_callback(void **components, void *data)
         state->beam_timer--;
         if (state->beam_timer == 0)
         {
-            // play fire sound
+            playSound(Sfx::beam);
             Entity* beam_hitbox = createEntity(ARCHETYPE_BEAM_HITBOX);
             void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_BEAM_HITBOX) + 1];
             getEntityComponents(beam_hitbox, hitbox_components);
@@ -183,7 +183,7 @@ void beam_callback(void **components, void *data)
     // Otherwise if the player is close enough to be hit, start a beam
     else if (player_dist < params->beam_fire_radius + PLAYER_RADIUS)
     {
-        // play charge sound
+        playSound(Sfx::charge);
         state->beam_timer = params->beam_start_lag;
         state->locked_rotation = rot[1];
     }
@@ -238,7 +238,16 @@ Entity* create_beam_enemy(float x, float y, float z, int subtype)
 
 void delete_beam_enemy(Entity *beam_enemy)
 {
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    getEntityComponents(beam_enemy, components);
 
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    BeamState* state = reinterpret_cast<BeamState*>(bhv_params->data.data());
+
+    if (state->beam_hitbox != nullptr)
+    {
+        queue_entity_deletion(state->beam_hitbox);
+    }
 }
 
 void on_beam_enter(BaseEnemyState* base_state, InputData* input, void** player_components)
@@ -304,7 +313,7 @@ void on_beam_update(BaseEnemyState* base_state, InputData* input, void** player_
         state->beam_timer--;
         if (state->beam_timer == 0)
         {
-            // play fire sound
+            playSound(Sfx::beam);
             Entity* beam_hitbox = createEntity(ARCHETYPE_BEAM_HITBOX);
             void* hitbox_components[NUM_COMPONENTS(ARCHETYPE_BEAM_HITBOX) + 1];
             getEntityComponents(beam_hitbox, hitbox_components);
@@ -315,7 +324,7 @@ void on_beam_update(BaseEnemyState* base_state, InputData* input, void** player_
     // Otherwise if the player is close enough to be hit, start a beam
     else if (input->buttonsPressed & Z_TRIG)
     {
-        // play charge sound
+        playSound(Sfx::charge);
         state->beam_timer = params->beam_start_lag;
         state->locked_rotation = rot[1];
         player_speed_mul = 0.5f;

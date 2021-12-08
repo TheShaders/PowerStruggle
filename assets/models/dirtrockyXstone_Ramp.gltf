@@ -1,0 +1,246 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.6.16",
+        "version" : "2.0"
+    },
+    "extensionsUsed" : [
+        "N64_materials_gltf64",
+        "N64_image_format",
+        "N64_texture_inputs"
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "dirtrockyXstone_Ramp",
+            "translation" : [
+                26,
+                0,
+                32
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "extensions" : {
+                "N64_materials_gltf64" : {
+                    "combiner" : [
+                        "TEXEL0",
+                        "TEXEL1",
+                        "SHADE_ALPHA",
+                        "TEXEL1",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "COMBINED",
+                        "0",
+                        "SHADE",
+                        "0",
+                        "0",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "othermodeH" : [
+                        "two_cycle"
+                    ],
+                    "drawLayer" : "Opaque",
+                    "renderMode" : {
+                        "zmode" : "OPA",
+                        "cvgDst" : "CLAMP",
+                        "flags" : [
+                            "IM_RD",
+                            "AA_EN",
+                            "ALPHA_CVG_SEL",
+                            "Z_CMP",
+                            "Z_UPD"
+                        ],
+                        "blender" : [
+                            "IN",
+                            "0",
+                            "IN",
+                            "1",
+                            "IN",
+                            "IN",
+                            "MEM",
+                            "MEM"
+                        ]
+                    }
+                }
+            },
+            "name" : "dirtrockXstone_f3d",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 0
+                },
+                "extensions" : {
+                    "N64_texture_inputs" : {
+                        "tex0" : {
+                            "index" : 0
+                        },
+                        "tex1" : {
+                            "index" : 1
+                        }
+                    }
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Plane.005",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2,
+                        "COLOR_0" : 3,
+                        "COLOR_1" : 4
+                    },
+                    "indices" : 5,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        }
+    ],
+    "images" : [
+        {
+            "extensions" : {
+                "N64_image_format" : {
+                    "format" : "I4"
+                }
+            },
+            "mimeType" : "image/png",
+            "name" : "stone2.I4",
+            "uri" : "../textures/stone2_I4.png"
+        },
+        {
+            "extensions" : {
+                "N64_image_format" : {
+                    "format" : "RGBA16"
+                }
+            },
+            "mimeType" : "image/png",
+            "name" : "dirt_rockyB.RGBA16",
+            "uri" : "../textures/dirt_rockyB_RGBA16.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 4,
+            "max" : [
+                0.5,
+                1,
+                0.5
+            ],
+            "min" : [
+                -0.5,
+                0,
+                -0.5
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 4,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 4,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 4,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5123,
+            "count" : 4,
+            "normalized" : true,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5123,
+            "count" : 6,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 48,
+            "byteOffset" : 48
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 32,
+            "byteOffset" : 96
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 32,
+            "byteOffset" : 128
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 32,
+            "byteOffset" : 160
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 12,
+            "byteOffset" : 192
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987,
+            "wrapS" : 10497,
+            "wrapT" : 10497
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 204,
+            "uri" : "dirtrockyXstone_Ramp.bin"
+        }
+    ]
+}

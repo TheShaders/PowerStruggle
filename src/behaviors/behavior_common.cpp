@@ -154,6 +154,27 @@ ControlHandler* control_handlers[] = {
     nullptr, // flamethrower
 };
 
+extern DeleteHandler delete_slash_enemy;
+extern DeleteHandler delete_spinner_enemy;
+extern DeleteHandler delete_ram_enemy;
+extern DeleteHandler delete_beam_enemy;
+extern DeleteHandler delete_stab_enemy;
+
+DeleteHandler* delete_handlers[] = {
+    nullptr, // shoot
+    delete_slash_enemy, // slash
+    delete_spinner_enemy, // spinner
+    delete_ram_enemy, // ram
+    nullptr, // bomb
+    delete_beam_enemy, // beam
+    nullptr, // multishot
+    nullptr, // jet
+    delete_stab_enemy, // stab
+    nullptr, // slam
+    nullptr, // mortar
+    nullptr, // flamethrower
+};
+
 int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
 {
     if (damage >= health_state.health)

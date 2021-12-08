@@ -2,6 +2,7 @@
 #include <collision.h>
 #include <files.h>
 #include <gameplay.h>
+#include <audio.h>
 
 #define ARCHETYPE_KEY (Bit_Position | Bit_Rotation | Bit_Model | Bit_Hitbox | Bit_Behavior)
 
@@ -16,7 +17,7 @@ void key_bhv_callback(void** components, void* data)
     if (hitbox.hits != nullptr)
     {
         collect_key();
-        // play key get sound
+        playSound(Sfx::card_get);
         queue_entity_deletion(key);
     }
 }

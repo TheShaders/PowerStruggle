@@ -231,7 +231,16 @@ Entity* create_slash_enemy(float x, float y, float z, int subtype)
 
 void delete_slash_enemy(Entity *slash_enemy)
 {
+    void* components[1 + NUM_COMPONENTS(ARCHETYPE_RAM)];
+    getEntityComponents(slash_enemy, components);
 
+    BehaviorState* bhv_params = get_component<Bit_Behavior, BehaviorState>(components, ARCHETYPE_RAM);
+    SlasherState* state = reinterpret_cast<SlasherState*>(bhv_params->data.data());
+
+    if (state->slash_hitbox != nullptr)
+    {
+        queue_entity_deletion(state->slash_hitbox);
+    }
 }
 
 void create_player_slash_hitbox_callback(UNUSED size_t count, void *arg, void **componentArrays)

@@ -30,6 +30,8 @@ float player_speed_mul = 1.0f;
 
 #define POINTER_ARCHETYPE (Bit_Model | Bit_Rotation | Bit_Position)
 
+Vec3 player_safe_pos;
+
 void setAnim(AnimState *animState, Animation *newAnim)
 {
     newAnim = segmentedToVirtual(newAnim);
@@ -407,6 +409,7 @@ void playerCallback(void **components, void *data)
         if (g_PlayerInput.buttonsPressed & L_TRIG)
         {
             BaseEnemyState* new_controlled_state = (BaseEnemyState*)&to_control_behavior->data;
+            int enemy_type = (int)new_controlled_state->definition->base.enemy_type;
             
             state->controlled_handler->on_leave(
                 state->controlled_state,
@@ -416,7 +419,7 @@ void playerCallback(void **components, void *data)
             player_speed_mul = 1.0f;
             player_control_state.fill(0);
             state->controlled_state->definition = new_controlled_state->definition;
-            state->controlled_handler = control_handlers[(int)new_controlled_state->definition->base.enemy_type];
+            state->controlled_handler = control_handlers[enemy_type];
 
             // Set the player's body and max health
             init_enemy_common(&state->controlled_state->definition->base, model, health);
@@ -434,6 +437,11 @@ void playerCallback(void **components, void *data)
                 components);
 
             VEC3_COPY(*pos, control_pos);
+
+            if (delete_handlers[enemy_type] != nullptr)
+            {
+                delete_handlers[enemy_type](to_control);
+            }
 
             queue_entity_deletion(to_control);
         }
