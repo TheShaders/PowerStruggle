@@ -15650,7 +15650,7 @@
       "ObjectParam": 0
     },
     {
-      "X": 186,
+      "X": 185,
       "Y": -5,
       "Z": 44,
       "Definition": {
@@ -15661,9 +15661,9 @@
       "ObjectParam": 0
     },
     {
-      "X": 186,
-      "Y": -5,
-      "Z": 51,
+      "X": 193,
+      "Y": -4,
+      "Z": 47,
       "Definition": {
         "ObjectClass": 0,
         "ObjectType": 6,
@@ -15683,9 +15683,9 @@
       "ObjectParam": 0
     },
     {
-      "X": 193,
+      "X": 187,
       "Y": -5,
-      "Z": 44,
+      "Z": 50,
       "Definition": {
         "ObjectClass": 0,
         "ObjectType": 6,

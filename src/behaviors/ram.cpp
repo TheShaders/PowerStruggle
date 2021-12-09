@@ -17,13 +17,15 @@ constexpr float ram_stop_time_constant = 0.2f;
 RamDefinition ram_definitions[] = {
     { // Till-R
         { // base
-            "models/Box", // model_name
+            "models/ram_Till-R", // model_name
             nullptr,      // model
             "Till-R",     // enemy_name
             100,          // max_health
-            25,           // controllable_health
+            0,           // controllable_health
             7.0f,         // move_speed
             EnemyType::Ram, // enemy_type
+            87, // head_y_offset
+            53, // head_z_offset
         },
         { // params
             1536.0f, // sight_radius

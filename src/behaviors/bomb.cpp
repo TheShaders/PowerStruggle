@@ -14,13 +14,14 @@
 BombDefinition bomber_definitions[] = {
     { // Herb-E
         { // base
-            "models/Box", // model_name
+            "models/bomb_Herb-E", // model_name
             nullptr,      // model
             "Herb-E",     // enemy_name
             100,          // max_health
             25,           // controllable_health
             12.0f,        // move_speed
             EnemyType::Bomb, // enemy_type
+            81, // head_y_offset
         },
         { // params
             "models/Sphere", // bomb_model_name
