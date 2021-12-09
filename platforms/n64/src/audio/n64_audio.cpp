@@ -68,7 +68,10 @@ void playSound(uint32_t soundIndex)
 }
 
 int song_ids[] {
-    Sfx::song0
+    Sfx::song0,
+    Sfx::song1,
+    Sfx::song2,
+    Sfx::song_title
 };
 
 musHandle cur_song = 0;

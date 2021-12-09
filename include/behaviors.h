@@ -50,7 +50,7 @@ Entity* create_interactable(float x, float y, float z, InteractableType type, in
 // Common initialiation routine for enemies
 void init_enemy_common(BaseEnemyInfo *base_info, Model** model_out, HealthState* health_out);
 // Common hitbox handling routine for enemies, returns true if the entity has run out of health
-int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state);
+int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state, int controllable_health);
 // Applies recoil to the given position and velocity based on the hit entity's position
 // Also applies recoil to the hit entity if it has a velocity component
 void apply_recoil(const Vec3& pos, Vec3& vel, Entity* hit, float recoil_strength);

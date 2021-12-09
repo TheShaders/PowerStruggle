@@ -27,6 +27,50 @@
         {
             "name": "beam",
             "sample": "beam.wav"
+        },
+        {
+            "name": "title",
+            "sample": "title.wav"
+        },
+        {
+            "name": "song1",
+            "sample": "song1.aiff"
+        },
+        {
+            "name": "song2",
+            "sample": "song2.aiff"
+        },
+        {
+            "name": "hijack",
+            "sample": "hijack.wav"
+        },
+        {
+            "name": "small_boom",
+            "sample": "small_explosion.wav"
+        },
+        {
+            "name": "clank",
+            "sample": "clank.wav"
+        },
+        {
+            "name": "crash",
+            "sample": "crash.wav"
+        },
+        {
+            "name": "door",
+            "sample": "door.wav"
+        },
+        {
+            "name": "boom",
+            "sample": "boom.wav"
+        },
+        {
+            "name": "launch",
+            "sample": "launch.wav"
+        },
+        {
+            "name": "grease",
+            "sample": "grease.wav"
         }
     ]
 }

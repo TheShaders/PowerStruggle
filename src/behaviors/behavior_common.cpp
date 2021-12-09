@@ -192,8 +192,9 @@ int take_damage(Entity* hit_entity, HealthState& health_state, int damage)
     return false;
 }
 
-int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state)
+int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& health_state, int controllable_health)
 {
+    int old_health = health_state.health;
     if (collider.floor_surface_type == surface_water || collider.floor_surface_type == surface_hot)
     {
         if (g_gameTimer % 4 == 0)
@@ -201,6 +202,10 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
             // play chip damage sound
             if (take_damage(enemy, health_state, 2))
             {
+                if (health_state.health < controllable_health && old_health > controllable_health)
+                {
+                    playSound(Sfx::small_boom);
+                }
                 return true;
             }
         }
@@ -217,6 +222,10 @@ int handle_enemy_hits(Entity* enemy, ColliderParams& collider, HealthState& heal
         health_state.last_hit_time = g_gameTimer;
         // queue_entity_deletion(cur_hit->entity);
         cur_hit = cur_hit->next;
+        if (health_state.health < controllable_health && old_health > controllable_health)
+        {
+            playSound(Sfx::small_boom);
+        }
         return ret;
     }
 
@@ -292,6 +301,8 @@ void create_explosion(Vec3 pos, int radius, int time, int mask)
     explosion_hitbox.size_z = 0;
     explosion_hitbox.mask = mask;
     explosion_hitbox.hits = nullptr;
+
+    playSound(Sfx::boom);
 }
 
 Entity* create_load_trigger(float x, float y, float z, UNUSED int size)
@@ -321,7 +332,6 @@ Entity* create_interactable(float x, float y, float z, InteractableType type, UN
             return create_load_trigger(x, y, z, param);
             break;
         case InteractableType::Door:
-            return nullptr;
             return create_door(x, y, z, param);
             break;
         case InteractableType::Key:

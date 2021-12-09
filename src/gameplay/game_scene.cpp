@@ -21,7 +21,7 @@ extern "C" {
 
 extern GridDefinition get_grid_definition(const char *file);
 
-GameplayScene::GameplayScene(int level_index) : grid_{}, level_index_{level_index}, unload_timer_{0}, keys_{0}
+GameplayScene::GameplayScene(int level_index) : grid_{}, level_index_{level_index}, unload_timer_{0}, keys_{0}, timer_{0}
 {
 }
 
@@ -52,7 +52,7 @@ bool GameplayScene::load()
             pos[2] = (1 - -99) * tile_size + tile_size / 2;
             // pos[0] = 0x0000DFD6 - 8192 + 1024;
             // pos[1] = (42) * tile_size;
-            // pos[2] = 0x00001D3F;
+            // pos[2] = 0x00001D3F - tile_size * 5;
             // pos[0] = 0x00002F26;
             // pos[1] = (10) * tile_size;
             // pos[2] = 0x00004DCE;
@@ -67,7 +67,14 @@ bool GameplayScene::load()
             pos[1] = 10.0f;
             pos[2] = (0 - -35) * tile_size + tile_size / 2;
             break;
+        default:
+            pos[0] = 0;
+            pos[1] = 0;
+            pos[2] = 0;
+            break;
     }
+    g_Camera.model_offset[0] = (int)pos[0];
+    g_Camera.model_offset[2] = (int)pos[2];
 
     // Create the player entity
     createPlayer(pos);
@@ -91,14 +98,14 @@ bool GameplayScene::load()
     tiles[i++] = TileType{load_model("models/dirtRockyRamp"),    TileCollision::slope};
     tiles[i++] = TileType{load_model("models/stone_Ramp"),     TileCollision::slope};
     tiles[i++] = TileType{load_model("models/dirtrockyXstone_Ramp"),    TileCollision::slope};
-    tiles[i++] = TileType{load_model("models/SlopeRed"),      TileCollision::slope};
+    tiles[i++] = TileType{load_model("models/stone_Obstacle"),      TileCollision::wall};
     tiles[i++] = TileType{load_model("models/SlopeWhite"),    TileCollision::slope};
     tiles[i++] = TileType{load_model("models/crop.B"),   TileCollision::floor};
     tiles[i++] = TileType{load_model("models/wall_Out"),      TileCollision::wall};
     tiles[i++] = TileType{load_model("models/crop_Obstacle"),      TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallBrown"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/wall_stone2"),      TileCollision::wall};
-    tiles[i++] = TileType{load_model("models/WallGreen"),     TileCollision::wall};
+    tiles[i++] = TileType{load_model("models/metalObstacle"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallRed"),       TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallWhite"),     TileCollision::wall};
     tiles[i++] = TileType{load_model("models/WallYellow"),    TileCollision::wall};
@@ -136,7 +143,7 @@ bool GameplayScene::load()
     // }
     }
 
-    playMusic(0);
+    playMusic(level_index_);
 
     return true;
 }
@@ -170,7 +177,7 @@ void GameplayScene::draw(bool unloading)
     setLightDirection(lightDir);
     set_text_color(255, 255, 255, 255);
 
-    if (g_gameTimer > 30)
+    if (timer_ > 30)
     {
         // debug_printf("before drawing\n");
         draw_enemy_heads();
@@ -195,6 +202,7 @@ void GameplayScene::draw(bool unloading)
     {
         shadeScreen((float)unload_timer_ / level_unload_time);
     }
+    timer_++;
 }
 
 void GameplayScene::after_gfx()

@@ -49,6 +49,7 @@ void TitleScene::update()
             {
                 title_state_ = TitleState::DisplayTitle;
                 title_timer_ = 0;
+                playMusic(3);
             }
             break;
         case TitleState::DisplayTitle:

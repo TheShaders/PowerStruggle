@@ -54,7 +54,7 @@ int update_stab_hitbox(const Vec3& stab_pos, const Vec3s& stab_rot, Vec3& stab_v
     {
         if (stab_hitbox.hits != nullptr)
         {
-            playSound(Sfx::zap);
+            playSound(Sfx::clank);
             apply_recoil(stab_pos, stab_vel, stab_hitbox.hits->hit, 16.0f);
             state->recoil_timer = 15;
         }
@@ -160,7 +160,7 @@ void stab_callback(void **components, void *data)
     float player_dist = approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
     // Check if the stab died
-    if (handle_enemy_hits(stab, collider, health))
+    if (handle_enemy_hits(stab, collider, health, definition->base.controllable_health))
     {
         // If it did, delete the hitbox if it exists
         if (state->stab_hitbox != nullptr)

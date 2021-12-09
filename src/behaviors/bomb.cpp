@@ -141,7 +141,7 @@ void bomber_callback(void **components, void *data)
             make_bomb = true;
         }
     }
-    handle_enemy_hits(bomber, collider, health);
+    handle_enemy_hits(bomber, collider, health, definition->base.controllable_health);
     if (make_bomb && health.health > 0)
     {
         createEntitiesCallback(ARCHETYPE_BOMB, bomber, 1, create_bomb_callback);

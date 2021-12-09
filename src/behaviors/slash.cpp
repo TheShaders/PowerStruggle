@@ -27,7 +27,7 @@ SlasherDefinition slasher_definitions[] = {
         { // params
             1536.0f, // sight_radius
             150.0f, // follow_distance
-            200, // slash_length
+            175, // slash_length
             40, // slash_width
             40, // slash_height
             65, // slash_y_offset
@@ -53,7 +53,7 @@ int update_slash_hitbox(const Vec3& slasher_pos, const Vec3s& slasher_rot, Vec3&
     {
         if (slash_hitbox.hits != nullptr)
         {
-            playSound(Sfx::zap);
+            playSound(Sfx::clank);
             apply_recoil(slasher_pos, slasher_vel, slash_hitbox.hits->hit, 16.0f);
             state->recoil_timer = 15;
         }
@@ -163,7 +163,7 @@ void slasher_callback(void **components, void *data)
     float player_dist = approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
     // Check if the slasher died
-    if (handle_enemy_hits(slasher, collider, health))
+    if (handle_enemy_hits(slasher, collider, health, definition->base.controllable_health))
     {
         // If it did, delete the hitbox if it exists
         if (state->slash_hitbox != nullptr)

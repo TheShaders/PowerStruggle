@@ -158,7 +158,7 @@ void beam_callback(void **components, void *data)
     }
 
     // Check if the beam died
-    if (handle_enemy_hits(beam, collider, health))
+    if (handle_enemy_hits(beam, collider, health, definition->base.controllable_health))
     {
         // If it did, delete the hitbox if it exists
         if (state->beam_hitbox != nullptr)

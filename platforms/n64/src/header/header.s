@@ -10,6 +10,6 @@
 .ascii "POWER STRUGGLE      " # ROM name: 20 bytes
 .word  0x00000000             # 
 .word  0x0000004E             # N
-.ascii "PS"                   # Cartridge ID
+.ascii "ED"                   # Cartridge ID
 .ascii "E"                    # Country
-.byte  0x00                   # Revision
+.byte  0x12                   # Revision

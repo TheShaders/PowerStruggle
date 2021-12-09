@@ -2,6 +2,7 @@
 #include <collision.h>
 #include <files.h>
 #include <gameplay.h>
+#include <audio.h>
 
 #define ARCHETYPE_DOOR (Bit_Position | Bit_Rotation | Bit_Model | Bit_Hitbox | Bit_Behavior)
 
@@ -34,7 +35,7 @@ void door_bhv_callback(void** components, UNUSED void* data)
     {
         if (num_keys() > 0)
         {
-            // play door open sound
+            playSound(Sfx::door);
             use_key();
             state->moving = true;
         }

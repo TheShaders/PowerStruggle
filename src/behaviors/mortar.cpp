@@ -8,6 +8,7 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
 
 #include <glm/gtx/compatibility.hpp>
 
@@ -125,6 +126,8 @@ void setup_shell(const Vec3& mortar_pos, const Vec3s& mortar_rot, const Vec3& mo
     gravity.terminalVelocity = -PLAYER_TERMINAL_VELOCITY;
 
     active_state.delete_on_deactivate = 1;
+
+    playSound(Sfx::launch);
 }
 
 void create_shell_callback(UNUSED size_t count, void *arg, void **componentArrays)
@@ -180,7 +183,7 @@ void mortar_callback(void **components, void *data)
     {
         fire_mortar = true;
     }
-    handle_enemy_hits(mortar, collider, health);
+    handle_enemy_hits(mortar, collider, health, definition->base.controllable_health);
     if (fire_mortar && health.health > 0)
     {
         createEntitiesCallback(ARCHETYPE_SHELL, mortar, 1, create_shell_callback);

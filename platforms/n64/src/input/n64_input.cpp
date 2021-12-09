@@ -7,11 +7,13 @@
 
 static OSContStatus controllerStatuses[MAXCONTROLLERS];
 static OSContPad contPads[MAXCONTROLLERS];
+s32 g_HasEeprom;
 
 void initInput()
 {
     u8 bitPattern; // TODO use this to repoll
     osContInit(&siMesgQueue, &bitPattern, controllerStatuses);
+    g_HasEeprom = osEepromProbe(&siMesgQueue);
 }
 
 void beginInputPolling()

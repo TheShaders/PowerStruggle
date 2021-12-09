@@ -8,6 +8,7 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
 
 #define ARCHETYPE_MULTISHOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity | Bit_Deactivatable)
 
@@ -28,7 +29,7 @@ MultishotDefinition multishoter_definitions[] = {
             nullptr, // shot_model
             1536.0f, // sight_radius
             512.0f,  // follow_distance
-            8.0f,   // shot_speed
+            12.0f,   // shot_speed
             25,      // shot_radius
             50,      // shot_height
             60.0f,   // shot_y_offset
@@ -150,10 +151,11 @@ void multishoter_callback(void **components, void *data)
     else if (player_dist < params->fire_radius)
     {
         shot_idx = 0;
+        playSound(Sfx::grease);
         createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, enemy, 4, create_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }
-    handle_enemy_hits(enemy, collider, health);
+    handle_enemy_hits(enemy, collider, health, definition->base.controllable_health);
 }
 
 Entity* create_multishot_enemy(float x, float y, float z, int subtype)
@@ -257,6 +259,7 @@ void on_multishoter_update(BaseEnemyState* base_state, InputData* input, void** 
     else if (input->buttonsPressed & Z_TRIG)
     {
         shot_idx = 0;
+        playSound(Sfx::grease);
         createEntitiesCallback(ARCHETYPE_MULTISHOT_HITBOX, player, 4, create_player_multishot_hitbox_callback);
         state->shot_timer = params->shot_rate;
     }

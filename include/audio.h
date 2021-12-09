@@ -15,6 +15,17 @@ enum Sfx {
     card_get,
     charge,
     beam,
+    song_title,
+    song1,
+    song2,
+    hijack,
+    small_boom,
+    clank,
+    crash,
+    door,
+    boom,
+    launch,
+    grease,
 };
 
 #endif

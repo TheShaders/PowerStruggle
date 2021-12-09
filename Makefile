@@ -251,7 +251,7 @@ LDFLAGS    := -T $(LD_CPP) -Wl,--accept-unknown-input-arch -Wl,--no-check-sectio
 			  $(ULTRA_LINKER) -L lib $(GCC_LINKER) -nostartfiles -Wl,-gc-sections
 SEG_LDFLAGS:= $(ULTRA_LINKER) -L lib -lstdc++ -lnustd -ln_mus -ln_audio_sc -l$(LIBULTRA) -e init -Wl,-gc-sections -u numberOfSetBits
 LDCPPFLAGS := -P -Wno-trigraphs -DBUILD_ROOT=$(BUILD_ROOT) -Umips
-OCOPYFLAGS := --pad-to=0x400000 --gap-fill=0xFF
+OCOPYFLAGS := --pad-to=0xA00000 --gap-fill=0xFF
 
 # TODO test various values of the following:
 #  --param max-completely-peeled-insns=X
@@ -276,7 +276,7 @@ endif
 
 $(BUILD_ROOT)/platforms/n64/src/usb/usb.o: OPT_FLAGS := -O0
 $(BUILD_ROOT)/platforms/n64/src/usb/usb.o: WARNFLAGS += -Wno-unused-variable -Wno-sign-compare -Wno-unused-function
-$(BUILD_ROOT)/platforms/n64/src/usb/debug.o: WARNFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized
+$(BUILD_ROOT)/platforms/n64/src/usb/debug.o: WARNFLAGS += -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-double-promotion
 $(ASSETS_CPP_O): WARNFLAGS += -Wno-missing-field-initializers
 $(SEG_OBJS): WARNFLAGS += -Wno-overflow -Wno-float-conversion -Wno-narrowing -Wno-missing-field-initializers
 

@@ -8,6 +8,8 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
+#include <main.h>
 
 #define ARCHETYPE_SPINNER_HITBOX (ARCHETYPE_RECTANGLE_HITBOX | Bit_Model)
 
@@ -37,6 +39,9 @@ SpinnerDefinition spinner_definitions[] = {
     }
 };
 
+// HACK
+int spinner_sound_last = 0;
+
 void update_blade_hitbox(const Vec3& spinner_pos, SpinnerParams* params, SpinnerState* state)
 {
     Entity* blade = state->blade_entity;
@@ -45,6 +50,16 @@ void update_blade_hitbox(const Vec3& spinner_pos, SpinnerParams* params, Spinner
 
     Vec3& blade_pos = *get_component<Bit_Position, Vec3>(blade_components, ARCHETYPE_SPINNER_HITBOX);
     Vec3s& blade_rot = *get_component<Bit_Rotation, Vec3s>(blade_components, ARCHETYPE_SPINNER_HITBOX);
+    Hitbox& blade_hitbox = *get_component<Bit_Hitbox, Hitbox>(blade_components, ARCHETYPE_SPINNER_HITBOX);
+
+    if (blade_hitbox.hits != nullptr)
+    {
+        if (g_gameTimer - spinner_sound_last > 30)
+        {
+            playSound(Sfx::clank);
+            spinner_sound_last = g_gameTimer;
+        }
+    }
     
     // Translate and rotate the slash hitbox accordingly
     blade_rot[1] += params->blade_speed;
@@ -130,7 +145,7 @@ void spinner_callback(void **components, void *data)
     approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
     // Check if the spinner died
-    if (handle_enemy_hits(spinner, collider, health))
+    if (handle_enemy_hits(spinner, collider, health, definition->base.controllable_health))
     {
         // If it did, delete the hitbox if it exists
         if (state->blade_entity != nullptr)

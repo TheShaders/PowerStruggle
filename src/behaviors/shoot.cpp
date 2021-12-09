@@ -8,6 +8,7 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
 
 #define ARCHETYPE_SHOOT_HITBOX (ARCHETYPE_CYLINDER_HITBOX | Bit_Model | Bit_Velocity | Bit_Deactivatable)
 
@@ -65,6 +66,8 @@ void setup_shot_hitbox(const Vec3& shooter_pos, const Vec3s& shooter_rot, ShootD
     pos[2] = shooter_pos[2] + vel[2];
 
     active_state.delete_on_deactivate = 1;
+
+    playSound(Sfx::grease);
 }
 
 void shooter_callback(void **components, void *data)
@@ -109,7 +112,7 @@ void shooter_callback(void **components, void *data)
         setup_shot_hitbox(pos, rot, definition, hitbox_components, player_hitbox_mask);
         state->shot_timer = params->shot_rate;
     }
-    handle_enemy_hits(shooter, collider, health);
+    handle_enemy_hits(shooter, collider, health, definition->base.controllable_health);
 }
 
 Entity* create_shoot_enemy(float x, float y, float z, int subtype)

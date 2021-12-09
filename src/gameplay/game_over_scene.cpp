@@ -19,7 +19,7 @@ void GameOverScene::update()
 {
     if (timer_ > 120)
     {
-        if (g_PlayerInput.buttonsPressed && START_BUTTON)
+        if (g_PlayerInput.buttonsPressed & START_BUTTON)
         {
             start_scene_load(std::make_unique<GameplayScene>(level_idx_));
         }

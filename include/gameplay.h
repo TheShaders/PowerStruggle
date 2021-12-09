@@ -45,6 +45,7 @@ private:
     int level_index_;
     int unload_timer_;
     int keys_;
+    int timer_;
 };
 
 class LevelTransitionScene : public Scene {

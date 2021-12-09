@@ -24,6 +24,8 @@ extern "C" {
 #include <scene.h>
 #include <gameplay.h>
 #include <misc_scenes.h>
+#include <save.h>
+#include <audio.h>
 #include <n64_mathutils.h>
 
 #include <memory>
@@ -306,6 +308,8 @@ void handle_player_hits(ColliderParams* collider, HealthState* health_state, Vec
         {
             if (!is_scene_loading())
             {
+                g_SaveFile.data.level = get_current_level() + 1;
+                do_save();
                 cur_level_idx = get_current_level() + 1;                
                 start_scene_load(std::make_unique<LevelTransitionScene>(get_current_level() + 1));
             }
@@ -440,6 +444,7 @@ void playerCallback(void **components, void *data)
         *pointer_model_out = pointer_model;
         if (g_PlayerInput.buttonsPressed & L_TRIG)
         {
+            playSound(Sfx::hijack);
             BaseEnemyState* new_controlled_state = (BaseEnemyState*)&to_control_behavior->data;
             int enemy_type = (int)new_controlled_state->definition->base.enemy_type;
             

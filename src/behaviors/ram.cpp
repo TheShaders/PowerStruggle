@@ -8,6 +8,7 @@
 #include <interaction.h>
 #include <control.h>
 #include <input.h>
+#include <audio.h>
 
 #include <glm/gtx/compatibility.hpp>
 
@@ -59,6 +60,7 @@ int update_ram_hitbox(const Vec3& rammer_pos, Vec3s& rammer_rot, Vec3& rammer_ve
     // If the rammer hit a wall, end the ram
     if (rammer_collider.hit_wall)
     {
+        playSound(Sfx::crash);
         rammer_vel[0] = -32.0f * sin_rot;
         rammer_vel[2] = -32.0f * cos_rot;
         return true;
@@ -66,6 +68,7 @@ int update_ram_hitbox(const Vec3& rammer_pos, Vec3s& rammer_rot, Vec3& rammer_ve
     // If the rammer hit an entity, end the ram
     if (ram_hitbox.hits != nullptr)
     {
+        playSound(Sfx::crash);
         apply_recoil(rammer_pos, rammer_vel, ram_hitbox.hits->hit, 32.0f);
         return true;
     }
@@ -170,7 +173,7 @@ void ram_callback(void **components, void *data)
         float player_dist = approach_target(params->sight_radius, params->follow_distance, definition->base.move_speed, pos, vel, rot, player_pos);
 
         // Check if the ram died
-        if (handle_enemy_hits(ram, collider, health))
+        if (handle_enemy_hits(ram, collider, health, definition->base.controllable_health))
         {
             // If it did, delete the hitbox if it exists
             if (state->ram_hitbox != nullptr)

@@ -24,6 +24,27 @@ extern "C" {
 #include <debug.h>
 }
 
+__attribute__((noinline)) void guMtxF2L_(float mf[4][4], Mtx *m)
+{
+	int	i, j;
+	int	e1,e2;
+	int	*ai,*af;
+
+
+	ai=(int *) &m->m[0][0];
+	af=(int *) &m->m[2][0];
+
+	for (i=0; i<4; i++)
+	for (j=0; j<2; j++) {
+        float a = mf[i][j*2];
+        float b = mf[i][j*2+1];
+		e1=FTOFIX32(a);
+		e2=FTOFIX32(b);
+		*(ai++) = ( e1 & 0xffff0000 ) | ((e2 >> 16)&0xffff);
+		*(af++) = ((e1 << 16) & 0xffff0000) | (e2 & 0xffff);
+	}
+}
+
 alignas(64) std::array<std::array<u16, screen_width * screen_height>, num_frame_buffers> g_frameBuffers;
 alignas(64) std::array<u16, screen_width * screen_height> g_depthBuffer;
 
@@ -512,7 +533,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
         }
         
         Mtx* curMtx = (Mtx*)allocGfx(sizeof(Mtx));
-        guMtxF2L(*g_curMatFPtr, curMtx);
+        guMtxF2L_(*g_curMatFPtr, curMtx);
 
         // Draw the joint's layers
         for (size_t cur_layer = 0; cur_layer < gfx::draw_layers; cur_layer++)
@@ -600,7 +621,7 @@ void drawModel(Model *toDraw, Animation *anim, u32 frame)
 void drawGfx(DrawLayer layer, Gfx* toDraw)
 {
     Mtx* curMtx = (Mtx*)allocGfx(sizeof(Mtx));
-    guMtxF2L(*g_curMatFPtr, curMtx);
+    guMtxF2L_(*g_curMatFPtr, curMtx);
 
     addMtxToDrawLayer(layer, curMtx);
     addGfxToDrawLayer(layer, toDraw);
@@ -661,7 +682,7 @@ void drawAABB(DrawLayer layer, AABB *toDraw, u32 color)
     gDPPipeSync(dlist++);
     gDPSetCombineMode(dlist++, G_CC_SHADE, G_CC_SHADE);
 
-    guMtxF2L(*g_curMatFPtr, curMtx);
+    guMtxF2L_(*g_curMatFPtr, curMtx);
     gSPMatrix(dlist++, curMtx,
 	       G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPTexture(dlist++, 0xFFFF, 0xFFFF, 0, 0, G_OFF);
@@ -716,7 +737,7 @@ void drawLine(DrawLayer layer, Vec3 start, Vec3 end, u32 color)
     gDPPipeSync(dlist++);
     gDPSetCombineMode(dlist++, G_CC_SHADE, G_CC_SHADE);
 
-    guMtxF2L(*g_curMatFPtr, curMtx);
+    guMtxF2L_(*g_curMatFPtr, curMtx);
     gSPMatrix(dlist++, curMtx,
 	       G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPTexture(dlist++, 0xFFFF, 0xFFFF, 0, 0, G_OFF);
@@ -799,13 +820,13 @@ void gfx::load_view_proj(Vec3 eye_pos, Camera *camera, float aspect, float near,
     vp_fixed = (Mtx*)allocGfx(sizeof(Mtx));
     
     v_fixed = (Mtx*)allocGfx(sizeof(Mtx));
-    guMtxF2L(g_gfxContexts[g_curGfxContext].projMtxF, vp_fixed);
-    guMtxF2L(g_gfxContexts[g_curGfxContext].viewMtxF, v_fixed);
+    guMtxF2L_(g_gfxContexts[g_curGfxContext].projMtxF, vp_fixed);
+    guMtxF2L_(g_gfxContexts[g_curGfxContext].viewMtxF, v_fixed);
     
     // Calculate vp matrix
     // guMtxCatF(g_gfxContexts[g_curGfxContext].projMtxF, g_gfxContexts[g_curGfxContext].viewMtxF, vp);
     mtxfMul(g_gfxContexts[g_curGfxContext].viewProjMtxF, g_gfxContexts[g_curGfxContext].projMtxF, g_gfxContexts[g_curGfxContext].viewMtxF);
-    // guMtxF2L(vp, vp_fixed);
+    // guMtxF2L_(vp, vp_fixed);
 
     gSPMatrix(g_dlist_head++, vp_fixed,
         G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
