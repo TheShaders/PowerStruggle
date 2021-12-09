@@ -30,8 +30,9 @@ void EndingScene::update()
 void EndingScene::draw(bool)
 {
     set_text_color(0, 128, 0, 255);
-    print_text_centered(screen_width / 2, screen_height / 2 - 5, "YOU'RE");
-    print_text_centered(screen_width / 2, screen_height / 2 + 5, "WINNER !");
+    print_text_centered(screen_width / 2, screen_height / 2 - 20, "Mainframe link established.");
+    print_text_centered(screen_width / 2, screen_height / 2 - 10, "Power generation restored!");
+    print_text_centered(screen_width / 2, screen_height / 2 + 10, "Congratulations! Thanks for playing!");
     if (timer_ > 120)
     {
         set_text_color(255, 255, 255, 255);

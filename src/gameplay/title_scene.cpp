@@ -108,6 +108,8 @@ void TitleScene::draw(UNUSED bool unloading)
                 print_text_centered(screen_width / 2, y, "SausageSage");
                 y += 10;
                 print_text_centered(screen_width / 2, y, "InTheBeef");
+                y += 10;
+                print_text_centered(screen_width / 2, y, "Audio from freesound.org and chosic.com");
 
                 set_text_color(255, 255, 255, 255);
 
