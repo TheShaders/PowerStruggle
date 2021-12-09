@@ -7,8 +7,8 @@
 #include <grid.h>
 #include <player.h>
 
-constexpr int level_unload_time = 120;
-constexpr int level_transition_time = 300;
+constexpr int level_unload_time = 30;
+constexpr int level_transition_time = 90;
 
 int get_current_level();
 void collect_key();

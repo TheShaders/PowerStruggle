@@ -74,7 +74,7 @@ void IntroScene::draw(bool)
 
     print_text(20, 140, "Damage robots to destroy their head modules.");
     print_text(20, 150, "Robot chassis can then be hijacked by aiming");
-    print_text(20, 160, "with the analog stick and pressing [R].");
+    print_text(20, 160, "with the analog stick and pressing [L] or [R].");
     set_text_color(255, 255, 255, 255);
     print_text_centered(screen_width / 2, screen_height - 40, "PRESS START");
     draw_all_text();

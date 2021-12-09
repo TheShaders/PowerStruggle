@@ -287,7 +287,10 @@ void LevelTransitionScene::update()
 // Called every frame while the scene is active every frame for drawing the scene contents
 void LevelTransitionScene::draw(UNUSED bool unloading)
 {
-
+    char text[32];
+    sprintf(text, "Loading level %d", level_index_ + 1);
+    print_text_centered(screen_width / 2, screen_height / 2, text);
+    draw_all_text();
 }
 // Called every frame while the scene is active after graphics processing is complete
 void LevelTransitionScene::after_gfx()

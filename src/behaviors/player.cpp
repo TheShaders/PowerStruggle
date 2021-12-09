@@ -442,7 +442,7 @@ void playerCallback(void **components, void *data)
         pointer_rot[1] += 0x100;
         pointer_rot[2] = 0;
         *pointer_model_out = pointer_model;
-        if (g_PlayerInput.buttonsPressed & L_TRIG)
+        if ((g_PlayerInput.buttonsPressed & L_TRIG) || (g_PlayerInput.buttonsPressed & R_TRIG))
         {
             playSound(Sfx::hijack);
             BaseEnemyState* new_controlled_state = (BaseEnemyState*)&to_control_behavior->data;
